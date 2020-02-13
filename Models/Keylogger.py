@@ -17,7 +17,7 @@
 # Dependencies: keyboard
 #
 # Revision 0.01 - File Created
-# Additional Comments: 
+# Additional Comments:
 
 # @copyright  Copyright © 2020 Raúl Caro Pastorino
 # @license    https://wwww.gnu.org/licenses/gpl.txt
@@ -53,10 +53,22 @@ from functools import partial
 import atexit
 import os
 import keyboard
+from datetime import datetime, date, time, timezone
 
 #######################################
 # #             Variables           # #
 #######################################
+
+#######################################
+# #             TODO           # #
+#######################################
+# Crear dos subprocesos:
+# 1 → Solo para el callback escuchando teclas
+# 2 → Comprobar cada X segundos si hay racha
+
+# En el MAP: COMBO_MAP → crear algoritmo dividiendo y redondeando hacia abajo
+# que utilice la pareja de clave_map: combo_puntuacion_sumar
+
 
 #######################################
 # #              Clases             # #
@@ -78,16 +90,105 @@ class Keylogger:
     # Almacena si hay una tecla presionada.
     is_down = {}
 
+    # Tiempo que dura una racha en segundos.
+    COMBO_RESET = 15
+
     # Traducción de carácteres para hacerlos imprimibles en texto plano.
-    MAP = {
+    KEYS_MAP = {
         "space": " ",
         "\r": "\n"
     }
+
+    #######################################
+    # #           Estadísticas          # #
+    #######################################
+
+    # Comienzo de las mediciones.
+    start_at = None
+
+    # Timestamp con la última pulsación.
+    last_pulsation_at = None
+
+    # Total de pulsaciones.
+    pulsations_total = 0
+
+    # Pulsaciones en la racha actual.
+    pulsations_current = 0
+
+    # Timestamp de la inicialización para la racha actual
+    pulsations_current_start_at = None
+
+    # Mayor racha de pulsaciones.
+    pulsation_high = 0
+
+    # Timestamp de la mejor racha de puntuaciones.
+    pulsation_high_at = None
+
+    # Puntuación total según la cantidad de combos.
+    combo_score = 0
+
+    # Valores para el algoritmo del combo → clave_map: combo_puntuacion_a_sumar
+    COMBO_MAP = {
+        1: 1,
+        2: 3,
+        3: 5,
+        4: 15,
+        5: 30,
+    }
+
+    def get_pulsation_average(self):
+        """
+        Devuelve la media de pulsaciones para la racha actual por segundos.
+        :return:
+        """
+        timestamp_utc = datetime.utcnow()
+        duration_seconds = timestamp_utc - self.pulsations_current_start_at
+
+        return self.pulsations_current / duration_seconds
+
+    def get_pulsations_total(self):
+        return self.pulsations_total
+
+    def get_pulsation_hight(self):
+        return self.pulsation_high
+
+    def increase_pulsation(self):
+        """
+        Aumenta una pulsación controlando la racha.
+        TODO → De esta forma, al apagar equipo o terminar no guardaría, replantear esta parte
+        :return:
+        """
+        timestamp_utc = datetime.utcnow()
+
+        self.pulsations_total += 1
+
+        # Comparo el tiempo desde la última pulsación para agrupar la racha.
+        if (self.last_pulsation_at - timestamp_utc) > 15:
+            self.pulsations_current += 1
+
+        # Asigno momento de esta pulsación.
+        self.last_pulsation_at = timestamp_utc
+
+        if self.pulsations_current >= self.pulsations_total:
+            self.pulsations_total = self.pulsations_current
+            self.pulsation_high_at = timestamp_utc
+
+
+    def set_combo(self):
+        """
+        Establece la puntuación según la cantidad de pulsaciones y tiempo
+        :return:
+        """
+        pass
+
 
     def __init__(self, file_path='keylogger.log', clear_on_startup=False, terminate_key=None):
         self.file_path = file_path
         self.clear_on_startup = clear_on_startup
         self.terminate_key = terminate_key
+
+        # Establezco marca de inicio
+        self.start_at = datetime.utcnow()
 
         # Se abre el archivo para escribir.
         self.output = open(self.file_path, "a")
@@ -106,11 +207,12 @@ class Keylogger:
 
     def callback(self, event):
         """
-        Esta función se ejecuta como callback cada vez que una tecla es pulsada recibiendo
-        el evento y filtrando solo por las primeras pulsaciones (no las continuadas)
+        Esta función se ejecuta como callback cada vez que una tecla es pulsada
+        recibiendo el evento y filtrando solo por las primeras pulsaciones
+        (no las continuadas).
         """
         if event.event_type in ("up", "down"):
-            key = self.MAP.get(event.name, event.name)
+            key = self.KEYS_MAP.get(event.name, event.name)
             modifier = len(key) > 1
 
             # Filtra el tipo de evento para solo contabilizar pulsaciones.
@@ -142,6 +244,6 @@ class Keylogger:
 
     def onexit(self):
         """
-        Acciones al salir
+        Acciones al salir.
         """
         self.output.close()
