@@ -39,6 +39,8 @@
 
 # Guía de estilos aplicada: PEP8
 
+# Librería keyboard: https://pypi.org/project/keyboard/
+
 #######################################
 # #           Descripción           # #
 #######################################
@@ -60,7 +62,7 @@ from datetime import datetime, date, time, timezone
 #######################################
 
 #######################################
-# #             TODO           # #
+# #             TODO                # #
 #######################################
 # Crear dos subprocesos:
 # 1 → Solo para el callback escuchando teclas
@@ -69,23 +71,34 @@ from datetime import datetime, date, time, timezone
 # En el MAP: COMBO_MAP → crear algoritmo dividiendo y redondeando hacia abajo
 # que utilice la pareja de clave_map: combo_puntuacion_sumar
 
+# Crear DB sqlite para registrar:
+# Timestamp de inicio racha → start_at
+# Timestamp de fin racha → end_at
+# Pulsación total racha → pulsations
+# Pulsación total racha para teclas especiales → pulsations_special_keys
+# Puntuación del combo → score
+# created_at
+# Día de la semana (0 domingo) → weekday
+
+# Implementar contador de clicks
+
+# TODO → ERROR: el contador de teclas especiales cuenta el total, no la racha actual → revisar!!!
+
+# TODO → Mayor racha de pulsaciones NO CUENTA NADA
+
+# TODO → Teclas especiales como PrtSC las detecta como desconocidas y actualmente eso se interpreta como si fuese el ratón
+
+# TODO → Implementar solo contador de carácteres para escribir, no teclas especiales
+# y añadir a una variable independiente tanto la más alta como el combo y total
+# de forma independiente al general
 
 #######################################
 # #              Clases             # #
 #######################################
 
 class Keylogger:
-    # Ubicación para guardar la salida en texto plano.
-    file_path = 'keylogger.log'
-
-    # Borrar archivo al iniciar programa.
-    clear_on_startup = False
-
     # Tecla para terminar el programa o None para no utilizar ninguna tecla.
     terminate_key = None
-
-    # Almacena el archivo de salida para operar sobre él.
-    output = None
 
     # Almacena si hay una tecla presionada.
     is_down = {}
@@ -96,14 +109,35 @@ class Keylogger:
     # Traducción de carácteres para hacerlos imprimibles en texto plano.
     KEYS_MAP = {
         "space": " ",
-        "\r": "\n"
+        'backspace': " ",
+        "\r": "(ENTER)",
+        'enter': "(ENTER)",
+        'unknown': '(click o tecla especial)',
+        'ctrl': '(CTRL)',
+        'alt': '(ALT)',
+        'alt gr': '(ALT GR)',
+        'menu': '(MENU)',
+        'tab': '(TAB)',
+        'shift': '(SHIFT)',
+        'caps lock': '(CAPS LOCK)',
+        'up': '(UP)',
+        'down': '(DOWN)',
+        'left': '(LEFT)',
+        'right': '(RIGHT)',
+        'home': '(HOME)',
+        'page up': '(PAGE UP)',
+        'page down': '(PAGE DOWN)',
+        'insert': '(INSERT)',
+        'delete': '(DELETE)',
+        'help': '(HELP)',
+
     }
 
     #######################################
     # #           Estadísticas          # #
     #######################################
 
-    # Comienzo de las mediciones.
+    # Timestamp con el comienzo de las mediciones.
     start_at = None
 
     # Timestamp con la última pulsación.
@@ -112,8 +146,14 @@ class Keylogger:
     # Total de pulsaciones.
     pulsations_total = 0
 
+    # Total de pulsaciones para teclas especiales.
+    pulsations_total_especial_keys = 0
+
     # Pulsaciones en la racha actual.
     pulsations_current = 0
+
+    # Pulsaciones de teclas especiales en la racha actual.
+    pulsations_current_special_keys = 0
 
     # Timestamp de la inicialización para la racha actual
     pulsations_current_start_at = None
@@ -125,16 +165,40 @@ class Keylogger:
     pulsation_high_at = None
 
     # Puntuación total según la cantidad de combos.
+    # TODO → Plantear si esto es viable, si llega a usarse horas el int desborda¿?¿?
     combo_score = 0
 
     # Valores para el algoritmo del combo → clave_map: combo_puntuacion_a_sumar
     COMBO_MAP = {
-        1: 1,
-        2: 3,
-        3: 5,
-        4: 15,
-        5: 30,
+        1: 0.01,
+        2: 0.03,
+        3: 0.05,
+        4: 0.15,
+        5: 0.30,
+        6: 0.50,
+        7: 0.70,
+        8: 0.80,
+        9: 0.90,
+        10: 1.00
     }
+
+    def __init__(self, terminate_key=None):
+        current_timestamp = datetime.utcnow()
+
+        # Establezco tecla para finalizar la captura.
+        self.terminate_key = terminate_key
+
+        # Establezco marca de inicio.
+        self.start_at = current_timestamp
+
+        # Establezco timestamps.
+        self.last_pulsation_at = current_timestamp
+        self.pulsations_current_start_at = current_timestamp
+        self.pulsation_high_at = current_timestamp
+
+        # Se inicia la escucha de teclas.
+        keyboard.hook(partial(self.callback))
+        keyboard.wait(self.terminate_key)
 
     def get_pulsation_average(self):
         """
@@ -142,14 +206,22 @@ class Keylogger:
         :return:
         """
         timestamp_utc = datetime.utcnow()
-        duration_seconds = timestamp_utc - self.pulsations_current_start_at
+        duration_seconds = (timestamp_utc - self.pulsations_current_start_at).seconds
 
         return self.pulsations_current / duration_seconds
 
     def get_pulsations_total(self):
+        """
+        Devuelve la cantidad total de pulsaciones.
+        :return:
+        """
         return self.pulsations_total
 
     def get_pulsation_hight(self):
+        """
+        Devuelve la puntuación más alta de toda la sesión.
+        :return:
+        """
         return self.pulsation_high
 
     def increase_pulsation(self):
@@ -163,47 +235,85 @@ class Keylogger:
         self.pulsations_total += 1
 
         # Comparo el tiempo desde la última pulsación para agrupar la racha.
-        if (self.last_pulsation_at - timestamp_utc) > 15:
+        if (timestamp_utc - self.last_pulsation_at).seconds > 15:
+            self.pulsations_current = 1
+        else:
             self.pulsations_current += 1
+
+        # Establezco el valor actual del combo
+        self.set_combo()
 
         # Asigno momento de esta pulsación.
         self.last_pulsation_at = timestamp_utc
 
+        # Asigno puntuación más alta si lo fuese.
         if self.pulsations_current >= self.pulsations_total:
             self.pulsations_total = self.pulsations_current
             self.pulsation_high_at = timestamp_utc
 
+    def increase_pulsation_special_key(self):
+        """
+        Contabiliza como tecla especial pulsada.
+        :return:
+        """
+        timestamp_utc = datetime.utcnow()
+
+        self.pulsations_total_especial_keys += 1
+
+        # Comparo el tiempo desde la última pulsación para agrupar la racha.
+        if (timestamp_utc - self.last_pulsation_at).seconds > 15:
+            self.pulsations_current_special_keys = 1
+        else:
+            self.pulsations_current_special_keys += 1
+
+        pass
 
     def set_combo(self):
         """
         Establece la puntuación según la cantidad de pulsaciones y tiempo
+        TODO → Temporalmente devuelvo una operación matemática estática, dinamizar para cuanto más pulsaciones mejor premio de combo.
         :return:
         """
-        pass
+        self.combo_score += int(self.pulsations_current * 0.05)
 
+        return True
 
-    def __init__(self, file_path='keylogger.log', clear_on_startup=False, terminate_key=None):
-        self.file_path = file_path
-        self.clear_on_startup = clear_on_startup
-        self.terminate_key = terminate_key
+    def statistics(self):
+        """
+        Devuelve todas las estadísticas del momento.
+        :return:
+        """
+        return [
+            # Comienzo del contador
+            self.start_at,
 
-        # Establezco marca de inicio
-        self.start_at = datetime.utcnow()
+            # Timestamp con la última pulsación.
+            self.last_pulsation_at,
 
-        # Se abre el archivo para escribir.
-        self.output = open(self.file_path, "a")
+            # Total de pulsaciones.
+            self.pulsations_total,
 
-        # Elimina el archivo anterior con los registros del keylogger.
-        if self.clear_on_startup:
-            os.remove(self.file_path)
-        
-        # Se añade evento para cerrar el archivo al salir.
-        atexit.register(self.onexit)
-        
-        # Se inicia la escucha de teclas.
-        keyboard.hook(partial(self.callback))
-        keyboard.wait(self.terminate_key)
+            # Total de pulsaciones para teclas especiales.
+            self.pulsations_total_especial_keys,
 
+            # Pulsaciones en la racha actual.
+            self.pulsations_current,
+
+            # Pulsaciones de teclas especiales en la racha actual.
+            self.pulsations_current_special_keys,
+
+            # Timestamp de la inicialización para la racha actual
+            self.pulsations_current_start_at,
+
+            # Mayor racha de pulsaciones.
+            self.pulsation_high,
+
+            # Timestamp de la mejor racha de puntuaciones.
+            self.pulsation_high_at,
+
+            # Puntuación total según la cantidad de combos.
+            self.combo_score
+        ]
 
     def callback(self, event):
         """
@@ -211,39 +321,71 @@ class Keylogger:
         recibiendo el evento y filtrando solo por las primeras pulsaciones
         (no las continuadas).
         """
-        if event.event_type in ("up", "down"):
+        if event.event_type in ('up', 'down'):
             key = self.KEYS_MAP.get(event.name, event.name)
             modifier = len(key) > 1
 
-            # Filtra el tipo de evento para solo contabilizar pulsaciones.
-            if not modifier and event.event_type == "down":
-                return
-            
-            # Cuando se mantiene presionada la misma tecla no se contabiliza.
-            if modifier:
-                if event.event_type == "down":
-                    if self.is_down.get(key, False):
-                        return
-                    else:
-                        self.is_down[key] = True
-                elif event.event_type == "up":
-                    self.is_down[key] = False
-                
-                # Indica si está siendo presionado.
-                key = " [{} ({})] ".format(key, event.event_type)
-            elif key == "\r":
-                # Salto de línea.
+            # Almaceno si es una tecla especial
+            special_key = True if event.name in self.KEYS_MAP else False
+
+            # Almaceno el tipo de evento
+            event_type = event.event_type
+
+            # Las teclas desconocidas o eventos de ratón se descartan
+            if event.name == 'unknown':
+                # TODO → Distinguir si es un click e implementar contador.
+                return None
+
+            # Marco si está pulsado para evitar registrar teclas presionadas
+            if event_type == "down":
+                if self.is_down.get(key, False):
+                    return None
+                else:
+                    self.is_down[key] = True
+            elif event_type == "up":
+                self.is_down[key] = False
+
+            # Aumento las pulsaciones de teclas.
+            if event_type == 'down':
+                self.increase_pulsation()
+
+            # Contabilizo teclas especiales dado el caso.
+            if (special_key or event.name == 'unknown') and event_type == 'down':
+                #print('Es una tecla especial')
+                self.increase_pulsation_special_key()
+                pass
+
+            # Añado salto de línea cuando se ha pulsado INTRO
+            if key == '(ENTER)' and event_type == 'down':
                 key = "\n"
 
-            # Escribe la tecla al archivo de salida.
-            self.output.write(key)
+            # DEBUG
+            print('')
+            print('Se ha pulsado la tecla: ' + str(key))
+            print('')
+            self.debug()
 
-            # Se fuerza escritura.
-            self.output.flush()
+            return True
 
-
-    def onexit(self):
+    def debug(self):
         """
-        Acciones al salir.
+        Utilizada para debug de la aplicación.
+        :return:
         """
-        self.output.close()
+        statistics = self.statistics()
+
+        print('')
+        print('---------------------------------')
+        print('------------- NUEVO -------------')
+        print('Comienzo del contador: ' + str(statistics[0]))
+        print('Timestamp con la última pulsación:' + str(statistics[1]))
+        print('Total de pulsaciones: ' + str(statistics[2]))
+        print('Total de pulsaciones para teclas especiales:' + str(statistics[3]))
+        print('Pulsaciones en la racha actual: ' + str(statistics[4]))
+        print('Pulsaciones de teclas especiales en la racha actual: ' + str(statistics[5]))
+        print('Timestamp de la inicialización para la racha actual: ' + str(statistics[6]))
+        print('Mayor racha de pulsaciones: ' + str(statistics[7]))
+        print('Timestamp de la mejor racha de puntuaciones: ' + str(statistics[8]))
+        print('Puntuación total según la cantidad de combos: ' + str(statistics[9]))
+        print('---------------------------------')
+        print('')

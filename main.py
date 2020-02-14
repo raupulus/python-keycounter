@@ -50,13 +50,40 @@
 #######################################
 # #       Importar Librerías        # #
 #######################################
-
-import time  # Importamos la libreria time --> time.sleep
+from time import sleep
 import datetime
 import random  # Genera números aleatorios --> random.randrange(1,100)
 import functions as func
 from dotenv import load_dotenv
 import os
 
-## Cargo archivos de configuración desde .env sobreescribiendo variables locales.
+# Importo modelos
+from Models.Keylogger import Keylogger
+from Models.DbConnection import DbConnection
+from Models.ApiConnection import ApiConnection
+
+# Cargo archivos de configuración desde .env sobreescribiendo variables locales.
 load_dotenv(override=True)
+
+
+def insert_data_to_db (self):
+    """
+    Añade los datos de la última racha a la db.
+    TODO → Implementar insertar datos en la DB.
+    :return:
+    """
+    pass
+
+
+def main():
+    keylogger = Keylogger()
+
+    while True:
+        #statistics = keylogger.statistics()
+        keylogger.debug()
+        sleep(1)
+
+
+
+if __name__ == "__main__":
+    main()
