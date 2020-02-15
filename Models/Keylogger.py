@@ -424,12 +424,9 @@ class Keylogger:
             if key == '(ENTER)' and event_type == 'down':
                 key = "\n"
 
-            # Pinta por consola datos de depuración.
+            # Pinta por consola datos de depuración si se indica debug.
             if self.has_debug:
-                print('')
-                print('Se ha pulsado la tecla: ' + str(key))
-                print('')
-                self.debug()
+                self.debug(keypress=str(key))
 
             # Muestra datos actuales por la pantalla si esta existiera.
             self.send_to_display()
@@ -445,7 +442,10 @@ class Keylogger:
 
         # En caso de no existir pantalla se salta.
         if self.display is None:
-            print('No hay pantalla, no se intentará pintar nada.')
+            # En caso de querer debug se muestra advertencia.
+            if self.has_debug:
+                print('No hay pantalla, no se intentará pintar nada.')
+
             return False
 
         # Almaceno todos los datos actuales para pasarlos a la pantalla.
@@ -456,7 +456,7 @@ class Keylogger:
 
         return True
 
-    def debug(self):
+    def debug(self, keypress=None):
         """
         Utilizada para debug de la aplicación.
         :return:
@@ -465,8 +465,13 @@ class Keylogger:
         session = statistics['session']
         streak = statistics['streak']
 
-        # Limpio la salida del terminal.
+        # Limpiar la salida del terminal.
         print(chr(27) + "[2J")
+
+        if keypress:
+            print('')
+            print('Se ha pulsado la tecla: ' + str(keypress))
+            print('')
 
         # Muestro todos los datos formateados.
         print('')

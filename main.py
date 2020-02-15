@@ -65,6 +65,7 @@ from Models.ApiConnection import ApiConnection
 # Cargo archivos de configuración desde .env sobreescribiendo variables locales.
 load_dotenv(override=True)
 
+SERIAL_PORT = '/dev/ttyUSB0'
 
 def insert_data_to_db (self):
     """
