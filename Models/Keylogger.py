@@ -57,7 +57,7 @@ from functools import partial
 # import os
 import keyboard
 # from datetime import datetime, date, time, timezone
-from datetime import datetime, date, time, timezone
+from datetime import datetime
 
 #######################################
 # #             Variables           # #
@@ -94,6 +94,8 @@ from datetime import datetime, date, time, timezone
 # TODO → Crear Array de "rachas sin guardar en db" para desde fuera de la clase
 # obtener lo que falte por guardar en la api
 
+# Reorganizar debug y estadisticas para devolver map()
+
 #######################################
 # #              Clase              # #
 #######################################
@@ -104,6 +106,17 @@ class Keylogger:
 
     # Almacena si hay una tecla presionada.
     is_down = {}
+
+    # Almacena todas las rachas de la sesión, cada recuento sin inactividad.
+    rachas = {}
+
+    # Indica si se pintará por pantalla datos para depuración.
+    has_debug = False
+
+    # Almacena la pantalla para mostrar datos, establecer None si no se usará
+    # tiene que disponer del método send_to_display() que procese los datos
+    # devueltos por el método statistics() de esta clase.
+    display = None
 
     # Tiempo que dura una racha en segundos.
     COMBO_RESET = 15
@@ -149,12 +162,13 @@ class Keylogger:
         'f13': '(F13 or VOLUME SILENCE)',
         'f14': '(F14 or VOLUME DOWN)',
         'num lock': '(NUM LOCK)',
+        'esc': '(ESC)',
+        'end': '(END)',
     }
 
     #######################################
     # #           Estadísticas          # #
     #######################################
-
 
     # ############# SESIÓN COMPLETA ############# #
 
@@ -193,11 +207,8 @@ class Keylogger:
     # Pulsaciones de teclas especiales en la racha actual.
     pulsations_current_special_keys = 0
 
-
     # Puntuación de combos en la racha actual.
     combo_score_current = 0
-
-
 
     # Valores para el algoritmo del combo → clave_map: combo_puntuacion_a_sumar
     COMBO_MAP = {
@@ -213,7 +224,14 @@ class Keylogger:
         10: 1.00
     }
 
-    def __init__(self, terminate_key=None):
+    def __init__(self, display=None, has_debug=False, terminate_key=None):
+        # Establezco pantalla si existiera.
+        self.display = display
+
+        # Establezco si existe debug.
+        self.has_debug = has_debug
+
+        # Creo timestamp para inicializar contadores.
         current_timestamp = datetime.utcnow()
 
         # Establezco tecla para finalizar la captura.
@@ -411,17 +429,40 @@ class Keylogger:
             elif event_type == 'down':
                 self.increase_pulsation(False)
 
-            # Añado salto de línea cuando se ha pulsado INTRO
+            # Añado salto de línea cuando se ha pulsado INTRO.
             if key == '(ENTER)' and event_type == 'down':
                 key = "\n"
 
-            # DEBUG
-            print('')
-            print('Se ha pulsado la tecla: ' + str(key))
-            print('')
-            self.debug()
+            # Pinta por consola datos de depuración.
+            if self.has_debug:
+                print('')
+                print('Se ha pulsado la tecla: ' + str(key))
+                print('')
+                self.debug()
+
+            # Muestra datos actuales por la pantalla si esta existiera.
+            self.send_to_display()
 
             return True
+
+    def send_to_display(self):
+        """
+        Muestra los datos por la pantalla usando el método: update_keycounter()
+        :return:
+        """
+
+        # En caso de no existir pantalla se salta.
+        if self.display is None:
+            print('No hay pantalla, no se intentará pintar nada.')
+            return False
+
+        # Almaceno todos los datos actuales para pasarlos a la pantalla.
+        data = self.statistics()
+
+        # Accede al método "update_keycounter" del modelo para la pantalla.
+        self.display.update_keycounter(data)
+
+        return True
 
     def debug(self):
         """

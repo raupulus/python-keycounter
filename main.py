@@ -76,7 +76,7 @@ def insert_data_to_db (self):
 
 
 def main():
-    keylogger = Keylogger()
+    keylogger = Keylogger(has_debug=True)
 
     while True:
         #statistics = keylogger.statistics()
