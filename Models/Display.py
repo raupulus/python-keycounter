@@ -79,10 +79,7 @@ class Display(LCDUart):
                          orientation=orientation)
 
         # Establezco preferencias de comunicación y limpio la pantalla.
-        self.write(b"RESET;\r\n")
-        self.write(b"BPS(115200);\r\n")
-        self.write(b'BL(0);\r\n')
-        self.write(b"CLR(0);\r\n")
+        self.write(b"RESET;BPS(115200);BL(0);CLR(0);\r\n")
         self.on()
 
     def update_keycounter(self, data):
@@ -108,16 +105,12 @@ class Display(LCDUart):
         color = "1"
         pulsations_current = "DCV16(0, 0," + str(streak.get('pulsations_current')) + ", 1);"
         pulsations_current_special_keys = "DCV16(0, 0," + str(streak.get('pulsations_current_special_keys')) + ", 1);"
-        pulsation_average = "DCV16(0, 16," + str(streak.get('pulsation_average')) + ", 1);"
-        combo_score_current = "DCV16(0, 48," + str(streak.get('combo_score_current')) + ", " + color + ");"
-        last_pulsation_at = "DCV16(0, 32," + str(streak.get('last_pulsation_at')) + ", " + color + ");"
+        pulsation_average = "DCV16(0, 32," + str(streak.get('pulsation_average')) + ", 1);"
+        combo_score_current = "DCV16(0, 64," + str(streak.get('combo_score_current')) + ", " + color + ");"
+        last_pulsation_at = "DCV16(0, 96," + str(streak.get('last_pulsation_at')) + ", " + color + ");"
 
-        #self.write(b"CLR(0);\r\n")
-        #self.write(b"SBC(15);\r\n")
-        msg = 'COMBO: ' + str(streak.get('combo_score_current'))
-        msg = "DCV16(0, 0," + msg + ", 1);"
-
-        new_screen = pulsations_current + pulsations_current_special_keys + \
+        new_screen = 'CLR(0);' + pulsations_current + \
+                     pulsations_current_special_keys + \
                      pulsation_average + last_pulsation_at + combo_score_current
 
         self.write(bytes(new_screen + "\r\n", encoding='utf-8'))
