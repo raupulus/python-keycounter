@@ -75,6 +75,8 @@ from datetime import datetime
 # Implementar solo contador de carácteres para escribir (a-Z,.*[]}{:;),
 # no teclas especiales. El objetivo es saber cuantas veces pulsa cada tecla
 
+# Implementar sistema de guardado cada minuto.
+
 #######################################
 # #             TODO                # #
 #######################################
@@ -166,50 +168,6 @@ class Keylogger:
         'end': '(END)',
     }
 
-    #######################################
-    # #           Estadísticas          # #
-    #######################################
-
-    # ############# SESIÓN COMPLETA ############# #
-
-    # Timestamp con el comienzo de las mediciones.
-    start_at = None
-
-    # Timestamp de la mejor racha de puntuaciones.
-    pulsation_high_at = None
-
-    # Total de pulsaciones.
-    pulsations_total = 0
-
-    # Total de pulsaciones para teclas especiales.
-    pulsations_total_especial_keys = 0
-
-    # Mayor racha de pulsaciones.
-    pulsation_high = 0
-
-    # Puntuación total según la cantidad de combos.
-    combo_score = 0
-
-    # Mayor Puntuación de combo en toda la sesión.
-    combo_score_high = 0
-
-    # ############# RACHA ACTUAL ############# #
-
-    # Timestamp de la inicialización para la racha actual
-    pulsations_current_start_at = None
-
-    # Timestamp con la última pulsación.
-    last_pulsation_at = None
-
-    # Pulsaciones en la racha actual.
-    pulsations_current = 0
-
-    # Pulsaciones de teclas especiales en la racha actual.
-    pulsations_current_special_keys = 0
-
-    # Puntuación de combos en la racha actual.
-    combo_score_current = 0
-
     # Valores para el algoritmo del combo → clave_map: combo_puntuacion_a_sumar
     COMBO_MAP = {
         1: 0.01,
@@ -223,6 +181,53 @@ class Keylogger:
         9: 0.90,
         10: 1.00
     }
+
+    #######################################
+    # #           Estadísticas          # #
+    #######################################
+
+    # ############# SESIÓN COMPLETA ############# #
+
+    # Timestamp con el comienzo de las mediciones.
+    start_at = None
+
+    # Mayor racha de pulsaciones.
+    pulsation_high = 0
+
+    # Timestamp de la mejor racha de puntuaciones.
+    pulsation_high_at = None
+
+    # Total de pulsaciones.
+    pulsations_total = 0
+
+    # Total de pulsaciones para teclas especiales.
+    pulsations_total_especial_keys = 0
+
+    # Puntuación total según la cantidad de combos.
+    combo_score = 0
+
+    # Mayor Puntuación de combo en toda la sesión.
+    combo_score_high = 0
+
+    # Timestamp del momento en el que se consiguió la mejor racha
+    combo_score_high_at = None
+
+    # ############# RACHA ACTUAL ############# #
+
+    # Pulsaciones en la racha actual.
+    pulsations_current = 0
+
+    # Pulsaciones de teclas especiales en la racha actual.
+    pulsations_current_special_keys = 0
+
+    # Timestamp de la inicialización para la racha actual
+    pulsations_current_start_at = None
+
+    # Timestamp con la última pulsación.
+    last_pulsation_at = None
+
+    # Puntuación de combos en la racha actual.
+    combo_score_current = 0
 
     def __init__(self, display=None, has_debug=False, terminate_key=None):
         # Establezco pantalla si existiera.
@@ -244,6 +249,7 @@ class Keylogger:
         self.last_pulsation_at = current_timestamp
         self.pulsations_current_start_at = current_timestamp
         self.pulsation_high_at = current_timestamp
+        self.combo_score_high_at = current_timestamp
 
         # Se inicia la escucha de teclas.
         keyboard.hook(partial(self.callback))
@@ -276,7 +282,6 @@ class Keylogger:
     def increase_pulsation(self, special_key=False):
         """
         Aumenta una pulsación controlando la racha.
-        TODO → De esta forma, al apagar equipo o terminar no guardaría, replantear esta parte
         :return:
         """
         timestamp_utc = datetime.utcnow()
@@ -295,7 +300,7 @@ class Keylogger:
             self.pulsations_current_special_keys = 0
 
             # Establezco el valor actual del combo reseteando contador de racha.
-            self.set_combo(reset_sesion=True)
+            self.set_combo(timestamp_utc, reset_sesion=True)
 
             # Si es una tecla especial la contabilizo.
             if special_key:
@@ -306,7 +311,7 @@ class Keylogger:
             self.pulsations_current += 1
 
             # Establezco el valor actual del combo sin resetear contador de racha.
-            self.set_combo(reset_sesion=False)
+            self.set_combo(timestamp_utc, reset_sesion=False)
 
             # Si es una tecla especial la contabilizo.
             if special_key:
@@ -321,7 +326,7 @@ class Keylogger:
             self.pulsation_high = self.pulsations_current
             self.pulsation_high_at = timestamp_utc
 
-    def set_combo(self, reset_sesion=False):
+    def set_combo(self, timestamp_utc, reset_sesion=False):
         """
         Establece la puntuación según la cantidad de pulsaciones y algoritmo
         :return:
@@ -348,6 +353,7 @@ class Keylogger:
             # En caso de ser una puntuación de combo record se añade al registro.
             if self.combo_score_current > self.combo_score_high:
                 self.combo_score_high = self.combo_score_current
+                self.combo_score_high_at = timestamp_utc
 
             return True
 
@@ -358,40 +364,25 @@ class Keylogger:
         Devuelve todas las estadísticas del momento.
         :return:
         """
-        return [
-            # Comienzo del contador
-            self.start_at,
-
-            # Timestamp con la última pulsación.
-            self.last_pulsation_at,
-
-            # Total de pulsaciones.
-            self.pulsations_total,
-
-            # Total de pulsaciones para teclas especiales.
-            self.pulsations_total_especial_keys,
-
-            # Pulsaciones en la racha actual.
-            self.pulsations_current,
-
-            # Pulsaciones de teclas especiales en la racha actual.
-            self.pulsations_current_special_keys,
-
-            # Timestamp de la inicialización para la racha actual
-            self.pulsations_current_start_at,
-
-            # Mayor racha de pulsaciones.
-            self.pulsation_high,
-
-            # Timestamp de la mejor racha de puntuaciones.
-            self.pulsation_high_at,
-
-            # Puntuación total según la cantidad de combos.
-            self.combo_score,
-
-            self.combo_score_current,
-            self.combo_score_high
-        ]
+        return {
+            'session': {
+                'start_at': self.start_at,
+                'pulsation_high': self.pulsation_high,
+                'pulsation_high_at': self.pulsation_high_at,
+                'pulsations_total': self.pulsations_total,
+                'pulsations_total_especial_keys': self.pulsations_total_especial_keys,
+                'combo_score': self.combo_score,
+                'combo_score_high': self.combo_score_high,
+                'combo_score_high_at': self.combo_score_high_at
+            },
+            'streak': {
+                'pulsations_current': self.pulsations_current,
+                'pulsations_current_special_keys': self.pulsations_current_special_keys,
+                'pulsations_current_start_at': self.pulsations_current_start_at,
+                'last_pulsation_at': self.last_pulsation_at,
+                'combo_score_current': self.combo_score_current
+            }
+        }
 
     def callback(self, event):
         """
@@ -471,21 +462,33 @@ class Keylogger:
         :return:
         """
         statistics = self.statistics()
+        session = statistics['session']
+        streak = statistics['streak']
 
+        # Limpio la salida del terminal.
+        print(chr(27) + "[2J")
+
+        # Muestro todos los datos formateados.
         print('')
         print('---------------------------------')
-        print('------------- NUEVO -------------')
-        print('Comienzo del contador: ' + str(statistics[0]))
-        print('Timestamp con la última pulsación:' + str(statistics[1]))
-        print('Total de pulsaciones: ' + str(statistics[2]))
-        print('Total de pulsaciones para teclas especiales:' + str(statistics[3]))
-        print('Pulsaciones en la racha actual: ' + str(statistics[4]))
-        print('Pulsaciones de teclas especiales en la racha actual: ' + str(statistics[5]))
-        print('Timestamp de la inicialización para la racha actual: ' + str(statistics[6]))
-        print('Mayor racha de pulsaciones: ' + str(statistics[7]))
-        print('Timestamp de la mejor racha de puntuaciones: ' + str(statistics[8]))
-        print('Puntuación total según la cantidad de combos: ' + str(statistics[9]))
-        print('Puntuación de combos en esta racha: ' + str(statistics[10]))
-        print('Puntuación de combos más alta: ' + str(statistics[11]))
+        print('--------- SESIÓN COMPLETA -------')
         print('---------------------------------')
+        print('')
+        print('La sesión comenzó: ' + str(session.get('start_at')))
+        print('Racha con número de pulsacionespulsaciones más alta: ' + str(session.get('pulsation_high')))
+        print('Momento de la puslación más alta: ' + str(session.get('pulsation_high_at')))
+        print('Número de pulsaciones total: ' + str(session.get('pulsations_total')))
+        print('Número de pulsaciones total en teclas especiales: ' + str(session.get('pulsations_total_especial_keys')))
+        print('Puntuación total obtenida en combos: ' + str(session.get('combo_score')))
+        print('Puntuación más alta obtenida en combos en una racha: ' + str(session.get('combo_score_high')))
+        print('Momento de la puntuación más alta obtenida en combos en una racha: ' + str(session.get('combo_score_high_at')))
+        print('')
+        print('---------------------------------')
+        print('---------- RACHA ACTUAL ---------')
+        print('---------------------------------')
+        print('Pulsaciones en racha actual: ' + str(streak.get('pulsations_current')))
+        print('Pulsaciones de teclas especiales en racha actual: ' + str(streak.get('pulsations_current_special_keys')))
+        print('Momento en el que inicia la racha: ' + str(streak.get('pulsations_current_start_at')))
+        print('Momento de la última pulsación: ' + str(streak.get('last_pulsation_at')))
+        print('Puntuación de combo para la racha actual: ' + str(streak.get('combo_score_current')))
         print('')
