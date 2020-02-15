@@ -92,6 +92,13 @@ from datetime import datetime, date, time, timezone
 # y añadir a una variable independiente tanto la más alta como el combo y total
 # de forma independiente al general
 
+# TODO → Implementar contador por cada tecla, veces que se pulsa A, B, C...
+
+# TODO → Implementar mayor racha de combos
+
+# TODO → Crear Array de "rachas sin guardar" para desde fuera de la clase
+# obtener lo que falte por guardar en la api desde ahí
+
 #######################################
 # #              Clases             # #
 #######################################
