@@ -448,6 +448,7 @@ class Keylogger:
     def send_to_display(self):
         """
         Muestra los datos por la pantalla usando el método: update_keycounter()
+        que deberá existir en el modelo para la pantalla.
         :return:
         """
 
