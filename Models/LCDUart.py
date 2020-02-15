@@ -19,22 +19,18 @@
 #######################################
 # #       Importar Librerías        # #
 #######################################
-import time  # Importamos la libreria time --> time.sleep
-import os  # Importamos la libreria para comandos de la consola/shell
-import random  # Genera números aleatorios --> random.randrange(1,100)
-# import nombre_libreria as nuevo_nombre_libreria
+import time
 import serial
-import base64
 
 #######################################
 # #             Variables           # #
 #######################################
 sleep = time.sleep
 
+#######################################
+# #             CLASE               # #
+#######################################
 
-#######################################
-# #             Funciones           # #
-#######################################
 
 class LCDUart:
     orientation = 'vertical'
@@ -69,15 +65,15 @@ class LCDUart:
         ## Abre el puerto
         self.ser = serial.Serial(port, baudrate, timeout=timeout)
 
+        if not self.ser.is_open:
+            print('No se pudo establecer la comunicación en el puerto ' + port)
+
         print('Serial Open? → ' + str(self.ser.is_open))
+        self.write(b"RESET;BPS(115200);BL(0);CLR(0);\r\n")
 
-        self.ser.write(b"RESET;\r\n")
+        time.sleep(1)
 
-        time.sleep(0.1)
-        self.ser.write(b"BPS(115200);\r\n")
-
-        time.sleep(0.1)
-        self.setOrientation = orientation
+        self.set_screen_orientation(orientation)
 
     def stop(self):
         """
@@ -104,7 +100,7 @@ class LCDUart:
         self.ser.write(bytes(command))
         #time.sleep(0.1)
 
-    def getScreenSize(self):
+    def get_screen_size(self):
         """
         Devuelve el tamaño de la pantalla
         """
@@ -124,14 +120,16 @@ class LCDUart:
         Establece un nuevo modo para la orientación de la pantalla, admite los valores
         horizontal y vertical
         """
-        if orientation is 'vertical':
+        if orientation == 'vertical':
+            print('Estableciendo orientación Vertical')
             self.orientation = orientation
             self.width = 176
             self.height = 220
             self.ser.write(b"DIR(0);\r\n")
             time.sleep(0.1)
             return True
-        elif orientation is 'horizontal':
+        elif orientation == 'horizontal':
+            print('Estableciendo orientación Horizontal')
             self.orientation = orientation
             self.width = 220
             self.height = 176

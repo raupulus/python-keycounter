@@ -69,19 +69,6 @@ sleep = time.sleep
 
 
 class Display(LCDUart):
-    def __init__(self, port='/dev/ttyUSB0', baudrate=115200, timeout=1,
-                 orientation='vertical'):
-        """
-        Inicializo la pantalla.
-        """
-        # Llamo al constructor del padre.
-        super().__init__(port=port, baudrate=baudrate, timeout=timeout,
-                         orientation=orientation)
-
-        # Establezco preferencias de comunicación y limpio la pantalla.
-        self.write(b"RESET;BPS(115200);BL(0);CLR(0);\r\n")
-        self.on()
-
     def update_keycounter(self, data):
         """
         Dibuja todos los datos recibidos por el keylogger/keycount en la
@@ -100,17 +87,15 @@ class Display(LCDUart):
         streak = data['streak']
 
         print('Entra en update_keycounter')
-        print('Combo actual: ' + str(streak.get('combo_score_current')))
 
         color = "1"
-        pulsations_current = "DCV16(0, 0," + str(streak.get('pulsations_current')) + ", 1);"
-        pulsations_current_special_keys = "DCV16(0, 0," + str(streak.get('pulsations_current_special_keys')) + ", 1);"
-        pulsation_average = "DCV16(0, 32," + str(streak.get('pulsation_average')) + ", 1);"
-        combo_score_current = "DCV16(0, 64," + str(streak.get('combo_score_current')) + ", " + color + ");"
-        last_pulsation_at = "DCV16(0, 96," + str(streak.get('last_pulsation_at')) + ", " + color + ");"
+        pulsations_current = "DCV32(0, 0,KEYS:" + str(streak.get('pulsations_current')) + ", " + color + ");"
+        pulsations_current_special_keys = "DCV32(0, 32,SPK:" + str(streak.get('pulsations_current_special_keys')) + ", " + color + ");"
+        pulsation_average = "DCV32(0, 64,AVG:" + str(streak.get('pulsation_average')) + ", 1);"
+        combo_score_current = "DCV32(0, 96,SCORE:" + str(streak.get('combo_score_current')) + ", " + color + ");"
+        last_pulsation_at = "DCV16(0, 128," + str(streak.get('last_pulsation_at')) + ", " + color + ");"
 
-        new_screen = 'CLR(0);' + pulsations_current + \
-                     pulsations_current_special_keys + \
+        new_screen = pulsations_current + pulsations_current_special_keys + \
                      pulsation_average + last_pulsation_at + combo_score_current
 
         self.write(bytes(new_screen + "\r\n", encoding='utf-8'))
