@@ -102,7 +102,7 @@ class LCDUart:
         Envía un comando en bruto a la pantalla
         """
         self.ser.write(bytes(command))
-        time.sleep(0.1)
+        #time.sleep(0.1)
 
     def getScreenSize(self):
         """
@@ -117,7 +117,7 @@ class LCDUart:
         """
         Devuelve la orientación actual de la pantalla
         """
-        return self.orientation == 'vertical' if 'vertical' else 'horizontal'
+        return self.orientation
 
     def set_screen_orientation(self, orientation):
         """
