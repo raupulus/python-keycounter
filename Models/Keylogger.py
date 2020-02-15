@@ -82,8 +82,6 @@ from datetime import datetime, date, time, timezone
 
 # Implementar contador de clicks
 
-# TODO → ERROR: el contador de teclas especiales cuenta el total, no la racha actual → revisar!!!
-
 # TODO → Mayor racha de pulsaciones NO CUENTA NADA
 
 # TODO → Teclas especiales como PrtSC las detecta como desconocidas y actualmente eso se interpreta como si fuese el ratón
@@ -136,8 +134,23 @@ class Keylogger:
         'page down': '(PAGE DOWN)',
         'insert': '(INSERT)',
         'delete': '(DELETE)',
-        'help': '(HELP)',
-
+        'help': '(HELP or VOLUME UP)',
+        'pause': '(PAUSE)',
+        'scroll lock': '(SCROLL LOCK)',
+        'f1': '(F1)',
+        'f2': '(F2)',
+        'f3': '(F3)',
+        'f4': '(F4)',
+        'f5': '(F5)',
+        'f6': '(F6)',
+        'f7': '(F7)',
+        'f8': '(F8)',
+        'f9': '(F9)',
+        'f10': '(F10)',
+        'f11': '(F11)',
+        'f12': '(F12)',
+        'f13': '(F13 or VOLUME SILENCE)',
+        'f14': '(F14 or VOLUME DOWN)',
     }
 
     #######################################
@@ -231,7 +244,7 @@ class Keylogger:
         """
         return self.pulsation_high
 
-    def increase_pulsation(self):
+    def increase_pulsation(self, special_key=False):
         """
         Aumenta una pulsación controlando la racha.
         TODO → De esta forma, al apagar equipo o terminar no guardaría, replantear esta parte
@@ -244,8 +257,18 @@ class Keylogger:
         # Comparo el tiempo desde la última pulsación para agrupar la racha.
         if (timestamp_utc - self.last_pulsation_at).seconds > 15:
             self.pulsations_current = 1
+
+            # Si es una tecla especial la contabilizo.
+            if special_key:
+                self.pulsations_current_special_keys = 1
+                self.pulsations_total_especial_keys += 1
         else:
             self.pulsations_current += 1
+
+            # Si es una tecla especial la contabilizo.
+            if special_key:
+                self.pulsations_current_special_keys += 1
+                self.pulsations_total_especial_keys += 1
 
         # Establezco el valor actual del combo
         self.set_combo()
@@ -257,23 +280,6 @@ class Keylogger:
         if self.pulsations_current >= self.pulsations_total:
             self.pulsations_total = self.pulsations_current
             self.pulsation_high_at = timestamp_utc
-
-    def increase_pulsation_special_key(self):
-        """
-        Contabiliza como tecla especial pulsada.
-        :return:
-        """
-        timestamp_utc = datetime.utcnow()
-
-        self.pulsations_total_especial_keys += 1
-
-        # Comparo el tiempo desde la última pulsación para agrupar la racha.
-        if (timestamp_utc - self.last_pulsation_at).seconds > 15:
-            self.pulsations_current_special_keys = 1
-        else:
-            self.pulsations_current_special_keys += 1
-
-        pass
 
     def set_combo(self):
         """
@@ -352,15 +358,11 @@ class Keylogger:
             elif event_type == "up":
                 self.is_down[key] = False
 
-            # Aumento las pulsaciones de teclas.
-            if event_type == 'down':
-                self.increase_pulsation()
-
-            # Contabilizo teclas especiales dado el caso.
+            # Aumento las pulsaciones de teclas indicando si es especial o no.
             if (special_key or event.name == 'unknown') and event_type == 'down':
-                #print('Es una tecla especial')
-                self.increase_pulsation_special_key()
-                pass
+                self.increase_pulsation(True)
+            elif event_type == 'down':
+                self.increase_pulsation(False)
 
             # Añado salto de línea cuando se ha pulsado INTRO
             if key == '(ENTER)' and event_type == 'down':
