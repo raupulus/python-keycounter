@@ -263,21 +263,12 @@ class Keylogger:
         timestamp_utc = datetime.utcnow()
         duration_seconds = (timestamp_utc - self.pulsations_current_start_at).seconds
 
-        return self.pulsations_current / duration_seconds
+        if duration_seconds > 0 and self.pulsations_current > 0:
+            average_per_minute = (self.pulsations_current / duration_seconds) * 60.0
+        else:
+            return 0.00
 
-    def get_pulsations_total(self):
-        """
-        Devuelve la cantidad total de pulsaciones.
-        :return:
-        """
-        return self.pulsations_total
-
-    def get_pulsation_hight(self):
-        """
-        Devuelve la puntuación más alta de toda la sesión.
-        :return:
-        """
-        return self.pulsation_high
+        return round(average_per_minute, 2)
 
     def increase_pulsation(self, special_key=False):
         """
@@ -359,29 +350,44 @@ class Keylogger:
 
         return False
 
-    def statistics(self):
+    def statistics_session(self):
         """
-        Devuelve todas las estadísticas del momento.
+        Devuelve las estadísticas generales a nivel de la sesión.
         :return:
         """
         return {
-            'session': {
-                'start_at': self.start_at,
-                'pulsation_high': self.pulsation_high,
-                'pulsation_high_at': self.pulsation_high_at,
-                'pulsations_total': self.pulsations_total,
-                'pulsations_total_especial_keys': self.pulsations_total_especial_keys,
-                'combo_score': self.combo_score,
-                'combo_score_high': self.combo_score_high,
-                'combo_score_high_at': self.combo_score_high_at
-            },
-            'streak': {
-                'pulsations_current': self.pulsations_current,
-                'pulsations_current_special_keys': self.pulsations_current_special_keys,
-                'pulsations_current_start_at': self.pulsations_current_start_at,
-                'last_pulsation_at': self.last_pulsation_at,
-                'combo_score_current': self.combo_score_current
-            }
+            'start_at': self.start_at,
+            'pulsation_high': self.pulsation_high,
+            'pulsation_high_at': self.pulsation_high_at,
+            'pulsations_total': self.pulsations_total,
+            'pulsations_total_especial_keys': self.pulsations_total_especial_keys,
+            'combo_score': self.combo_score,
+            'combo_score_high': self.combo_score_high,
+            'combo_score_high_at': self.combo_score_high_at
+        }
+
+    def statistics_streak(self):
+        """
+        Devuelve las estadísticas solo para la racha actual.
+        :return:
+        """
+        return {
+            'pulsations_current': self.pulsations_current,
+            'pulsations_current_special_keys': self.pulsations_current_special_keys,
+            'pulsation_average': self.get_pulsation_average(),
+            'pulsations_current_start_at': self.pulsations_current_start_at,
+            'last_pulsation_at': self.last_pulsation_at,
+            'combo_score_current': self.combo_score_current
+        }
+
+    def statistics(self):
+        """
+        Devuelve todas las estadísticas.
+        :return:
+        """
+        return {
+            'session': self.statistics_session(),
+            'streak': self.statistics_streak()
         }
 
     def callback(self, event):
@@ -493,6 +499,7 @@ class Keylogger:
         print('---------------------------------')
         print('Pulsaciones en racha actual: ' + str(streak.get('pulsations_current')))
         print('Pulsaciones de teclas especiales en racha actual: ' + str(streak.get('pulsations_current_special_keys')))
+        print('Velocidad media de pulsaciones por minuto: ' + str(streak.get('pulsation_average')))
         print('Momento en el que inicia la racha: ' + str(streak.get('pulsations_current_start_at')))
         print('Momento de la última pulsación: ' + str(streak.get('last_pulsation_at')))
         print('Puntuación de combo para la racha actual: ' + str(streak.get('combo_score_current')))
