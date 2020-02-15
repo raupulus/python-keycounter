@@ -82,8 +82,6 @@ from datetime import datetime, date, time, timezone
 
 # Implementar contador de clicks
 
-# TODO → Mayor racha de pulsaciones NO CUENTA NADA
-
 # TODO → Teclas especiales como PrtSC las detecta como desconocidas y actualmente eso se interpreta como si fuese el ratón
 
 # TODO → Implementar solo contador de carácteres para escribir, no teclas especiales
@@ -157,11 +155,13 @@ class Keylogger:
     # #           Estadísticas          # #
     #######################################
 
+    # ############# SESIÓN COMPLETA ############# #
+
     # Timestamp con el comienzo de las mediciones.
     start_at = None
 
-    # Timestamp con la última pulsación.
-    last_pulsation_at = None
+    # Timestamp de la mejor racha de puntuaciones.
+    pulsation_high_at = None
 
     # Total de pulsaciones.
     pulsations_total = 0
@@ -169,20 +169,24 @@ class Keylogger:
     # Total de pulsaciones para teclas especiales.
     pulsations_total_especial_keys = 0
 
+    # Mayor racha de pulsaciones.
+    pulsation_high = 0
+
+
+    # ############# RACHA ACTUAL ############# #
+
+    # Timestamp de la inicialización para la racha actual
+    pulsations_current_start_at = None
+
+    # Timestamp con la última pulsación.
+    last_pulsation_at = None
+
     # Pulsaciones en la racha actual.
     pulsations_current = 0
 
     # Pulsaciones de teclas especiales en la racha actual.
     pulsations_current_special_keys = 0
 
-    # Timestamp de la inicialización para la racha actual
-    pulsations_current_start_at = None
-
-    # Mayor racha de pulsaciones.
-    pulsation_high = 0
-
-    # Timestamp de la mejor racha de puntuaciones.
-    pulsation_high_at = None
 
     # Puntuación total según la cantidad de combos.
     # TODO → Plantear si esto es viable, si llega a usarse horas el int desborda¿?¿?
@@ -256,7 +260,14 @@ class Keylogger:
 
         # Comparo el tiempo desde la última pulsación para agrupar la racha.
         if (timestamp_utc - self.last_pulsation_at).seconds > 15:
+            # Establezco marca de tiempo para la nueva racha
+            self.pulsations_current_start_at = timestamp_utc
+
+            # Reseteo contador de teclas pulsadas en la nueva racha.
             self.pulsations_current = 1
+
+            # Reseteo contador de teclas especiales pulsadas en la nueva racha.
+            self.pulsations_current_special_keys = 0
 
             # Si es una tecla especial la contabilizo.
             if special_key:
@@ -277,8 +288,8 @@ class Keylogger:
         self.last_pulsation_at = timestamp_utc
 
         # Asigno puntuación más alta si lo fuese.
-        if self.pulsations_current >= self.pulsations_total:
-            self.pulsations_total = self.pulsations_current
+        if self.pulsations_current >= self.pulsation_high:
+            self.pulsation_high = self.pulsations_current
             self.pulsation_high_at = timestamp_utc
 
     def set_combo(self):
