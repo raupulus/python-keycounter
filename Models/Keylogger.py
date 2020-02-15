@@ -11,7 +11,9 @@
 
 # Create Date: 2020
 # Project Name: Python Keylogger
-# Description: Keylogger escrito en python 3 para detectar las teclas pulsadas en un equipo linux. En principio debería funcionar también en windows (no comprobado por no tener ese sistema)
+# Description: Keylogger escrito en python 3 para detectar las teclas pulsadas
+# en un equipo linux. En principio debería funcionar también en windows
+# (no comprobado por no tener ese sistema)
 
 #
 # Dependencies: keyboard
@@ -44,17 +46,17 @@
 #######################################
 # #           Descripción           # #
 #######################################
-# Keylogger escrito en python 3 para detectar las teclas pulsadas en un equipo linux. 
-# En principio debería funcionar también en windows (no comprobado por no tener ese 
-# sistema)
+# Description: Keylogger escrito en python 3 para detectar las teclas pulsadas
+# en un equipo linux. En principio debería funcionar también en windows
+# (no comprobado por no tener ese sistema)
 
 #######################################
 # #       Importar Librerías        # #
 #######################################
 from functools import partial
-import atexit
-import os
+# import os
 import keyboard
+# from datetime import datetime, date, time, timezone
 from datetime import datetime, date, time, timezone
 
 #######################################
@@ -62,14 +64,23 @@ from datetime import datetime, date, time, timezone
 #######################################
 
 #######################################
+# #        NUEVAS FEATURES          # #
+#######################################
+# Esta lista describe las nuevas características que se "podría" implementar
+# para mejorar la herramienta. Es necesario barajar cada una y su utilidad real.
+
+# Implementar contador de clicks, algunas teclascomo PrtSC las detecta como
+# desconocidas y no puedo filtrar que todos los clicks sean el "unknown"
+
+# Implementar solo contador de carácteres para escribir (a-Z,.*[]}{:;),
+# no teclas especiales. El objetivo es saber cuantas veces pulsa cada tecla
+
+#######################################
 # #             TODO                # #
 #######################################
-# Crear dos subprocesos:
+# Crear dos subprocesos (o replantear mejor en la llamada del main.py):
 # 1 → Solo para el callback escuchando teclas
 # 2 → Comprobar cada X segundos si hay racha
-
-# En el MAP: COMBO_MAP → crear algoritmo dividiendo y redondeando hacia abajo
-# que utilice la pareja de clave_map: combo_puntuacion_sumar
 
 # Crear DB sqlite para registrar:
 # Timestamp de inicio racha → start_at
@@ -80,23 +91,11 @@ from datetime import datetime, date, time, timezone
 # created_at
 # Día de la semana (0 domingo) → weekday
 
-# Implementar contador de clicks
-
-# TODO → Teclas especiales como PrtSC las detecta como desconocidas y actualmente eso se interpreta como si fuese el ratón
-
-# TODO → Implementar solo contador de carácteres para escribir, no teclas especiales
-# y añadir a una variable independiente tanto la más alta como el combo y total
-# de forma independiente al general
-
-# TODO → Implementar contador por cada tecla, veces que se pulsa A, B, C...
-
-# TODO → Implementar mayor racha de combos
-
-# TODO → Crear Array de "rachas sin guardar" para desde fuera de la clase
-# obtener lo que falte por guardar en la api desde ahí
+# TODO → Crear Array de "rachas sin guardar en db" para desde fuera de la clase
+# obtener lo que falte por guardar en la api
 
 #######################################
-# #              Clases             # #
+# #              Clase              # #
 #######################################
 
 class Keylogger:
@@ -149,11 +148,13 @@ class Keylogger:
         'f12': '(F12)',
         'f13': '(F13 or VOLUME SILENCE)',
         'f14': '(F14 or VOLUME DOWN)',
+        'num lock': '(NUM LOCK)',
     }
 
     #######################################
     # #           Estadísticas          # #
     #######################################
+
 
     # ############# SESIÓN COMPLETA ############# #
 
@@ -172,6 +173,11 @@ class Keylogger:
     # Mayor racha de pulsaciones.
     pulsation_high = 0
 
+    # Puntuación total según la cantidad de combos.
+    combo_score = 0
+
+    # Mayor Puntuación de combo en toda la sesión.
+    combo_score_high = 0
 
     # ############# RACHA ACTUAL ############# #
 
@@ -188,9 +194,10 @@ class Keylogger:
     pulsations_current_special_keys = 0
 
 
-    # Puntuación total según la cantidad de combos.
-    # TODO → Plantear si esto es viable, si llega a usarse horas el int desborda¿?¿?
-    combo_score = 0
+    # Puntuación de combos en la racha actual.
+    combo_score_current = 0
+
+
 
     # Valores para el algoritmo del combo → clave_map: combo_puntuacion_a_sumar
     COMBO_MAP = {
@@ -269,20 +276,24 @@ class Keylogger:
             # Reseteo contador de teclas especiales pulsadas en la nueva racha.
             self.pulsations_current_special_keys = 0
 
+            # Establezco el valor actual del combo reseteando contador de racha.
+            self.set_combo(reset_sesion=True)
+
             # Si es una tecla especial la contabilizo.
             if special_key:
                 self.pulsations_current_special_keys = 1
                 self.pulsations_total_especial_keys += 1
         else:
+            # Sumo una pulsación al contador.
             self.pulsations_current += 1
+
+            # Establezco el valor actual del combo sin resetear contador de racha.
+            self.set_combo(reset_sesion=False)
 
             # Si es una tecla especial la contabilizo.
             if special_key:
                 self.pulsations_current_special_keys += 1
                 self.pulsations_total_especial_keys += 1
-
-        # Establezco el valor actual del combo
-        self.set_combo()
 
         # Asigno momento de esta pulsación.
         self.last_pulsation_at = timestamp_utc
@@ -292,15 +303,37 @@ class Keylogger:
             self.pulsation_high = self.pulsations_current
             self.pulsation_high_at = timestamp_utc
 
-    def set_combo(self):
+    def set_combo(self, reset_sesion=False):
         """
-        Establece la puntuación según la cantidad de pulsaciones y tiempo
-        TODO → Temporalmente devuelvo una operación matemática estática, dinamizar para cuanto más pulsaciones mejor premio de combo.
+        Establece la puntuación según la cantidad de pulsaciones y algoritmo
         :return:
         """
-        self.combo_score += int(self.pulsations_current * 0.05)
 
-        return True
+        # Creo el valor de la puntuación para sumar con este combo.
+        new_combo_score = int(self.pulsations_current * 0.15)
+
+        # Controlo si restablecer contador de combos para la sesión.
+        if reset_sesion:
+            self.combo_score_current = 0
+            return False
+
+        # Compruebo si pertenece combo y devuelvo bool indiciando si hay
+        if (int((self.pulsations_current * 2.7) *
+                ((self.pulsations_current + 1) * 3.4)) % 5) == 0:
+
+            # Añado puntuación al contador global.
+            self.combo_score += new_combo_score
+
+            # Añado puntuación al contador de racha.
+            self.combo_score_current += new_combo_score
+
+            # En caso de ser una puntuación de combo record se añade al registro.
+            if self.combo_score_current > self.combo_score_high:
+                self.combo_score_high = self.combo_score_current
+
+            return True
+
+        return False
 
     def statistics(self):
         """
@@ -336,7 +369,10 @@ class Keylogger:
             self.pulsation_high_at,
 
             # Puntuación total según la cantidad de combos.
-            self.combo_score
+            self.combo_score,
+
+            self.combo_score_current,
+            self.combo_score_high
         ]
 
     def callback(self, event):
@@ -407,5 +443,7 @@ class Keylogger:
         print('Mayor racha de pulsaciones: ' + str(statistics[7]))
         print('Timestamp de la mejor racha de puntuaciones: ' + str(statistics[8]))
         print('Puntuación total según la cantidad de combos: ' + str(statistics[9]))
+        print('Puntuación de combos en esta racha: ' + str(statistics[10]))
+        print('Puntuación de combos más alta: ' + str(statistics[11]))
         print('---------------------------------')
         print('')
