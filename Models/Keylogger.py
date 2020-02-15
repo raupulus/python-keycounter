@@ -116,8 +116,8 @@ class Keylogger:
     has_debug = False
 
     # Almacena la pantalla para mostrar datos, establecer None si no se usará
-    # tiene que disponer del método send_to_display() que procese los datos
-    # devueltos por el método statistics() de esta clase.
+    # tiene que disponer del método update_keycounter(data) que procese los
+    # datos devueltos por el método statistics() de esta clase.
     display = None
 
     # Tiempo que dura una racha en segundos.

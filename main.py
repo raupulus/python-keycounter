@@ -61,13 +61,18 @@ import os
 from Models.Keylogger import Keylogger
 from Models.DbConnection import DbConnection
 from Models.ApiConnection import ApiConnection
+from Models.Display import Display
+
+# Parámetros de configuración por defecto, se pueden modificar en el .env
+SERIAL_PORT = '/dev/ttyUSB1'
+SERIAL_BAUDRATE = '115200'
+SERIAL_ORIENTATION = 'horizontal'
 
 # Cargo archivos de configuración desde .env sobreescribiendo variables locales.
 load_dotenv(override=True)
 
-SERIAL_PORT = '/dev/ttyUSB0'
 
-def insert_data_to_db (self):
+def insert_data_to_db(self):
     """
     Añade los datos de la última racha a la db.
     TODO → Implementar insertar datos en la DB.
@@ -77,13 +82,15 @@ def insert_data_to_db (self):
 
 
 def main():
-    keylogger = Keylogger(has_debug=True)
+    display = Display(port=SERIAL_PORT,
+                      baudrate=SERIAL_BAUDRATE,
+                      orientation=SERIAL_ORIENTATION)
+    keylogger = Keylogger(display=display, has_debug=True)
 
     while True:
         #statistics = keylogger.statistics()
         keylogger.debug()
         sleep(1)
-
 
 
 if __name__ == "__main__":
