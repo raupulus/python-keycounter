@@ -69,6 +69,9 @@ sleep = time.sleep
 
 
 class Display(LCDUart):
+    # Almacena las últimas pulsaciones para saber si es una nueva racha.
+    last_pulsations_current = 0
+
     def update_keycounter(self, data):
         """
         Dibuja todos los datos recibidos por el keylogger/keycount en la
@@ -88,7 +91,7 @@ class Display(LCDUart):
 
         print('Entra en update_keycounter')
 
-        color = "1"
+        color = "4"
         pulsations_current = "DCV32(0, 0,KEYS:" + str(streak.get('pulsations_current')) + ", " + color + ");"
         pulsations_current_special_keys = "DCV32(0, 32,SPK:" + str(streak.get('pulsations_current_special_keys')) + ", " + color + ");"
         pulsation_average = "DCV32(0, 64,AVG:" + str(streak.get('pulsation_average')) + ", 1);"
@@ -98,7 +101,14 @@ class Display(LCDUart):
         new_screen = pulsations_current + pulsations_current_special_keys + \
                      pulsation_average + last_pulsation_at + combo_score_current
 
-        self.write(bytes(new_screen + "\r\n", encoding='utf-8'))
+        # Limpia restos cuando hay nueva racha.
+        if self.last_pulsations_current > streak.get('pulsations_current'):
+            new_screen += 'CLR(0);'
+
+        self.write(bytes("SBC(11);"+new_screen + "\r\n", encoding='utf-8'))
+
+        # Almaceno la racha actual.
+        self.last_pulsations_current = streak.get('pulsations_current')
 
         self.update_streak()
         self.update_session()

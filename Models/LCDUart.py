@@ -75,6 +75,8 @@ class LCDUart:
 
         self.set_screen_orientation(orientation)
 
+        print('Pantalla Lista')
+
     def stop(self):
         """
         Detiene la comunicación con la pantalla.
