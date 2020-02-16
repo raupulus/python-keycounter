@@ -21,6 +21,7 @@
 #######################################
 import time
 import serial
+import os
 
 #######################################
 # #             Variables           # #
@@ -62,7 +63,13 @@ class LCDUart:
 
     def __init__(self, port='/dev/ttyUSB0', baudrate=115200, timeout=1,
                   orientation='vertical'):
-        ## Abre el puerto
+
+        # Compruebo si existe el puerto.
+        if not os.system('ls ' + port + ' 2> /dev/null') == 0:
+            print('El puerto para la pantalla no existe.')
+            return None
+
+        # Abre el puerto
         self.ser = serial.Serial(port, baudrate, timeout=timeout)
 
         if not self.ser.is_open:
@@ -75,7 +82,13 @@ class LCDUart:
 
         self.set_screen_orientation(orientation)
 
+        self.configurations()
+
         print('Pantalla Lista')
+
+    def configurations(self):
+        print('Aplicando Configuraciones a la pantalla')
+        return True
 
     def stop(self):
         """

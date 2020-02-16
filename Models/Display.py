@@ -71,6 +71,15 @@ sleep = time.sleep
 class Display(LCDUart):
     # Almacena las últimas pulsaciones para saber si es una nueva racha.
     last_pulsations_current = 0
+    color = "2"
+    background = "0"
+
+    def configurations(self):
+        super().configurations()
+
+        background = 'CLR(' + self.background + ');\r\n'
+
+        self.write(bytes(background, encoding='utf-8'))
 
     def update_keycounter(self, data):
         """
@@ -79,6 +88,10 @@ class Display(LCDUart):
         TODO → Implementar.
         :return:
         """
+
+        if self.ser and not self.ser.is_open or not self.ser:
+            print('Ocurrió un problema con la pantalla, ¿Cambió el puerto serial?')
+            return False
 
         # ATENCIÓN → AL CREAR LAS ÓRDENES, TIENE QUE ACABAR EN \r\n sólo
         # la última orden.
@@ -91,21 +104,28 @@ class Display(LCDUart):
 
         print('Entra en update_keycounter')
 
-        color = "4"
+        color = self.color
+        background = self.background
+
         pulsations_current = "DCV32(0, 0,KEYS:" + str(streak.get('pulsations_current')) + ", " + color + ");"
         pulsations_current_special_keys = "DCV32(0, 32,SPK:" + str(streak.get('pulsations_current_special_keys')) + ", " + color + ");"
         pulsation_average = "DCV32(0, 64,AVG:" + str(streak.get('pulsation_average')) + ", 1);"
         combo_score_current = "DCV32(0, 96,SCORE:" + str(streak.get('combo_score_current')) + ", " + color + ");"
-        last_pulsation_at = "DCV16(0, 128," + str(streak.get('last_pulsation_at')) + ", " + color + ");"
+        pulsations_total = "DCV32(0, 128,T.KEYS:" + str(session.get('pulsations_total')) + ", " + color + ");"
+        combo_score = "DCV16(0, 160,T.SCORE:" + str(session.get('combo_score')) + ", " + color + ");"
 
         new_screen = pulsations_current + pulsations_current_special_keys + \
-                     pulsation_average + last_pulsation_at + combo_score_current
+                     pulsation_average + combo_score_current + \
+                     pulsations_total + combo_score
+
+        # Añado configuraciones
+        new_screen = 'SBC(' + background + ');' + new_screen
 
         # Limpia restos cuando hay nueva racha.
         if self.last_pulsations_current > streak.get('pulsations_current'):
-            new_screen += 'CLR(0);'
+            new_screen = 'CLR(' + background + ');' + new_screen
 
-        self.write(bytes("SBC(11);"+new_screen + "\r\n", encoding='utf-8'))
+        self.write(bytes(new_screen + "\r\n", encoding='utf-8'))
 
         # Almaceno la racha actual.
         self.last_pulsations_current = streak.get('pulsations_current')

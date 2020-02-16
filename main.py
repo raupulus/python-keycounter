@@ -64,7 +64,7 @@ from Models.ApiConnection import ApiConnection
 from Models.Display import Display
 
 # Parámetros de configuración por defecto, se pueden modificar en el .env
-SERIAL_PORT = '/dev/ttyUSB1'
+SERIAL_PORT = '/dev/ttyUSB2'
 SERIAL_BAUDRATE = '115200'
 SERIAL_ORIENTATION = 'horizontal'
 
