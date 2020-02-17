@@ -63,6 +63,8 @@ class LCDUart:
 
     def __init__(self, port='/dev/ttyUSB0', baudrate=115200, timeout=1,
                   orientation='vertical'):
+        if not port:
+            return None
 
         # Compruebo si existe el puerto.
         if not os.system('ls ' + port + ' 2> /dev/null') == 0:

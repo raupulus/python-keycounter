@@ -63,13 +63,36 @@ from Models.DbConnection import DbConnection
 from Models.ApiConnection import ApiConnection
 from Models.Display import Display
 
-# Parámetros de configuración por defecto, se pueden modificar en el .env
-SERIAL_PORT = '/dev/ttyUSB2'
-SERIAL_BAUDRATE = '115200'
-SERIAL_ORIENTATION = 'horizontal'
-
 # Cargo archivos de configuración desde .env sobreescribiendo variables locales.
 load_dotenv(override=True)
+
+# Parámetros de configuración por defecto, se pueden modificar en el .env
+
+# Configuración Serial.
+SERIAL_PORT = os.getenv('SERIAL_PORT') or None
+SERIAL_BAUDRATE = os.getenv('SERIAL_BAUDRATE') or '9600'
+
+# Configuración pantalla.
+DISPLAY_ORIENTATION = os.getenv('SERIAL_BAUDRATE') or 'horizontal'
+
+# Configuración DB.
+DB_CONNECTION = os.getenv("DB_CONNECTION")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_DATABASE = os.getenv("DB_DATABASE")
+DB_USERNAME = os.getenv("DB_USERNAME")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+
+# Configuración API para el volcado de datos.
+API_URL = os.getenv("API_URL")
+API_TOKEN = os.getenv("API_TOKEN")
+
+# Configuración para identificar el dispositivo que envía los datos.
+MI_PC = os.getenv("MI_PC")
+PC_ID = os.getenv("PC_ID")
+PC_TOKEN = os.getenv("PC_TOKEN")
+
+
 
 
 def insert_data_to_db(self):
@@ -84,7 +107,10 @@ def insert_data_to_db(self):
 def main():
     display = Display(port=SERIAL_PORT,
                       baudrate=SERIAL_BAUDRATE,
-                      orientation=SERIAL_ORIENTATION)
+                      orientation=DISPLAY_ORIENTATION) if SERIAL_PORT else None
+
+    print(SERIAL_BAUDRATE)
+
     keylogger = Keylogger(display=display, has_debug=True)
 
     while True:
