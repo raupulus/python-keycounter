@@ -94,6 +94,8 @@ MI_PC = os.getenv("MI_PC")
 PC_ID = os.getenv("PC_ID")
 PC_TOKEN = os.getenv("PC_TOKEN")
 
+# Debug
+DEBUG = os.getenv("DEBUG") == "True"
 
 def insert_data_to_db(self):
     """
@@ -118,17 +120,12 @@ def main():
                       baudrate=SERIAL_BAUDRATE,
                       orientation=DISPLAY_ORIENTATION) if SERIAL_PORT else None
 
-
-    # TODO → Añadir a un hilo
-    keylogger = Keylogger(display=display, has_debug=True)
+    # Instancio el keylogger, este quedará en un subproceso leyendo teclas.
+    keylogger = Keylogger(display=display, has_debug=DEBUG)
 
     # TODO → Añadir a otro hilo
+    # Instancio socket pasándole el keylogger para que alcance sus datos.
     socket = Socket(keylogger)
-
-    while True:
-        #statistics = keylogger.statistics()
-        keylogger.debug()
-        sleep(1)
 
 
 if __name__ == "__main__":

@@ -123,23 +123,33 @@ class Socket:
         """
         while True:
             # Queda esperando conexiones
-            print('Esperando conexiones')
+            print('Socket Unix Esperando conexiones')
             connection, client_address = self.sock.accept()
 
             try:
                 print('Conexión desde', client_address)
+                data = connection.recv(2048)
+                print('Enviando Pulsaciones: ' + str(self.keylogger.pulsations_current))
+                connection.sendall(bytes(str(self.keylogger.pulsations_current), encoding='utf-8'))
 
+                """
                 # Recibe los datos en pequeños trozos para retrasmitirlos.
                 while True:
                     data = connection.recv(16)
                     print('Recibido {!r}'.format(data))
                     if data:
-                        print('Devolviendo los datos al cliente.')
-                        connection.sendall(data)
+                        # Envío los datos de conexión
+                        print('Enviando Pulsaciones: ' + str(self.keylogger.pulsations_current))
+                        #connection.sendall(bytes(self.keylogger.pulsations_current, encoding='utf-8'))
+                        connection.sendall(str(self.keylogger.pulsations_current))
+
+                        #print('Devolviendo los datos al cliente.')
+                        #self.keylogger.debug()
+                        #connection.sendall(data)
                     else:
                         print('No hay más datos desde:', client_address)
                         break
-
+                """
             finally:
                 # Cierra y limpia la conexión.
                 connection.close()

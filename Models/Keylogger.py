@@ -253,8 +253,14 @@ class Keylogger:
         self.pulsation_high_at = current_timestamp
         self.combo_score_high_at = current_timestamp
 
+        # Comienza la escucha de teclas pulsadas
+        start_new_thread(self.read_keyboard, ())
 
-        # Se inicia la escucha de teclas.
+    def read_keyboard(self):
+        """
+        Esta función inicia la escucha de teclas constantemente para el
+        keylogger.
+        """
         keyboard.hook(partial(self.callback))
         keyboard.wait(self.terminate_key)
 

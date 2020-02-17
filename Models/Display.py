@@ -102,8 +102,6 @@ class Display(LCDUart):
         # Datos para la racha actual.
         streak = data['streak']
 
-        print('Entra en update_keycounter')
-
         color = self.color
         background = self.background
 

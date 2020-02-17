@@ -9,7 +9,7 @@ sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
 # Connect the socket to the port where the server is listening
 server_address = '/var/run/keycounter.socket'
-print('connecting to {}'.format(server_address))
+print('Conectando a {}'.format(server_address))
 try:
     sock.connect(server_address)
 except socket.error as msg:
@@ -17,19 +17,25 @@ except socket.error as msg:
     sys.exit(1)
 
 try:
-
-    # Send data
-    message = b'This is the message.  It will be repeated.'
-    print('sending {!r}'.format(message))
+    # Pido cantidad de pulsaciones actual
+    message = b'pulsations_current'
+    print('Enviando {!r}'.format(message))
     sock.sendall(message)
 
+    # Recibo la cantidad de pulsaciones
+    data = sock.recv(2048)
+    print('Recibido {!r}'.format(data.decode("utf-8")))
+
+    """
     amount_received = 0
     amount_expected = len(message)
-
+    
     while amount_received < amount_expected:
-        data = sock.recv(16)
+        #data = sock.recv(16)
+        data = sock.recv()
         amount_received += len(data)
         print('received {!r}'.format(data))
+    """
 
 finally:
     print('closing socket')
