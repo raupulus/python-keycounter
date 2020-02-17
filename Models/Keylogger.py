@@ -58,6 +58,7 @@ from functools import partial
 import keyboard
 # from datetime import datetime, date, time, timezone
 from datetime import datetime
+from _thread import start_new_thread
 
 #######################################
 # #             Variables           # #
@@ -101,6 +102,7 @@ from datetime import datetime
 #######################################
 # #              Clase              # #
 #######################################
+
 
 class Keylogger:
     # Tecla para terminar el programa o None para no utilizar ninguna tecla.
@@ -250,6 +252,7 @@ class Keylogger:
         self.pulsations_current_start_at = current_timestamp
         self.pulsation_high_at = current_timestamp
         self.combo_score_high_at = current_timestamp
+
 
         # Se inicia la escucha de teclas.
         keyboard.hook(partial(self.callback))
