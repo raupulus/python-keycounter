@@ -56,12 +56,14 @@ import random  # Genera números aleatorios --> random.randrange(1,100)
 import functions as func
 from dotenv import load_dotenv
 import os
+from _thread import start_new_thread
 
 # Importo modelos
 from Models.Keylogger import Keylogger
 from Models.DbConnection import DbConnection
 from Models.ApiConnection import ApiConnection
 from Models.Display import Display
+from Models.Socket import Socket
 
 # Cargo archivos de configuración desde .env sobreescribiendo variables locales.
 load_dotenv(override=True)
@@ -93,12 +95,19 @@ PC_ID = os.getenv("PC_ID")
 PC_TOKEN = os.getenv("PC_TOKEN")
 
 
-
-
 def insert_data_to_db(self):
     """
     Añade los datos de la última racha a la db.
     TODO → Implementar insertar datos en la DB.
+    :return:
+    """
+    pass
+
+
+def upload_data_to_api(self):
+    """
+    Procesa la subida de datos a la API.
+    TODO → Implementar Subir a la API.
     :return:
     """
     pass
@@ -109,9 +118,12 @@ def main():
                       baudrate=SERIAL_BAUDRATE,
                       orientation=DISPLAY_ORIENTATION) if SERIAL_PORT else None
 
-    print(SERIAL_BAUDRATE)
 
+    # TODO → Añadir a un hilo
     keylogger = Keylogger(display=display, has_debug=True)
+
+    # TODO → Añadir a otro hilo
+    socket = Socket(keylogger)
 
     while True:
         #statistics = keylogger.statistics()
