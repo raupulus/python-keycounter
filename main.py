@@ -75,7 +75,7 @@ SERIAL_PORT = os.getenv('SERIAL_PORT') or None
 SERIAL_BAUDRATE = os.getenv('SERIAL_BAUDRATE') or '9600'
 
 # Configuración pantalla.
-DISPLAY_ORIENTATION = os.getenv('SERIAL_BAUDRATE') or 'horizontal'
+DISPLAY_ORIENTATION = os.getenv('DISPLAY_ORIENTATION') or 'horizontal'
 
 # Configuración DB.
 DB_CONNECTION = os.getenv("DB_CONNECTION")
