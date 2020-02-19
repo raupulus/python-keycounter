@@ -139,3 +139,6 @@ dmypy.json
 # Socket
 uds_socket
 keycounter.socket
+
+# DB
+keycounter.db
