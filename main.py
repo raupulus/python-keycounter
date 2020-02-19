@@ -77,14 +77,6 @@ SERIAL_BAUDRATE = os.getenv('SERIAL_BAUDRATE') or '9600'
 # Configuración pantalla.
 DISPLAY_ORIENTATION = os.getenv('DISPLAY_ORIENTATION') or 'horizontal'
 
-# Configuración DB.
-DB_CONNECTION = os.getenv("DB_CONNECTION")
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT")
-DB_DATABASE = os.getenv("DB_DATABASE")
-DB_USERNAME = os.getenv("DB_USERNAME")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-
 # Configuración API para el volcado de datos.
 API_URL = os.getenv("API_URL")
 API_TOKEN = os.getenv("API_TOKEN")
@@ -97,22 +89,51 @@ PC_TOKEN = os.getenv("PC_TOKEN")
 # Debug
 DEBUG = os.getenv("DEBUG") == "True"
 
-def insert_data_to_db(self):
+def insert_data_to_db(keylogger, dbconnection):
     """
-    Añade los datos de la última racha a la db.
+    Almacena los datos de los sensores en la base de datos.
+    :param dbconnection:
     TODO → Implementar insertar datos en la DB.
     :return:
     """
-    pass
+
+    # TODO → Implementar map en keylogger para guardar estadísticas pasadas
+    # limpiar ese map tras obtener datos y guardarlos en db.
+
+    # TODO → Crear método en keylogger para obtener estructura de tablas
+    params = '???'
 
 
-def upload_data_to_api(self):
+    dbconnection.table_save_data(
+        tablename='keyboard',
+        params=params['data']
+    )
+
+
+def upload_data_to_api(dbconnection):
     """
     Procesa la subida de datos a la API.
     TODO → Implementar Subir a la API.
     :return:
     """
     pass
+
+
+def loop(keylogger):
+    while True:
+        try:
+            # TODO → Terminar guardado en db
+            # Instancio el modelo para guardar datos en la DB cada minuto.
+            dbconnection = DbConnection()
+            insert_data_to_db(keylogger, dbconnection)
+
+
+            # TODO → Implementar guardado en API cada 5 minutos.
+        except Exception as e:
+            print('Tipo de error al leer estadísticas:', e.__class__)
+
+        finally:
+            sleep(60)
 
 
 def main():
@@ -126,6 +147,9 @@ def main():
     # TODO → Añadir a otro hilo
     # Instancio socket pasándole el keylogger para que alcance sus datos.
     socket = Socket(keylogger)
+
+    # Comienza el bucle para guardar datos y subirlos a la API.
+    loop(keylogger)
 
 
 if __name__ == "__main__":
