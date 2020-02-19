@@ -69,9 +69,17 @@ class DbConnection:
     DB_PASSWORD = os.getenv("DB_PASSWORD")
 
     # Conexión a la base de datos
-    engine = create_engine(DB_CONNECTION + '://' + DB_USERNAME +
-                           ':' + DB_PASSWORD + '@' + DB_HOST + ':' + DB_PORT
-                           + '/' + DB_DATABASE)
+    str_conn = DB_CONNECTION + '://' + DB_USERNAME + \
+                           ':' + DB_PASSWORD + '@' + DB_HOST
+    print(DB_PORT)
+    str_conn += ':' + DB_PORT if DB_PORT and int(DB_PORT) > 0 else ''
+    str_conn += '/' + DB_DATABASE
+
+    # TODO → TOFIX → Reescribo temporalmente db, dinamizar desde .env
+    str_conn = DB_CONNECTION + ':///' + 'keycounter.db'
+
+
+    engine = create_engine(str_conn)
     meta = MetaData()
     connection = engine.connect()
 
