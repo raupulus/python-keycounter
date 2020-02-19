@@ -103,10 +103,10 @@ def insert_data_to_db(keylogger, dbconnection):
     # TODO → Crear método en keylogger para obtener estructura de tablas
     params = '???'
 
-
+    # Guardo las estadísticas registradas para el teclado.
     dbconnection.table_save_data(
-        tablename='keyboard',
-        params=params['data']
+        tablename=keylogger.tablename,
+        params=params
     )
 
 
@@ -120,11 +120,18 @@ def upload_data_to_api(dbconnection):
 
 
 def loop(keylogger):
+    # TODO → Terminar guardado en db
+    # Instancio el modelo para guardar datos en la DB cada minuto.
+    dbconnection = DbConnection()
+
+    # Seteo tabla en el modelo de conexión a la DB.
+    dbconnection.table_set_new(
+        keylogger.tablename,    # Nombre de la tabla.
+        keylogger.tablemodel()  # Modelo de tabla y columnas.
+    )
     while True:
         try:
-            # TODO → Terminar guardado en db
-            # Instancio el modelo para guardar datos en la DB cada minuto.
-            dbconnection = DbConnection()
+
             insert_data_to_db(keylogger, dbconnection)
 
 
@@ -149,7 +156,7 @@ def main():
     socket = Socket(keylogger)
 
     # Comienza el bucle para guardar datos y subirlos a la API.
-    loop(keylogger)
+    #loop(keylogger)
 
 
 if __name__ == "__main__":

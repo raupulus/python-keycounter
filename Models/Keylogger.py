@@ -105,6 +105,9 @@ from _thread import start_new_thread
 
 
 class Keylogger:
+    # Nombre de la tabla para almacenar datos
+    tablename = 'keyboard'
+
     # Tecla para terminar el programa o None para no utilizar ninguna tecla.
     terminate_key = None
 
@@ -470,6 +473,39 @@ class Keylogger:
         self.display.update_keycounter(data)
 
         return True
+
+    def tablemodel(self):
+        """
+        Plantea campos como modelo de datos para una base de datos y poder ser
+        tomados desde el exterior.
+        """
+        return {
+            'data1': {
+                'type': 'Numeric',
+                'params': {
+                    'precision': 15,
+                    'asdecimal': True,
+                    'scale': 4
+                },
+                'others': None,
+            },
+            'data2': {
+                'type': 'Numeric',
+                'params': {
+                    'precision': 15,
+                    'asdecimal': True,
+                    'scale': 4
+                },
+                'others': None,
+            },
+            'created_at': {
+                'type': 'DateTime',
+                'params': None,
+                'others': {
+                    'default': datetime.utcnow
+                },
+            },
+        }
 
     def debug(self, keypress=None):
         """
