@@ -76,28 +76,12 @@ from _thread import start_new_thread
 # Implementar solo contador de carácteres para escribir (a-Z,.*[]}{:;),
 # no teclas especiales. El objetivo es saber cuantas veces pulsa cada tecla
 
-# Implementar sistema de guardado cada minuto.
-
 #######################################
 # #             TODO                # #
 #######################################
-# Crear dos subprocesos (o replantear mejor en la llamada del main.py):
-# 1 → Solo para el callback escuchando teclas
-# 2 → Comprobar cada X segundos si hay racha
-
-# Crear DB sqlite para registrar:
-# Timestamp de inicio racha → start_at
-# Timestamp de fin racha → end_at
-# Pulsación total racha → pulsations
-# Pulsación total racha para teclas especiales → pulsations_special_keys
-# Puntuación del combo → score
-# created_at
-# Día de la semana (0 domingo) → weekday
 
 # TODO → Crear Array de "rachas sin guardar en db" para desde fuera de la clase
 # obtener lo que falte por guardar en la api
-
-# Reorganizar debug y estadisticas para devolver map()
 
 #######################################
 # #              Clase              # #
@@ -108,14 +92,14 @@ class Keylogger:
     # Nombre de la tabla para almacenar datos
     tablename = 'keyboard'
 
+    # Map para almacenar todas las rachas no guardadas en DB
+    spurts = {}
+
     # Tecla para terminar el programa o None para no utilizar ninguna tecla.
     terminate_key = None
 
     # Almacena si hay una tecla presionada.
     is_down = {}
-
-    # Almacena todas las rachas de la sesión, cada recuento sin inactividad.
-    rachas = {}
 
     # Indica si se pintará por pantalla datos para depuración.
     has_debug = False
@@ -478,7 +462,20 @@ class Keylogger:
         """
         Plantea campos como modelo de datos para una base de datos y poder ser
         tomados desde el exterior.
+
+        - Timestamp de inicio racha → start_at
+        - Timestamp de fin racha → end_at
+        - Pulsación total racha → pulsations
+        - Pulsación total racha para teclas especiales → pulsations_special_keys
+        - Pulsaciones media por minuto → pulsation_average
+        - Puntuación del combo → score
+        - created_at
+        - Día de la semana (0 domingo) → weekday
         """
+
+        # start_at, end_at, pulsations, pulsations_special_keys, score,
+        # created_at, weekday
+
         return {
             'data1': {
                 'type': 'Numeric',
