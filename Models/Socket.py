@@ -95,7 +95,7 @@ class Socket:
         self.change_permissions_socket()
 
         # Comienza el bucle esperando conexiones.
-        self.ready()
+        start_new_thread(self.ready, ())
 
     def delete_old_socket(self):
         """

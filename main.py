@@ -138,7 +138,7 @@ def loop(keylogger):
     )
 
     # Pausa de 60 segundos para dar margen a tomar datos.
-    sleep(10)
+    sleep(60)
 
     while True:
         try:
@@ -147,10 +147,11 @@ def loop(keylogger):
             insert_data_to_db(keylogger, dbconnection)
 
             # TODO → Implementar guardado en API cada 5 minutos.
+
         except Exception as e:
             print('Tipo de error al leer estadísticas:', e.__class__)
         finally:
-            sleep(10)
+            sleep(60)
 
 
 def main():
@@ -163,7 +164,7 @@ def main():
 
     # TODO → Añadir a otro hilo
     # Instancio socket pasándole el keylogger para que alcance sus datos.
-    #socket = Socket(keylogger)
+    socket = Socket(keylogger)
 
     # Comienza el bucle para guardar datos y subirlos a la API.
     loop(keylogger)

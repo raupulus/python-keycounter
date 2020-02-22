@@ -80,9 +80,6 @@ from _thread import start_new_thread
 # #             TODO                # #
 #######################################
 
-# TODO → Crear Array de "rachas sin guardar en db" para desde fuera de la clase
-# obtener lo que falte por guardar en la api
-
 #######################################
 # #              Clase              # #
 #######################################
