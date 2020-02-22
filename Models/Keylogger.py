@@ -277,6 +277,9 @@ class Keylogger:
 
         # Comparo el tiempo desde la última pulsación para agrupar la racha.
         if (timestamp_utc - self.last_pulsation_at).seconds > 15:
+            # Guardo la racha actual en el map de rachas antes de resetear.
+            self.add_old_streak(timestamp_utc)
+
             # Establezco marca de tiempo para la nueva racha
             self.pulsations_current_start_at = timestamp_utc
 
@@ -312,6 +315,23 @@ class Keylogger:
         if self.pulsations_current >= self.pulsation_high:
             self.pulsation_high = self.pulsations_current
             self.pulsation_high_at = timestamp_utc
+
+    def add_old_streak(self, timestamp_utc):
+        """
+        Establece una racha pasada al map de rachas de forma que pueda ser
+        insertado en la db o subido a la API.
+        :return:
+        """
+        self.spurts[timestamp_utc] = {
+            'start_at': self.pulsations_current_start_at,
+            'end_at': timestamp_utc,
+            'pulsations': self.pulsations_current,
+            'pulsations_special_keys': self.pulsations_current_special_keys,
+            'pulsation_average': self.get_pulsation_average(),
+            'score': self.combo_score_current,
+            'weekday': datetime.today().weekday(),
+        }
+
 
     def set_combo(self, timestamp_utc, reset_sesion=False):
         """

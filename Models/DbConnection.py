@@ -150,13 +150,13 @@ class DbConnection:
 
         table = self.tables[tablename]
 
-        print('Guardando en DB: ', table, params)
-
         # Inserto Datos
         try:
+            print('Intentando guardar en la DB: ', params)
             stmt = table.insert().values(params).return_defaults()
             result = self.connection.execute(stmt)
             # server_created_at = result.returned_defaults['created_at']
+            return True
         except Exception as e:
             print('Ha ocurrido un problema al insertar datos', e.__class__.__name__)
             return None

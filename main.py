@@ -97,18 +97,25 @@ def insert_data_to_db(keylogger, dbconnection):
     :return:
     """
 
-    # TODO → Implementar map en keylogger para guardar estadísticas pasadas
-    # limpiar ese map tras obtener datos y guardarlos en db.
+    # Almaceno la clave de los elementos guardados correctamente en db.
+    saved = []
 
     # Guardo las estadísticas registradas para el teclado de todas las rachas.
-    for params in keylogger.spurts:
+    for register in keylogger.spurts:
         # Compruebo que existan datos registrados, que existe una racha.
-        if params is not None:
-            dbconnection.table_save_data(
+        if register is not None:
+            save_data = dbconnection.table_save_data(
                 tablename=keylogger.tablename,
-                params=params
+                params=keylogger.spurts[register]
             )
 
+            # Si se ha llevado a cabo el guardado, se quita del map.
+            if save_data:
+                saved.append(register)
+
+    # Elimino los registros que fueron almacenados en la db correctamente.
+    for key in saved:
+        del keylogger.spurts[key]
 
 def upload_data_to_api(dbconnection):
     """
@@ -129,19 +136,19 @@ def loop(keylogger):
         keylogger.tablename,    # Nombre de la tabla.
         keylogger.tablemodel()  # Modelo de tabla y columnas.
     )
+
+    # Pausa de 60 segundos para dar margen a tomar datos.
+    sleep(10)
+
     while True:
         try:
-            print('Entra en while guardar en la DB')
+            print('Entra en while para guardar en la DB')
 
-            #insert_data_to_db(keylogger, dbconnection)
-
-            print('Tablas en DB: ', dbconnection.engine.table_names())
-
+            insert_data_to_db(keylogger, dbconnection)
 
             # TODO → Implementar guardado en API cada 5 minutos.
         except Exception as e:
             print('Tipo de error al leer estadísticas:', e.__class__)
-
         finally:
             sleep(10)
 
