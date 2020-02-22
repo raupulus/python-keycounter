@@ -93,7 +93,6 @@ def insert_data_to_db(keylogger, dbconnection):
     """
     Almacena los datos de los sensores en la base de datos.
     :param dbconnection:
-    TODO → Implementar insertar datos en la DB.
     :return:
     """
 
@@ -127,7 +126,6 @@ def upload_data_to_api(dbconnection):
 
 
 def loop(keylogger):
-    # TODO → Terminar guardado en db
     # Instancio el modelo para guardar datos en la DB cada minuto.
     dbconnection = DbConnection()
 
