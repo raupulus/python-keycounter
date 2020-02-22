@@ -469,29 +469,59 @@ class Keylogger:
         - Pulsación total racha para teclas especiales → pulsations_special_keys
         - Pulsaciones media por minuto → pulsation_average
         - Puntuación del combo → score
-        - created_at
         - Día de la semana (0 domingo) → weekday
+        - Timestamp en el que se crea el registro → created_at
         """
 
-        # start_at, end_at, pulsations, pulsations_special_keys, score,
-        # created_at, weekday
-
         return {
-            'data1': {
+            'start_at': {
+                'type': 'DateTime',
+                'params': None,
+                'others': None,
+            },
+            'end_at': {
+                'type': 'DateTime',
+                'params': None,
+                'others': None,
+            },
+            'pulsations': {
                 'type': 'Numeric',
                 'params': {
                     'precision': 15,
-                    'asdecimal': True,
-                    'scale': 4
+                    'asdecimal': False,
                 },
                 'others': None,
             },
-            'data2': {
+            'pulsations_special_keys': {
+                'type': 'Numeric',
+                'params': {
+                    'precision': 15,
+                    'asdecimal': False,
+                },
+                'others': None,
+            },
+            'pulsation_average': {
                 'type': 'Numeric',
                 'params': {
                     'precision': 15,
                     'asdecimal': True,
-                    'scale': 4
+                    'scale': 5
+                },
+                'others': None,
+            },
+            'score': {
+                'type': 'Numeric',
+                'params': {
+                    'precision': 15,
+                    'asdecimal': False,
+                },
+                'others': None,
+            },
+            'weekday': {
+                'type': 'Numeric',
+                'params': {
+                    'precision': 1,
+                    'asdecimal': False,
                 },
                 'others': None,
             },
