@@ -500,6 +500,7 @@ class Keylogger:
                 },
                 'others': None,
             },
+
             'pulsation_average': {
                 'type': 'Numeric',
                 'params': {

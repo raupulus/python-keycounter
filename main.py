@@ -100,14 +100,14 @@ def insert_data_to_db(keylogger, dbconnection):
     # TODO → Implementar map en keylogger para guardar estadísticas pasadas
     # limpiar ese map tras obtener datos y guardarlos en db.
 
-    # TODO → Crear método en keylogger para obtener estructura de tablas
-    params = '???'
-
-    # Guardo las estadísticas registradas para el teclado.
-    dbconnection.table_save_data(
-        tablename=keylogger.tablename,
-        params=params
-    )
+    # Guardo las estadísticas registradas para el teclado de todas las rachas.
+    for params in keylogger.spurts:
+        # Compruebo que existan datos registrados, que existe una racha.
+        if params is not None:
+            dbconnection.table_save_data(
+                tablename=keylogger.tablename,
+                params=params
+            )
 
 
 def upload_data_to_api(dbconnection):
@@ -131,8 +131,11 @@ def loop(keylogger):
     )
     while True:
         try:
+            print('Entra en while guardar en la DB')
 
-            insert_data_to_db(keylogger, dbconnection)
+            #insert_data_to_db(keylogger, dbconnection)
+
+            print('Tablas en DB: ', dbconnection.engine.table_names())
 
 
             # TODO → Implementar guardado en API cada 5 minutos.
@@ -140,7 +143,7 @@ def loop(keylogger):
             print('Tipo de error al leer estadísticas:', e.__class__)
 
         finally:
-            sleep(60)
+            sleep(10)
 
 
 def main():
@@ -153,10 +156,10 @@ def main():
 
     # TODO → Añadir a otro hilo
     # Instancio socket pasándole el keylogger para que alcance sus datos.
-    socket = Socket(keylogger)
+    #socket = Socket(keylogger)
 
     # Comienza el bucle para guardar datos y subirlos a la API.
-    #loop(keylogger)
+    loop(keylogger)
 
 
 if __name__ == "__main__":

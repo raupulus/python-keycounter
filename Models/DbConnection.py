@@ -69,15 +69,14 @@ class DbConnection:
     DB_PASSWORD = os.getenv("DB_PASSWORD")
 
     # Conexión a la base de datos
-    str_conn = DB_CONNECTION + '://' + DB_USERNAME + \
-                           ':' + DB_PASSWORD + '@' + DB_HOST
-    print(DB_PORT)
-    str_conn += ':' + DB_PORT if DB_PORT and int(DB_PORT) > 0 else ''
-    str_conn += '/' + DB_DATABASE
+    if DB_CONNECTION == 'sqlite':
+        str_conn = DB_CONNECTION + ':///' + DB_DATABASE
+    else:
+        str_conn = DB_CONNECTION + '://' + DB_USERNAME + \
+                   ':' + DB_PASSWORD + '@' + DB_HOST
 
-    # TODO → TOFIX → Reescribo temporalmente db, dinamizar desde .env
-    str_conn = DB_CONNECTION + ':///' + 'keycounter.db'
-
+        str_conn += ':' + DB_PORT if DB_PORT and int(DB_PORT) > 0 else ''
+        str_conn += '/' + DB_DATABASE
 
     engine = create_engine(str_conn)
     meta = MetaData()
@@ -97,11 +96,11 @@ class DbConnection:
         columns.append(Column('id', Integer, primary_key=True, autoincrement=True))
 
         # Seteo el resto de columnas.
-        for name, datas in parameters.items():
-            data_type = datas['type']
-            data_params = datas['params']
+        for column_name, attributes in parameters.items():
+            data_type = attributes['type']
+            data_params = attributes['params']
             type_column = None
-            other_data = datas['others']
+            other_data = attributes['others']
 
             # Creo el campo según el tipo de dato.
             if data_type == 'Numeric':
@@ -113,10 +112,10 @@ class DbConnection:
             elif data_type == 'String':
                 type_column = String(**data_params)
 
-            if datas['others']:
-                columns.append(Column(name, type_column, **other_data))
+            if attributes['others']:
+                columns.append(Column(column_name, type_column, **other_data))
             else:
-                columns.append(Column(name, type_column))
+                columns.append(Column(column_name, type_column))
 
         # Creo la tabla con las columnas antes seteadas.
         self.tables[tablename] = Table(
