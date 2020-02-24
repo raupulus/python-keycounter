@@ -77,15 +77,6 @@ SERIAL_BAUDRATE = os.getenv('SERIAL_BAUDRATE') or '9600'
 # Configuración pantalla.
 DISPLAY_ORIENTATION = os.getenv('DISPLAY_ORIENTATION') or 'horizontal'
 
-# Configuración API para el volcado de datos.
-API_URL = os.getenv("API_URL")
-API_TOKEN = os.getenv("API_TOKEN")
-
-# Configuración para identificar el dispositivo que envía los datos.
-MI_PC = os.getenv("MI_PC")
-PC_ID = os.getenv("PC_ID")
-PC_TOKEN = os.getenv("PC_TOKEN")
-
 # Debug
 DEBUG = os.getenv("DEBUG") == "True"
 
