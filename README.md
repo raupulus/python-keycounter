@@ -8,7 +8,7 @@ Herramienta en python 3 para contar la cantidad de teclas que se ha pulsado en u
 
 pip install keyboard
 
-sudo apt install python3-serial
+sudo apt install python3-serial python3-dotenv
 
 ## Ejecución
 
