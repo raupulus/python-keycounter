@@ -112,3 +112,46 @@ Posteriormente ejecutar **main.py** como root. Puede añadirse a un cron @reboot
 para que sea ejecutado en el inicio del sistema y esté siempre funcionando en
 el background.
 
+## Renombrar pantalla UART
+
+Es posible que tengas problemas con la configuración para la pantalla si
+estás continuamente suspendiendo (en mi caso es así) o desconectando la pantalla
+cada poco tiempo.
+
+En estos casos suele producirse un pequeño conflicto, se renombra la interfaz
+por lo que cuando conectamos ya no funcionará mostrando datos correctamente.
+
+Esto no es un gran problema ya que podemos crear una regla en nuestro sistema
+operativo para que quede de forma estática enlazando al punto de montaje de
+turno con dicha interfaz. De este modo pondremos en la configuración de esta
+herramienta el dispositivo que hemos renombrado o enlazado.
+
+A continuación explico como realizarlo.
+
+### Listar dispositivo conectado
+
+```bash
+sudo dmesg | grep ttyUSB
+```
+
+### Listar atributos
+
+```bash
+udevadm info --name=/dev/ttyUSB0 --attribute-walk
+```
+
+### Añadir regla udev
+
+Abrimos el archivo y añadimos la regla modificando el "serial", el "idVendor" y el "idProduct"
+
+```bash
+sudo nano /etc/udev/rules.d/10-usb-serial.rules
+```
+
+SUBSYSTEM=="tty", ATTRS{idVendor}=="05e3", ATTRS{idProduct}=="0610", ATTRS{serial}=="0000:00:14.0",  SYMLINK+="ttyUSB_KEYCOUNTER"
+
+### Recargar nueva configuración
+
+```bash
+sudo udevadm trigger
+```
