@@ -61,7 +61,7 @@ from _thread import start_new_thread
 # Importo modelos
 from Models.Keylogger import Keylogger
 from Models.DbConnection import DbConnection
-from Models.ApiConnection import ApiConnection
+#from Models.ApiConnection import ApiConnection
 from Models.Display import Display
 from Models.Socket import Socket
 
