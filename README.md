@@ -61,3 +61,42 @@ dicha base de datos.
 
 Para la base de datos se utiliza el ORM **SQLAlchemy**
 
+## Instalando (En Debian)
+
+Esta herramienta solo la he llegado a probar en Debian GNU/Linux, también
+de forma parcial en fedora.
+
+### Dependencias
+
+A continuación señalo las depenedencias que he necesitado para lograr 
+ejecutar con éxito esta herramienta. 
+
+Puede ser que necesite alguna más y no me haya dado cuenta de ello al tenerla 
+previamente instalada de alguna otra aplicación en mi sistema.
+
+#### Con el gestor de paquetes de python, pip
+
+Dependencias que instalo desde el gestor de paquetes **pip** para python:
+
+```bash
+pip3 install keyboard
+```
+
+*Hay que tener en cuenta que para que funcione el keycounter es necesario
+ejecutarlo como root, por lo tanto el comando anterior tal vez sea necesario
+hacerlo con tal usuario de la siguiente forma*
+
+```bash
+sudo pip3 install keyboard 
+```
+
+#### Desde el gestor de paquetes y repositorios oficiales para Debian stable
+
+A continuación la línea que he utilizado para obtener las dependencias de 
+python que existen en los repositorios en lugar de hacerlo desde el gestor
+de paquetes de python 3:
+
+```bash
+sudo apt install python3-serial python3-dotenv python3-sqlalchemy
+```
+
