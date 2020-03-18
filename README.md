@@ -100,3 +100,15 @@ de paquetes de python 3:
 sudo apt install python3-serial python3-dotenv python3-sqlalchemy
 ```
 
+## Ejecución
+
+Se necesitan configurar las variables de nuestro entorno copiando el archivo
+.env.example a .env y modificando en este nuestros parámetros de configuración
+que se encuentran en su interior descritos.
+
+## Ejecutar automáticamente al iniciar el sistema
+
+Posteriormente ejecutar **main.py** como root. Puede añadirse a un cron @reboot
+para que sea ejecutado en el inicio del sistema y esté siempre funcionando en
+el background.
+
