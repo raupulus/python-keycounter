@@ -61,7 +61,7 @@ from _thread import start_new_thread
 # Importo modelos
 from Models.Keylogger import Keylogger
 from Models.DbConnection import DbConnection
-#from Models.ApiConnection import ApiConnection
+from Models.ApiConnection import ApiConnection
 from Models.Display import Display
 from Models.Socket import Socket
 
@@ -79,6 +79,7 @@ DISPLAY_ORIENTATION = os.getenv('DISPLAY_ORIENTATION') or 'horizontal'
 
 # Debug
 DEBUG = os.getenv("DEBUG") == "True"
+
 
 def insert_data_to_db(keylogger, dbconnection):
     """
@@ -107,16 +108,43 @@ def insert_data_to_db(keylogger, dbconnection):
     for key in saved:
         del keylogger.spurts[key]
 
-def upload_data_to_api(dbconnection):
+
+def upload_data_to_api(dbconnection, apiconnection):
     """
     Procesa la subida de datos a la API.
-    TODO → Implementar Subir a la API.
-    :return:
     """
-    pass
+
+    try:
+        print('Comprobando datos para subir a la API')
+
+        ## Parámetros/tuplas desde la base de datos.
+        params_from_db = dbconnection.table_get_data_last('keyboard', 10)
+
+        ## Columnas del modelo.
+        columns = dbconnection.tables['keyboard'].columns.keys()
+
+        name = 'Keyboard'
+        path = '/keycounter/keyboard/add-json'
+
+        if params_from_db:
+            print('Hay datos para subir a la API')
+            response = apiconnection.upload(
+                name,
+                path,
+                params_from_db,
+                columns,
+            )
+
+        # Limpio los datos de la tabla si se ha subido correctamente.
+        if response:
+            # dbconnection.table_truncate('keyboard')
+            pass
+
+    except():
+        print('Error al subir datos a la api')
 
 
-def loop(keylogger):
+def loop(keylogger, apiconnection=None):
     # Instancio el modelo para guardar datos en la DB cada minuto.
     dbconnection = DbConnection()
 
@@ -130,15 +158,22 @@ def loop(keylogger):
     sleep(60)
 
     while True:
-        try:
-            print('Entra en while para guardar en la DB')
+        print('Entra en while para guardar en la DB')
 
+
+
+        try:
             insert_data_to_db(keylogger, dbconnection)
 
-            # TODO → Implementar guardado en API cada 5 minutos.
+            # TODO → Limitar subida cada 5 minutos
+            if apiconnection and apiconnection.API_TOKEN and apiconnection.API_URL:
+                print('Entra en if para subir a la API')
+                sleep(5)
+                upload_data_to_api(dbconnection, apiconnection)
+                sleep(5)
 
         except Exception as e:
-            print('Tipo de error al leer estadísticas:', e.__class__)
+            print('Tipo de error al leer datos:', e.__class__)
         finally:
             sleep(60)
 
@@ -151,12 +186,14 @@ def main():
     # Instancio el keylogger, este quedará en un subproceso leyendo teclas.
     keylogger = Keylogger(display=display, has_debug=DEBUG)
 
-    # TODO → Añadir a otro hilo
+    # Instancio conexión con la API
+    apiconnection = ApiConnection()
+
     # Instancio socket pasándole el keylogger para que alcance sus datos.
     socket = Socket(keylogger)
 
     # Comienza el bucle para guardar datos y subirlos a la API.
-    loop(keylogger)
+    loop(keylogger, apiconnection)
 
 
 if __name__ == "__main__":

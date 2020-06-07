@@ -77,10 +77,6 @@ from _thread import start_new_thread
 # no teclas especiales. El objetivo es saber cuantas veces pulsa cada tecla
 
 #######################################
-# #             TODO                # #
-#######################################
-
-#######################################
 # #              Clase              # #
 #######################################
 
@@ -329,7 +325,6 @@ class Keylogger:
             'weekday': datetime.today().weekday(),
         }
 
-
     def set_combo(self, timestamp_utc, reset_sesion=False):
         """
         Establece la puntuación según la cantidad de pulsaciones y algoritmo
@@ -519,12 +514,8 @@ class Keylogger:
             },
 
             'pulsation_average': {
-                'type': 'Numeric',
-                'params': {
-                    'precision': 15,
-                    'asdecimal': True,
-                    'scale': 5
-                },
+                'type': 'String',
+                'params': {},
                 'others': None,
             },
             'score': {

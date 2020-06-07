@@ -76,15 +76,14 @@ sleep = time.sleep
 # Cargo archivos de configuración desde .env sobreescribiendo variables locales.
 load_dotenv(override=True)
 
-class Apiconnection:
+class ApiConnection:
     # Configuración API para el volcado de datos.
     API_URL = os.getenv("API_URL")
     API_TOKEN = os.getenv("API_TOKEN")
 
     # Configuración para identificar el dispositivo que envía los datos.
-    MI_PC = os.getenv("MI_PC")
+    PC_NAME = os.getenv("PC_NAME")
     PC_ID = os.getenv("PC_ID")
-    PC_TOKEN = os.getenv("PC_TOKEN")
 
     def requests_retry_session(
             retries=3,
@@ -116,7 +115,7 @@ class Apiconnection:
     def send(self, path, datas_json):
         '''
         Envía la petición a la API.
-        :param path: Directorio dentro de la api (ex: /api/ws/humidity)
+        :param path: Directorio dentro de la api (ex: /keycounter/add-json)
         '''
 
         url = self.API_URL
@@ -125,7 +124,7 @@ class Apiconnection:
 
         data = {
             'data': datas_json,
-            'info': 'Enviado desde ' +
+            'info': 'Enviado desde ' + self.PC_NAME
         }
 
         headers = {
@@ -155,6 +154,7 @@ class Apiconnection:
                 return False
         except Exception as e:
             print('Ha fallado la petición http :', e.__class__.__name__)
+            #print('Ha fallado la petición http :', e)
             sleep(5)
 
             return False
@@ -171,7 +171,10 @@ class Apiconnection:
 
         # Compongo el objeto json que será devuelto.
         for row in rows:
-            tupla = {}
+            tupla = {
+                'device_id': self.PC_ID,
+                'device_name': self.PC_NAME
+            }
 
             # Por cada tupla creo la pareja de clave: valor
             for iteracion in range(len(columns)):
@@ -190,7 +193,7 @@ class Apiconnection:
             indent=4,
         )
 
-    def upload(self, sensorname, path, datas, columns):
+    def upload(self, name, path, datas, columns):
         """
         Recibe la ruta dentro de la API y los datos a enviar para procesar la
         subida atacando la API.
@@ -198,7 +201,7 @@ class Apiconnection:
         :param datas: Datos a enviar
         """
         if datas:
-            print('Subiendo sensor: ' + sensorname + ', ruta de api: ' + path)
+            print('Subiendo datos para: ' + name + ', ruta de api: ' + path)
             datas_json = self.parse_to_json(datas, columns)
             #print('Datos formateados en JSON:', datas_json)
             result_send = self.send(path, datas_json)

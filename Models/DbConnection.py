@@ -141,6 +141,30 @@ class DbConnection:
             select([table])
         ).fetchall()
 
+    def table_get_data_last(self, tablename, limit):
+        """
+        Obtiene los datos de una tabla previamente seteada limitando resultados.
+        :param tablename: Nombre de la tabla desde la que obtener datos.
+        :param limit: Límite de datos a extraer de la db
+        """
+
+        table = self.tables[tablename]
+
+        print('----------- table_get_data_last ------------')
+
+        # Ejecuto la consulta para traer las tuplas de la tabla completa
+        return self.connection.execute(
+            select([table])
+        ).fetchall()
+
+        # Ejecuto la consulta para traer las tuplas de la tabla limitada
+        #TODO → Limitar y ordenar resultados a devolver:
+        """
+        return self.connection.execute(
+            select([table])
+        ).limit(limit).order_by("created_at DESC").fetchall()
+        """
+
     def table_save_data(self, tablename, params):
         """
         Almacena datos recibidos en la tabla recibida.
