@@ -19,10 +19,10 @@
 # Revision 0.01 - File Created
 # Additional Comments:
 
-# @copyright  Copyright © 2019 Raúl Caro Pastorino
+# @copyright  Copyright © 2020 Raúl Caro Pastorino
 # @license    https://wwww.gnu.org/licenses/gpl.txt
 
-# Copyright (C) 2019  Raúl Caro Pastorino
+# Copyright (C) 2020  Raúl Caro Pastorino
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -52,7 +52,9 @@
 import datetime
 import os
 from sqlalchemy import create_engine, Table, Column, Integer, String, \
-                       MetaData, DateTime, Numeric, select
+                       MetaData, DateTime, Numeric, select, text
+
+from sqlalchemy.orm import sessionmaker
 
 # Cargo archivos de configuración desde .env
 from dotenv import load_dotenv
@@ -81,6 +83,9 @@ class DbConnection:
     engine = create_engine(str_conn)
     meta = MetaData()
     connection = engine.connect()
+
+    # Probando sesión para lotes
+    Session = sessionmaker(bind=engine)
 
     tables = {}
 
@@ -152,18 +157,10 @@ class DbConnection:
 
         print('----------- table_get_data_last ------------')
 
-        # Ejecuto la consulta para traer las tuplas de la tabla completa
-        return self.connection.execute(
-            select([table])
-        ).fetchall()
-
         # Ejecuto la consulta para traer las tuplas de la tabla limitada
-        #TODO → Limitar y ordenar resultados a devolver:
-        """
         return self.connection.execute(
-            select([table])
-        ).limit(limit).order_by("created_at DESC").fetchall()
-        """
+            select([table]).order_by(text('created_at DESC')).limit(limit)
+        ).fetchall()
 
     def table_save_data(self, tablename, params):
         """
@@ -191,6 +188,29 @@ class DbConnection:
         :param tablename: Nombre de la tabla.
         """
         self.connection.execute(self.tables[tablename].delete())
+
+    def table_drop_last_elements(self, tablename, limit):
+        table = self.tables[tablename]
+        session = self.Session()
+
+        #deleted_objects = table.delete().where(User.id.in_([1, 2, 3]))
+        #deleted_objects = table.__table__.delete().order_by(
+        # table.created_at,'DESC').limit(limit)
+        #session.execute(deleted_objects)
+        #session.commit()
+
+        #deleted_objects = table.query.order_by(table.created_at,'DESC').limit(limit)
+        #session.delete(deleted_objects)
+        #session.commit()
+
+        session.query(table).order_by(table.created_at,'DESC').limit(limit).delete()
+        session.commit()
+        print('BORRADO COMPLETO')
+        return True
+
+        return self.connection.execute(
+            select([table]).order_by(table.created_at, 'DESC').limit(limit).delete()
+        ).fetchall()
 
     def get_all_data(self):
         '''

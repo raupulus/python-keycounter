@@ -94,15 +94,22 @@ def insert_data_to_db(keylogger, dbconnection):
     # Guardo las estadísticas registradas para el teclado de todas las rachas.
     for register in keylogger.spurts:
         # Compruebo que existan datos registrados, que existe una racha.
-        if register is not None:
-            save_data = dbconnection.table_save_data(
-                tablename=keylogger.tablename,
-                params=keylogger.spurts[register]
-            )
+        try:
+            if register is not None:
+                if keylogger.spurts[register]['pulsations'] > 1:
+                    save_data = dbconnection.table_save_data(
+                        tablename=keylogger.tablename,
+                        params=keylogger.spurts[register]
+                    )
+                else:
+                    save_data = True
 
-            # Si se ha llevado a cabo el guardado, se quita del map.
-            if save_data:
-                saved.append(register)
+                # Si se ha llevado a cabo el guardado, se quita del map.
+                if save_data:
+                    saved.append(register)
+        except:
+            print('Error al insertar elemento')
+            print(register)
 
     # Elimino los registros que fueron almacenados en la db correctamente.
     for key in saved:
@@ -118,7 +125,10 @@ def upload_data_to_api(dbconnection, apiconnection):
         print('Comprobando datos para subir a la API')
 
         ## Parámetros/tuplas desde la base de datos.
-        params_from_db = dbconnection.table_get_data_last('keyboard', 10)
+        params_from_db = dbconnection.table_get_data_last('keyboard', 1)
+
+        print('params_from_db')
+        print(params_from_db)
 
         ## Columnas del modelo.
         columns = dbconnection.tables['keyboard'].columns.keys()
@@ -137,8 +147,8 @@ def upload_data_to_api(dbconnection, apiconnection):
 
         # Limpio los datos de la tabla si se ha subido correctamente.
         if response:
-            # dbconnection.table_truncate('keyboard')
-            pass
+            print('Eliminando de la DB local rachas subidas')
+            dbconnection.table_drop_last_elements('keyboard', 1)
 
     except():
         print('Error al subir datos a la api')
@@ -169,7 +179,7 @@ def loop(keylogger, apiconnection=None):
             if apiconnection and apiconnection.API_TOKEN and apiconnection.API_URL:
                 print('Entra en if para subir a la API')
                 sleep(5)
-                upload_data_to_api(dbconnection, apiconnection)
+                #upload_data_to_api(dbconnection, apiconnection)
                 sleep(5)
 
         except Exception as e:
