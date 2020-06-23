@@ -145,10 +145,10 @@ def upload_data_to_api(dbconnection, apiconnection):
                 columns,
             )
 
-        # Limpio los datos de la tabla si se ha subido correctamente.
-        if response:
-            print('Eliminando de la DB local rachas subidas')
-            dbconnection.table_drop_last_elements('keyboard', 10)
+            # Limpio los datos de la tabla si se ha subido correctamente.
+            if response:
+                print('Eliminando de la DB local rachas subidas')
+                dbconnection.table_drop_last_elements('keyboard', 10)
 
     except():
         print('Error al subir datos a la api')
