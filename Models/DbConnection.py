@@ -190,27 +190,28 @@ class DbConnection:
         self.connection.execute(self.tables[tablename].delete())
 
     def table_drop_last_elements(self, tablename, limit):
-        table = self.tables[tablename]
+        """
+        Elimina los últimos elementos en la cantidad recibida, de una
+        tabla recibida
+        :param tablename: Nombre de la tabla sobre la que actuar
+        :param limit: Límite, cantidad de entradas a borrar
+        :return:
+        """
+        table = self.tables.get(tablename)
         session = self.Session()
 
-        #deleted_objects = table.delete().where(User.id.in_([1, 2, 3]))
-        #deleted_objects = table.__table__.delete().order_by(
-        # table.created_at,'DESC').limit(limit)
-        #session.execute(deleted_objects)
-        #session.commit()
+        ## Obtengo los últimos elementos para eliminarlos posteriormente.
+        lastData = self.table_get_data_last(tablename, limit)
 
-        #deleted_objects = table.query.order_by(table.created_at,'DESC').limit(limit)
-        #session.delete(deleted_objects)
-        #session.commit()
+        ## Almaceno los ids de todos los resultados.
+        ids = []
 
-        session.query(table).order_by(table.created_at,'DESC').limit(limit).delete()
+        for data in lastData:
+            ids.append(data.id)
+
+        query = table.delete().where(table.c.id.in_(ids))
+        session.execute(query)
         session.commit()
-        print('BORRADO COMPLETO')
-        return True
-
-        return self.connection.execute(
-            select([table]).order_by(table.created_at, 'DESC').limit(limit).delete()
-        ).fetchall()
 
     def get_all_data(self):
         '''

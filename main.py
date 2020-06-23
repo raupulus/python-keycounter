@@ -121,21 +121,21 @@ def upload_data_to_api(dbconnection, apiconnection):
     Procesa la subida de datos a la API.
     """
 
+    print('Comprobando datos para subir a la API')
+
+    ## Parámetros/tuplas desde la base de datos.
+    params_from_db = dbconnection.table_get_data_last('keyboard', 10)
+
+    print('params_from_db')
+    print(params_from_db)
+
+    ## Columnas del modelo.
+    columns = dbconnection.tables['keyboard'].columns.keys()
+
+    name = 'Keyboard'
+    path = '/keycounter/keyboard/add-json'
+
     try:
-        print('Comprobando datos para subir a la API')
-
-        ## Parámetros/tuplas desde la base de datos.
-        params_from_db = dbconnection.table_get_data_last('keyboard', 1)
-
-        print('params_from_db')
-        print(params_from_db)
-
-        ## Columnas del modelo.
-        columns = dbconnection.tables['keyboard'].columns.keys()
-
-        name = 'Keyboard'
-        path = '/keycounter/keyboard/add-json'
-
         if params_from_db:
             print('Hay datos para subir a la API')
             response = apiconnection.upload(
@@ -148,7 +148,7 @@ def upload_data_to_api(dbconnection, apiconnection):
         # Limpio los datos de la tabla si se ha subido correctamente.
         if response:
             print('Eliminando de la DB local rachas subidas')
-            dbconnection.table_drop_last_elements('keyboard', 1)
+            dbconnection.table_drop_last_elements('keyboard', 10)
 
     except():
         print('Error al subir datos a la api')
@@ -170,22 +170,22 @@ def loop(keylogger, apiconnection=None):
     while True:
         print('Entra en while para guardar en la DB')
 
+        insert_data_to_db(keylogger, dbconnection)
 
+        # TODO → Limitar subida a la api cada 5 minutos
+        if apiconnection and apiconnection.API_TOKEN and apiconnection.API_URL:
+            print('Entra en if para subir a la API')
+            sleep(2)
+            upload_data_to_api(dbconnection, apiconnection)
+            sleep(1)
 
         try:
-            insert_data_to_db(keylogger, dbconnection)
-
-            # TODO → Limitar subida cada 5 minutos
-            if apiconnection and apiconnection.API_TOKEN and apiconnection.API_URL:
-                print('Entra en if para subir a la API')
-                sleep(5)
-                #upload_data_to_api(dbconnection, apiconnection)
-                sleep(5)
+            pass
 
         except Exception as e:
             print('Tipo de error al leer datos:', e.__class__)
         finally:
-            sleep(60)
+            sleep(10)
 
 
 def main():
