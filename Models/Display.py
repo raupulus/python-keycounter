@@ -90,6 +90,11 @@ class Display(LCDUart):
         """
 
         if self.ser and not self.ser.is_open or not self.ser:
+
+            ##TODO → Cada 1 minuto comprobar timestamp y reinicializar
+            self.initialize()
+
+
             print('Ocurrió un problema con la pantalla, ¿Cambió el puerto serial?')
             return False
 

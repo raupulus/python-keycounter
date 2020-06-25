@@ -62,6 +62,8 @@ load_dotenv(override=True)
 
 
 class DbConnection:
+    has_debug = os.getenv("DEBUG") == "True"
+
     # Datos de conexión con la DB desde .env
     DB_CONNECTION = os.getenv("DB_CONNECTION")
     DB_HOST = os.getenv("DB_HOST")
@@ -131,7 +133,8 @@ class DbConnection:
 
         self.meta.create_all(self.engine)
 
-        print('Tablas en la DB: ', self.engine.table_names())
+        if self.has_debug:
+            print('Tablas en la DB: ', self.engine.table_names())
 
     def table_get_data(self, tablename):
         """
@@ -155,7 +158,8 @@ class DbConnection:
 
         table = self.tables[tablename]
 
-        print('----------- table_get_data_last ------------')
+        if self.has_debug:
+            print('----------- table_get_data_last ------------')
 
         # Ejecuto la consulta para traer las tuplas de la tabla limitada
         return self.connection.execute(
@@ -173,13 +177,16 @@ class DbConnection:
 
         # Inserto Datos
         try:
-            print('Intentando guardar en la DB: ', params)
+            if self.has_debug:
+                print('Intentando guardar en la DB: ', params)
+
             stmt = table.insert().values(params).return_defaults()
             result = self.connection.execute(stmt)
             # server_created_at = result.returned_defaults['created_at']
             return True
         except Exception as e:
-            print('Ha ocurrido un problema al insertar datos', e.__class__.__name__)
+            if self.has_debug:
+                print('Ha ocurrido un problema al insertar datos', e.__class__.__name__)
             return None
 
     def table_truncate(self, tablename):
@@ -240,5 +247,7 @@ class DbConnection:
         trans.commit()
 
     def close_connection(self):
-        print('Cerrando conexión con la Base de Datos')
+        if self.has_debug:
+            print('Cerrando conexión con la Base de Datos')
+
         self.connection.close()

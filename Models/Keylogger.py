@@ -466,9 +466,14 @@ class Keylogger:
         data = self.statistics()
 
         # Accede al método "update_keycounter" del modelo para la pantalla.
-        self.display.update_keycounter(data)
-
-        return True
+        start_new_thread(self.display.update_keycounter, (data,))
+        try:
+            #self.display.update_keycounter(data)
+            return True
+        except:
+            if self.has_debug:
+                print('En Keylogger.py método send_to_display error al dibujar por pantalla')
+            return False
 
     def tablemodel(self):
         """

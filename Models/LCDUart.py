@@ -34,6 +34,10 @@ sleep = time.sleep
 
 
 class LCDUart:
+    has_debug = False
+    port = '/dev/ttyUSB0'
+    baudrate = 115200,
+    timeout = 1,
     orientation = 'vertical'
     width = 176
     height = 220
@@ -62,34 +66,62 @@ class LCDUart:
     }
 
     def __init__(self, port='/dev/ttyUSB0', baudrate=115200, timeout=1,
-                  orientation='vertical'):
+                  orientation='vertical', has_debug=False):
         if not port:
             return None
 
-        # Compruebo si existe el puerto.
-        if not os.system('ls ' + port + ' 2> /dev/null') == 0:
-            print('El puerto para la pantalla no existe.')
+        self.has_debug = has_debug
+        self.port = port
+        self.baudrate = baudrate
+        self.timeout = timeout
+        self.orientation = orientation
+
+        if not self.initialize():
             return None
 
+        if self.has_debug:
+            print('Pantalla Lista')
+
+    def initialize(self):
+        """
+        Abrir el puerto para comenzar la comunicación con la pantalla.
+        :return:
+        """
+        time.sleep(1)
+
+        # Compruebo si existe el puerto.
+        if not os.system('ls ' + self.port + ' 2> /dev/null') == 0:
+            if self.has_debug:
+                print('El puerto ' + self.port + ' para la pantalla no existe.')
+            return None
+
+        # Cierro el puerto para abrirlo posteriormente
+        if self.ser and self.ser.is_open:
+            time.sleep(1)
+            self.ser.close()
+            time.sleep(3)
+
         # Abre el puerto
-        self.ser = serial.Serial(port, baudrate, timeout=timeout)
+        self.ser = serial.Serial(self.port, self.baudrate, timeout=self.timeout)
 
         if not self.ser.is_open:
-            print('No se pudo establecer la comunicación en el puerto ' + port)
+            if self.has_debug:
+                print('No se pudo establecer la comunicación en el puerto ' + self.port)
 
-        print('Serial Open? → ' + str(self.ser.is_open))
+        if self.has_debug:
+            print('Serial Open? → ' + str(self.ser.is_open))
+
         self.write(b"RESET;BPS(115200);BL(0);CLR(0);\r\n")
 
         time.sleep(1)
 
-        self.set_screen_orientation(orientation)
+        self.set_screen_orientation(self.orientation)
 
         self.configurations()
 
-        print('Pantalla Lista')
-
     def configurations(self):
-        print('Aplicando Configuraciones a la pantalla')
+        if self.has_debug:
+            print('Aplicando Configuraciones a la pantalla')
         return True
 
     def stop(self):
@@ -114,8 +146,11 @@ class LCDUart:
         """
         Envía un comando en bruto a la pantalla
         """
-        self.ser.write(bytes(command))
-        #time.sleep(0.1)
+        try:
+            self.ser.write(bytes(command))
+        except:
+            time.sleep(1)
+            self.initialize()
 
     def get_screen_size(self):
         """
@@ -138,7 +173,9 @@ class LCDUart:
         horizontal y vertical
         """
         if orientation == 'vertical':
-            print('Estableciendo orientación Vertical')
+            if self.has_debug:
+                print('Estableciendo orientación Vertical')
+
             self.orientation = orientation
             self.width = 176
             self.height = 220
@@ -146,11 +183,14 @@ class LCDUart:
             time.sleep(0.1)
             return True
         elif orientation == 'horizontal':
-            print('Estableciendo orientación Horizontal')
+            if self.has_debug:
+                print('Estableciendo orientación Horizontal')
+
             self.orientation = orientation
             self.width = 220
             self.height = 176
             self.ser.write(b"DIR(1);\r\n")
+
             return True
 
         return False

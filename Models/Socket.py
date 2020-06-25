@@ -66,6 +66,8 @@ from _thread import start_new_thread
 
 
 class Socket:
+    has_debug = False
+
     # Ruta dónde se creará el Socket.
     server_address = '/var/run/keycounter.socket'
 
@@ -75,8 +77,9 @@ class Socket:
     # Almacena la instancia del keylogger para obtener sus datos.
     keylogger = None
 
-    def __init__(self, keylogger):
+    def __init__(self, keylogger, has_debug=False):
         self.keylogger = keylogger
+        self.has_debug = has_debug
 
         # Limpio sockets anteriores que pueda existir.
         self.delete_old_socket()
@@ -85,7 +88,9 @@ class Socket:
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
         # Crea el socket en la dirección indicada con "server_address.
-        print('Comenzando socket abierto en {}'.format(self.server_address))
+        if self.has_debug:
+            print('Comenzando socket abierto en {}'.format(self.server_address))
+
         self.sock.bind(self.server_address)
 
         # Comienza a escuchar conexiones entrantes.
@@ -123,13 +128,19 @@ class Socket:
         """
         while True:
             # Queda esperando conexiones
-            print('Socket Unix Esperando conexiones')
+            if self.has_debug:
+                print('Socket Unix Esperando conexiones')
             connection, client_address = self.sock.accept()
 
             try:
-                print('Conexión desde', client_address)
+                if self.has_debug:
+                    print('Conexión desde', client_address)
+
                 data = connection.recv(2048)
-                print('Enviando Pulsaciones: ' + str(self.keylogger.pulsations_current))
+
+                if self.has_debug:
+                    print('Enviando Pulsaciones: ' + str(self.keylogger.pulsations_current))
+
                 connection.sendall(bytes(str(self.keylogger.pulsations_current), encoding='utf-8'))
 
                 """

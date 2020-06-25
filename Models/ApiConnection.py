@@ -77,6 +77,8 @@ sleep = time.sleep
 load_dotenv(override=True)
 
 class ApiConnection:
+    has_debug = os.getenv("DEBUG") == "True"
+
     # Configuración API para el volcado de datos.
     API_URL = os.getenv("API_URL")
     API_TOKEN = os.getenv("API_TOKEN")
@@ -141,20 +143,23 @@ class ApiConnection:
                 timeout=30
             )
 
-            print('Respuesta de API: ', req.status_code)
+            if self.has_debug:
+                print('Respuesta de API: ', req.status_code)
             #print('Recibido: ', req.text)
 
             # Guardado correctamente 201, con errores 200, mal 500
             if int(req.status_code) == 201:
                 return True
             elif int(req.status_code) == 200:
-                print('Al guardar en la API algunos elementos tuvieron error.')
+                if self.has_debug:
+                    print('Al guardar en la API algunos elementos tuvieron error.')
                 return True
             else:
                 return False
         except Exception as e:
-            print('Ha fallado la petición http :', e.__class__.__name__)
-            #print('Ha fallado la petición http :', e)
+            if self.has_debug:
+                print('Ha fallado la petición http :', e.__class__.__name__)
+                #print('Ha fallado la petición http :', e)
             sleep(5)
 
             return False
@@ -201,9 +206,14 @@ class ApiConnection:
         :param datas: Datos a enviar
         """
         if datas:
-            print('Subiendo datos para: ' + name + ', ruta de api: ' + path)
+            if self.has_debug:
+                print('Subiendo datos para: ' + name + ', ruta de api: ' + path)
+
             datas_json = self.parse_to_json(datas, columns)
-            #print('Datos formateados en JSON:', datas_json)
+
+            #if self.has_debug:
+                #print('Datos formateados en JSON:', datas_json)
+
             result_send = self.send(path, datas_json)
 
             return result_send
