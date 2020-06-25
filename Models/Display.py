@@ -94,8 +94,9 @@ class Display(LCDUart):
             ##TODO → Cada 1 minuto comprobar timestamp y reinicializar
             self.initialize()
 
+            if self.has_debug:
+                print('Ocurrió un problema con la pantalla, ¿Cambió el puerto serial?')
 
-            print('Ocurrió un problema con la pantalla, ¿Cambió el puerto serial?')
             return False
 
         # ATENCIÓN → AL CREAR LAS ÓRDENES, TIENE QUE ACABAR EN \r\n sólo
