@@ -249,7 +249,8 @@ class Keylogger:
         Devuelve la media de pulsaciones para la racha actual por segundos.
         :return:
         """
-        timestamp_utc = datetime.utcnow()
+        #timestamp_utc = datetime.utcnow()
+        timestamp_utc = self.last_pulsation_at
         duration_seconds = (timestamp_utc - self.pulsations_current_start_at).seconds
 
         if duration_seconds > 0 and self.pulsations_current > 0:
@@ -315,9 +316,11 @@ class Keylogger:
         insertado en la db o subido a la API.
         :return:
         """
-        self.spurts[timestamp_utc] = {
+        #self.spurts[timestamp_utc] = {
+        self.spurts[self.last_pulsation_at] = {
             'start_at': self.pulsations_current_start_at,
-            'end_at': timestamp_utc,
+            #'end_at': timestamp_utc,
+            'end_at': self.last_pulsation_at,
             'pulsations': self.pulsations_current,
             'pulsations_special_keys': self.pulsations_current_special_keys,
             'pulsation_average': self.get_pulsation_average(),
