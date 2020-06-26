@@ -164,6 +164,10 @@ class Keylogger:
         10: 1.00
     }
 
+    # Representa el inicio del día actual, para resetear contadores totales cada día.
+    current_day_start = None
+    current_day_end = None
+
     #######################################
     # #           Estadísticas          # #
     #######################################
@@ -224,17 +228,63 @@ class Keylogger:
         # Establezco tecla para finalizar la captura.
         self.terminate_key = terminate_key
 
-        # Establezco marca de inicio.
-        self.start_at = current_timestamp
+        # Establezco contadores para sesión completa por día
+        self.reset_global_counter()
 
         # Establezco timestamps.
         self.last_pulsation_at = current_timestamp
         self.pulsations_current_start_at = current_timestamp
-        self.pulsation_high_at = current_timestamp
-        self.combo_score_high_at = current_timestamp
 
         # Comienza la escucha de teclas pulsadas
         start_new_thread(self.read_keyboard, ())
+
+    def reset_global_counter(self):
+        if self.has_debug:
+            print('Restableciendo contadores de la sesión')
+
+        current_day_start = datetime.utcnow()
+        current_day_start = current_day_start.replace(hour=0, minute=0,
+                                                      second=0, microsecond=0)
+        current_day_end = datetime.utcnow()
+        current_day_end = current_day_end.replace(hour=23, minute=59,
+                                                      second=59, microsecond=999999)
+
+        if self.has_debug:
+            print('Marca de inicio de la sesión')
+            print(current_day_start)
+
+            print('Marca de final de la sesión')
+            print(current_day_end)
+
+        self.current_day_start = current_day_start
+        self.current_day_end = current_day_end
+
+        # Creo timestamp para inicializar contadores.
+        current_timestamp = datetime.utcnow()
+
+        # Timestamp con el comienzo de las mediciones.
+        self.start_at = current_timestamp
+
+        # Mayor racha de pulsaciones.
+        self.pulsation_high = 0
+
+        # Timestamp de la mejor racha de puntuaciones.
+        self.pulsation_high_at = current_timestamp
+
+        # Total de pulsaciones.
+        self.pulsations_total = 0
+
+        # Total de pulsaciones para teclas especiales.
+        self.pulsations_total_especial_keys = 0
+
+        # Puntuación total según la cantidad de combos.
+        self.combo_score = 0
+
+        # Mayor Puntuación de combo en toda la sesión.
+        self.combo_score_high = 0
+
+        # Timestamp del momento en el que se consiguió la mejor racha
+        self.combo_score_high_at = current_timestamp
 
     def read_keyboard(self):
         """
@@ -309,6 +359,10 @@ class Keylogger:
         if self.pulsations_current >= self.pulsation_high:
             self.pulsation_high = self.pulsations_current
             self.pulsation_high_at = timestamp_utc
+
+        # Compruebo el día para reestablecer contadores globales de sesión
+        if timestamp_utc > self.current_day_end:
+            start_new_thread(self.reset_global_counter, ())
 
     def add_old_streak(self, timestamp_utc):
         """
