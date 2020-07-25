@@ -86,7 +86,7 @@ class DbConnection:
     meta = MetaData()
     connection = engine.connect()
 
-    # Probando sesión para lotes
+    # Sesión para acciones por lotes
     Session = sessionmaker(bind=engine)
 
     tables = {}
