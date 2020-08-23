@@ -51,12 +51,12 @@
 # #       Importar Librerías        # #
 #######################################
 from time import sleep
-import datetime
-import random  # Genera números aleatorios --> random.randrange(1,100)
-import functions as func
+#import datetime
+#import random  # Genera números aleatorios --> random.randrange(1,100)
+#import functions as func
 from dotenv import load_dotenv
 import os
-from _thread import start_new_thread
+#from _thread import start_new_thread
 
 # Importo modelos
 from Models.Keylogger import Keylogger

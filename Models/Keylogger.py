@@ -53,12 +53,11 @@
 #######################################
 # #       Importar Librerías        # #
 #######################################
-from functools import partial
-# import os
 import keyboard
-# from datetime import datetime, date, time, timezone
 from datetime import datetime
 from _thread import start_new_thread
+import subprocess
+from time import sleep
 
 #######################################
 # #             Variables           # #
@@ -84,6 +83,10 @@ from _thread import start_new_thread
 class Keylogger:
     # Nombre de la tabla para almacenar datos
     tablename = 'keyboard'
+
+    # Lista con los dispositivos encontrados, se usa para recargar al
+    # conectar algo como un teclado usb.
+    devices = None
 
     # Map para almacenar todas las rachas no guardadas en DB
     spurts = {}
@@ -236,9 +239,58 @@ class Keylogger:
         self.pulsations_current_start_at = current_timestamp
 
         # Comienza la escucha de teclas pulsadas
-        start_new_thread(self.read_keyboard, ())
+        keyboard.hook(self.callback)
+        # keyboard.wait(self.terminate_key)
+
+        # Almacenos los dispositivos de entrada conectados
+        self.devices = self.readDevicesById()
+
+        # Inicio hilo para comprobar cambios en dispositivos conectados/desconectados
+        start_new_thread(self.reloadKeycounterOnNewDevice, ())
+
+    def readDevicesById(self):
+        """
+        Lee todos los dispositivos de entrada conectados en el sistema por id y
+        los devuelve.
+        :return:
+        """
+        return subprocess.getoutput('ls /dev/input/by-id/')
+
+    def reloadKeycounterOnNewDevice(self):
+        """
+        Cuando se detecta un nuevo dispositivo conectado al sistema se recargará
+        el keycounter para añadirlo a la lista de soportados.
+        :return:
+        """
+        while True:
+            new_devices = self.readDevicesById()
+
+            if self.devices != new_devices:
+                # Almaceno los nuevos dispositivos en la clase
+                self.devices = new_devices
+
+                if self.has_debug:
+                    print('Hay cambios en los dispositivos, reiniciando callback')
+                    print(new_devices)
+
+                print('Hay cambios en los dispositivos, reiniciando callback')
+                print(new_devices)
+                sleep(1)
+
+                # Vuelvo a iniciar el callback.
+                keyboard.unhook_all()
+                sleep(3)
+                print('Reiniciando')
+                keyboard.hook(self.callback)
+
+            # Pausa entre cada comprobación.
+            sleep(1)
 
     def reset_global_counter(self):
+        """
+        Borra los contadores globales al acabar el día.
+        :return:
+        """
         if self.has_debug:
             print('Restableciendo contadores de la sesión')
 
@@ -285,14 +337,6 @@ class Keylogger:
 
         # Timestamp del momento en el que se consiguió la mejor racha
         self.combo_score_high_at = current_timestamp
-
-    def read_keyboard(self):
-        """
-        Esta función inicia la escucha de teclas constantemente para el
-        keylogger.
-        """
-        keyboard.hook(partial(self.callback))
-        keyboard.wait(self.terminate_key)
 
     def get_pulsation_average(self):
         """
@@ -461,6 +505,7 @@ class Keylogger:
         recibiendo el evento y filtrando solo por las primeras pulsaciones
         (no las continuadas).
         """
+
         if event.event_type in ('up', 'down'):
             key = self.KEYS_MAP.get(event.name, event.name)
             modifier = len(key) > 1
@@ -486,7 +531,8 @@ class Keylogger:
                 self.is_down[key] = False
 
             # Aumento las pulsaciones de teclas indicando si es especial o no.
-            if (special_key or event.name == 'unknown') and event_type == 'down':
+            if (
+                    special_key or event.name == 'unknown') and event_type == 'down':
                 self.increase_pulsation(True)
             elif event_type == 'down':
                 self.increase_pulsation(False)
@@ -501,8 +547,6 @@ class Keylogger:
 
             # Muestra datos actuales por la pantalla si esta existiera.
             self.send_to_display()
-
-            return True
 
     def send_to_display(self):
         """
