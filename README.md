@@ -79,7 +79,7 @@ previamente instalada de alguna otra aplicación en mi sistema.
 Dependencias que instalo desde el gestor de paquetes **pip** para python:
 
 ```bash
-pip3 install keyboard
+pip3 install keyboard mouse
 ```
 
 *Hay que tener en cuenta que para que funcione el keycounter es necesario
@@ -87,7 +87,7 @@ ejecutarlo como root, por lo tanto el comando anterior tal vez sea necesario
 hacerlo con tal usuario de la siguiente forma*
 
 ```bash
-sudo pip3 install keyboard 
+sudo pip3 install keyboard mouse
 ```
 
 #### Desde el gestor de paquetes y repositorios oficiales para Debian stable

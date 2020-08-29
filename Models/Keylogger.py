@@ -54,6 +54,7 @@
 # #       Importar Librerías        # #
 #######################################
 import keyboard
+import mouse
 from datetime import datetime
 from _thread import start_new_thread
 import subprocess
@@ -255,6 +256,10 @@ class Keylogger:
         Inicia el callback para contar las teclas pulsadas
         """
         keyboard.hook(self.callback)
+        mouse.on_click(self.callback_mouse, ('left',))
+        mouse.on_right_click(self.callback_mouse, ('right',))
+        mouse.on_middle_click(self.callback_mouse, ('middle',))
+
 
     def reload_keycounter_on_new_device(self):
         """
@@ -337,6 +342,13 @@ class Keylogger:
 
         # Timestamp del momento en el que se consiguió la mejor racha
         self.combo_score_high_at = current_timestamp
+
+        # Borro contadores globales para el teclado
+        # TODO → Refactorizar guardado de datos en el modelo de teclado
+        self.model_keyboard.reset_global_counter()
+
+        # Borro contadores globales para el ratón
+        self.model_mouse.reset_global_counter()
 
     def get_pulsation_average(self):
         """
@@ -490,6 +502,32 @@ class Keylogger:
             'streak': self.statistics_streak()
         }
 
+    def callback_mouse(self, button):
+        """
+        Esta función registra las pulsaciones del ratón.
+        :param button:
+        """
+
+        print('Botón pulsado: ' + button)
+
+        if button == 'left':
+            pass
+        elif button == 'middle':
+            pass
+        elif button == 'right':
+            pass
+
+        """
+        # Compruebo que el evento de ratón sea una pulsación
+        if isinstance(event, mouse.ButtonEvent):
+            #event.event_type
+            #event.button
+            print('Es un evento contemplado (double, down, left, middle):')
+            print('Tipo: ' +event.event_type + ' botón: ' + event.button)
+            
+        """
+
+
     def callback(self, event):
         """
         Esta función se ejecuta como callback cada vez que una tecla es pulsada
@@ -509,7 +547,6 @@ class Keylogger:
 
             # Las teclas desconocidas o eventos de ratón se descartan
             if event.name == 'unknown':
-                # TODO → Distinguir si es un click e implementar contador.
                 return None
 
             # Marco si está pulsado para evitar registrar teclas presionadas
@@ -522,8 +559,7 @@ class Keylogger:
                 self.is_down[key] = False
 
             # Aumento las pulsaciones de teclas indicando si es especial o no.
-            if (
-                    special_key or event.name == 'unknown') and event_type == 'down':
+            if (special_key or event.name == 'unknown') and event_type == 'down':
                 self.increase_pulsation(True)
             elif event_type == 'down':
                 self.increase_pulsation(False)

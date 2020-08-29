@@ -71,6 +71,28 @@ class MouseLogger:
     # Map para almacenar todas las rachas no guardadas en DB
     spurts = {}
 
+    # ############# Estadísticas de MOUSE ############# #
+    click_left = 0
+    click_right = 0
+    click_center = 0
+    click_up = 0
+    click_down = 0
+    click_other = 0
+    current_clicks = 0
+    total_clicks = 0
+    clicks_current_start_at = None
+    last_pulsation_at = None
+    pulsations_hight = 0
+    pulsations_hight_at = None
+
+    def reset_global_counter(self):
+        current_timestamp = datetime.utcnow()
+        self.pulsations_hight = 0
+        self.pulsations_hight_at = current_timestamp
+
+    def increase_click(self, special_key=False):
+        pass
+
     def tablemodel(self):
         """
         Plantea campos como modelo de datos para una base de datos y poder ser
