@@ -80,11 +80,19 @@ DISPLAY_ORIENTATION = os.getenv('DISPLAY_ORIENTATION') or 'horizontal'
 # Debug
 DEBUG = os.getenv("DEBUG") == "True"
 
+def insert_keyboard_spurts_in_db(keylogger, dbconnection):
+    insert_data_to_db(keylogger, dbconnection, keylogger.tablename)
 
-def insert_data_to_db(keylogger, dbconnection):
+def insert_mouse_spurts_in_db(keylogger, dbconnection):
+    #insert_data_to_db(keylogger, dbconnection, tablename)
+    pass
+
+
+def insert_data_to_db(keylogger, dbconnection, tablename):
     """
     Almacena los datos de los sensores en la base de datos.
-    :param dbconnection:
+    :param dbconnection: Conexión con la base de datos.
+    :param tablename: Nombre de la tabla.
     :return:
     """
 
@@ -176,9 +184,11 @@ def loop(keylogger, apiconnection=None):
             print('Entra en while para guardar en la DB')
 
         try:
-            insert_data_to_db(keylogger, dbconnection)
+            #insert_data_to_db(keylogger, dbconnection)
+            insert_keyboard_spurts_in_db(keylogger, dbconnection)
+            insert_mouse_spurts_in_db(keylogger, dbconnection)
 
-            # TODO → Limitar subida a la api cada 5 minutos
+            # Inicia la subida a la base de datos si está configurada.
             if apiconnection and apiconnection.API_TOKEN and apiconnection.API_URL:
                 if DEBUG:
                     print('Entra en if para subir a la API')
