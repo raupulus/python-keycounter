@@ -81,10 +81,16 @@ DISPLAY_ORIENTATION = os.getenv('DISPLAY_ORIENTATION') or 'horizontal'
 DEBUG = os.getenv("DEBUG") == "True"
 
 def insert_keyboard_spurts_in_db(keylogger, dbconnection):
-    insert_data_to_db(keylogger, dbconnection, keylogger.tablename)
+    insert_data_to_db(keylogger,
+                      dbconnection,
+                      keylogger.model_keyboard.tablename)
 
 def insert_mouse_spurts_in_db(keylogger, dbconnection):
-    #insert_data_to_db(keylogger, dbconnection, tablename)
+    """
+    insert_data_to_db(keylogger,
+                      dbconnection,
+                      keylogger.model_mouse.tablename)
+    """
     pass
 
 

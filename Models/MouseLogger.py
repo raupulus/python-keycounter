@@ -59,4 +59,4 @@
 
 class MouseLogger:
     # Nombre de la tabla para almacenar datos
-    tablename = 'keyboard'
+    tablename = 'mouse'
