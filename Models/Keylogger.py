@@ -100,6 +100,9 @@ class Keylogger:
     # Indica si se pintará por pantalla datos para depuración.
     has_debug = False
 
+    # Indica si también se cuentan pulsaciones del ratón
+    MOUSE_ENABLED = False
+
     # Almacena la pantalla para mostrar datos, establecer None si no se usará
     # tiene que disponer del método update_keycounter(data) que procese los
     # datos devueltos por el método statistics() de esta clase.
@@ -218,12 +221,15 @@ class Keylogger:
     # Puntuación de combos en la racha actual.
     combo_score_current = 0
 
-    def __init__(self, display=None, has_debug=False):
+    def __init__(self, display=None, has_debug=False, mouse_enabled=True):
         # Establezco pantalla si existiera.
         self.display = display
 
         # Establezco si existe debug.
         self.has_debug = has_debug
+
+        # Establezco control para ratón
+        self.MOUSE_ENABLED = mouse_enabled
 
         # Creo timestamp para inicializar contadores.
         current_timestamp = datetime.utcnow()
@@ -256,10 +262,11 @@ class Keylogger:
         Inicia el callback para contar las teclas pulsadas
         """
         keyboard.hook(self.callback)
+
+
         mouse.on_click(self.callback_mouse, ('left',))
         mouse.on_right_click(self.callback_mouse, ('right',))
         mouse.on_middle_click(self.callback_mouse, ('middle',))
-
 
     def reload_keycounter_on_new_device(self):
         """
@@ -354,7 +361,6 @@ class Keylogger:
         """
         Devuelve la media de pulsaciones para la racha actual por segundos.
         """
-        #timestamp_utc = datetime.utcnow()
         timestamp_utc = self.last_pulsation_at
         duration_seconds = (timestamp_utc - self.pulsations_current_start_at).seconds
 
@@ -508,26 +514,53 @@ class Keylogger:
         :param button:
         """
 
+        timestamp_utc = datetime.utcnow()
+
+        # Comparo el tiempo desde la última pulsación para agrupar la racha.
+        if (timestamp_utc - self.model_mouse.last_pulsation_at).seconds > self.COMBO_RESET:
+            # Guardo la racha actual en la variable de rachas del modelo.
+            self.model_mouse.add_old_streak()
+
+            self.model_mouse.click_left = 0
+            self.model_mouse.click_middle = 0
+            self.model_mouse.click_right = 0
+            self.model_mouse.current_clicks = 0
+            self.model_mouse.clicks_current_start_at = timestamp_utc
+
         if self.has_debug:
             print('Botón pulsado: ' + button)
 
         if button == 'left':
-            pass
+            self.model_mouse.click_left += 1
         elif button == 'middle':
-            pass
+            self.model_mouse.click_middle += 1
         elif button == 'right':
-            pass
+            self.model_mouse.click_right += 1
+        else:
+            return
 
-        """
-        # Compruebo que el evento de ratón sea una pulsación
-        if isinstance(event, mouse.ButtonEvent):
-            #event.event_type
-            #event.button
-            print('Es un evento contemplado (double, down, left, middle):')
-            print('Tipo: ' +event.event_type + ' botón: ' + event.button)
-            
-        """
+        # Asigno momento de esta pulsación.
+        self.model_mouse.last_pulsation_at = timestamp_utc
 
+        # Aumento contador de clicks en la racha actual.
+        self.model_mouse.current_clicks += 1
+
+        # Aumento el contador de clicks totales.
+        self.model_mouse.total_clicks += 1
+
+        # Asigno puntuación más alta si lo fuese.
+        if self.model_mouse.current_clicks >= self.model_mouse.pulsations_hight:
+            self.model_mouse.pulsations_hight = self.model_mouse.current_clicks
+            self.model_mouse.pulsations_hight_at = timestamp_utc
+
+        # Compruebo el día para restablecer contadores globales de sesión
+        if timestamp_utc > self.current_day_end:
+            start_new_thread(self.model_mouse.reset_global_counter, ())
+
+        # Debug para comprobar rachas almacenadas.
+        if self.has_debug:
+            print('Rachas de ratón almacenadas')
+            print(self.model_mouse.spurts)
 
     def callback(self, event):
         """
@@ -594,16 +627,15 @@ class Keylogger:
         # Almaceno todos los datos actuales para pasarlos a la pantalla.
         data = self.statistics()
 
-        # Accede al método "update_keycounter" del modelo para la pantalla.
-        start_new_thread(self.display.update_keycounter, (data,))
         try:
-            #self.display.update_keycounter(data)
+            # Accede al método "update_keycounter" del modelo para la pantalla.
+            start_new_thread(self.display.update_keycounter, (data,))
             return True
-        except:
+        except Exception as e:
             if self.has_debug:
                 print('En Keylogger.py método send_to_display error al dibujar por pantalla')
+                print(e)
             return False
-
 
     def debug(self, keypress=None):
         """

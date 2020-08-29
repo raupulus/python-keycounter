@@ -81,6 +81,7 @@ MOUSE_ENABLED = (os.getenv('MOUSE_ENABLED') == "True") or \
 # Debug
 DEBUG = os.getenv("DEBUG") == "True"
 
+
 def insert_data_in_db(dbconnection, tablemodel):
     """
     Almacena los datos de los sensores en la base de datos.
@@ -97,7 +98,8 @@ def insert_data_in_db(dbconnection, tablemodel):
         # Compruebo que existan datos registrados, que existe una racha.
         try:
             if register is not None:
-                if tablemodel.spurts[register]['pulsations'] > 1:
+                if (tablemodel.tablename == 'keyboard' and tablemodel.spurts[register]['pulsations'] > 1) or \
+                   (tablemodel.tablename == 'mouse' and tablemodel.spurts[register]['total_clicks'] > 1):
                     save_data = dbconnection.table_save_data(
                         tablename=tablemodel.tablename,
                         params=tablemodel.spurts[register]
@@ -108,10 +110,13 @@ def insert_data_in_db(dbconnection, tablemodel):
                 # Si se ha llevado a cabo el guardado, se quita del map.
                 if save_data:
                     saved.append(register)
-        except:
+        except Exception as e:
             if DEBUG:
-                print('Error al insertar elemento')
+                print('Error al insertar elemento en modelo: ' +
+                      tablemodel.name)
                 print(register)
+                print(e)
+            continue
 
     # Elimino los registros que fueron almacenados en la db correctamente.
     for key in saved:
@@ -127,7 +132,8 @@ def upload_data_to_api(dbconnection, apiconnection, tablemodel):
     n_registers = 10
 
     if DEBUG:
-        print('Comprobando datos para subir a la API del modelo ' + tablemodel.name)
+        print('Comprobando datos para subir a la API del modelo ' +
+              tablemodel.name)
 
     # Parámetros/tuplas desde la base de datos.
     params_from_db = dbconnection.table_get_data_last(
@@ -157,7 +163,9 @@ def upload_data_to_api(dbconnection, apiconnection, tablemodel):
             if response:
                 if DEBUG:
                     print('Eliminando de la DB local rachas subidas')
-                dbconnection.table_drop_last_elements(tablemodel.tablename, n_registers)
+                dbconnection.table_drop_last_elements(
+                    tablemodel.tablename,
+                    n_registers)
 
     except():
         if DEBUG:
@@ -173,6 +181,8 @@ def loop(keylogger, apiconnection=None):
         keylogger.model_keyboard.tablename,    # Nombre de la tabla.
         keylogger.model_keyboard.tablemodel()  # Modelo de tabla y columnas.
     )
+
+    sleep(1)
 
     # Seteo tabla en el modelo de conexión a la DB para el mouse.
     dbconnection.table_set_new(
@@ -191,12 +201,12 @@ def loop(keylogger, apiconnection=None):
             insert_data_in_db(dbconnection, keylogger.model_keyboard)
 
             if MOUSE_ENABLED:
-                #insert_data_in_db(dbconnection, keylogger.model_mouse)
-                #insert_mouse_spurts_in_db(keylogger, dbconnection)
-                pass
+                insert_data_in_db(dbconnection, keylogger.model_mouse)
 
             # Inicia la subida a la base de datos si está configurada.
-            if apiconnection and apiconnection.API_TOKEN and apiconnection.API_URL:
+            if apiconnection and \
+               apiconnection.API_TOKEN and \
+               apiconnection.API_URL:
                 if DEBUG:
                     print('Entra en if para subir a la API')
 
@@ -207,17 +217,15 @@ def loop(keylogger, apiconnection=None):
                                    keylogger.model_keyboard)
 
                 if MOUSE_ENABLED:
-                    """
                     upload_data_to_api(dbconnection,
                                        apiconnection,
                                        keylogger.model_mouse)
-                    """
 
                 sleep(10)
 
         except Exception as e:
             if DEBUG:
-                print('Tipo de error al leer datos:', e.__class__)
+                print('Tipo de error al leer datos:', e, e.__class__)
         finally:
             sleep(10)
 
@@ -229,13 +237,15 @@ def main():
                       has_debug=DEBUG) if SERIAL_PORT else None
 
     # Instancio el keylogger, este quedará en un subproceso leyendo teclas.
-    keylogger = Keylogger(display=display, has_debug=DEBUG)
+    keylogger = Keylogger(display=display,
+                          has_debug=DEBUG,
+                          mouse_enabled=MOUSE_ENABLED)
 
     # Instancio conexión con la API
     apiconnection = ApiConnection()
 
     # Instancio socket pasándole el keylogger para que alcance sus datos.
-    socket = Socket(keylogger, has_debug=DEBUG)
+    Socket(keylogger, has_debug=DEBUG)
 
     # Comienza el bucle para guardar datos y subirlos a la API.
     loop(keylogger, apiconnection)

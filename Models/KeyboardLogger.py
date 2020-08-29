@@ -73,9 +73,6 @@ class KeyboardLogger:
     def reset_global_counter(self):
         pass
 
-    def increase_pulsation(self, special_key=False):
-        pass
-
     def tablemodel(self):
         """
         Plantea campos como modelo de datos para una base de datos y poder ser

@@ -186,7 +186,8 @@ class DbConnection:
             return True
         except Exception as e:
             if self.has_debug:
-                print('Ha ocurrido un problema al insertar datos', e.__class__.__name__)
+                print('Ha ocurrido un problema al insertar datos',
+                      e, e.__class__.__name__)
             return None
 
     def table_truncate(self, tablename):

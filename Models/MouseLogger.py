@@ -71,27 +71,69 @@ class MouseLogger:
     # Map para almacenar todas las rachas no guardadas en DB
     spurts = {}
 
-    # ############# Estadísticas de MOUSE ############# #
+    # Clicks por cada botón.
     click_left = 0
     click_right = 0
-    click_center = 0
-    click_up = 0
-    click_down = 0
-    click_other = 0
+    click_middle = 0
+
+    # Cantidad de clicks totales en la racha actual.
     current_clicks = 0
-    total_clicks = 0
+
+    # Comienzo de la racha actual.
     clicks_current_start_at = None
+
+    # Momento de la última pulsación.
     last_pulsation_at = None
+
+    # Almaceno el total de clicks entre todas las rachas.
+    total_clicks = 0
+
+    # Registro la mayor racha de clicks que se haya obtenido en las sesiones.
     pulsations_hight = 0
     pulsations_hight_at = None
+
+    def __init__(self):
+        # Creo timestamp para inicializar contadores.
+        current_timestamp = datetime.utcnow()
+
+        # Establezco timestamps.
+        self.last_pulsation_at = current_timestamp
+        self.clicks_current_start_at = current_timestamp
 
     def reset_global_counter(self):
         current_timestamp = datetime.utcnow()
         self.pulsations_hight = 0
         self.pulsations_hight_at = current_timestamp
 
-    def increase_click(self, special_key=False):
-        pass
+    def add_old_streak(self):
+        """
+        Establece una racha pasada al map de rachas de forma que pueda ser
+        insertado en la db o subido a la API.
+        """
+        self.spurts[self.last_pulsation_at] = {
+            'start_at': self.clicks_current_start_at,
+            'end_at': self.last_pulsation_at,
+            'clicks_left': self.click_left,
+            'clicks_right': self.click_right,
+            'clicks_middle': self.click_middle,
+            'total_clicks': self.current_clicks,
+            'clicks_average': self.get_clicks_average(),
+            'weekday': datetime.today().weekday(),
+        }
+
+    def get_clicks_average(self):
+        """
+        Devuelve la media de pulsaciones para la racha actual por segundos.
+        """
+        timestamp_utc = self.last_pulsation_at
+        duration_seconds = (timestamp_utc - self.clicks_current_start_at).seconds
+
+        if duration_seconds > 0 and self.current_clicks > 0:
+            average_per_minute = (self.current_clicks / duration_seconds) * 60.0
+        else:
+            return 0.00
+
+        return round(average_per_minute, 2)
 
     def tablemodel(self):
         """
@@ -131,13 +173,7 @@ class MouseLogger:
                 },
                 'others': None,
             },
-
-            'clicks_center': {
-                'type': 'String',
-                'params': {},
-                'others': None,
-            },
-            'clicks_up': {
+            'clicks_middle': {
                 'type': 'Numeric',
                 'params': {
                     'precision': 15,
@@ -145,20 +181,17 @@ class MouseLogger:
                 },
                 'others': None,
             },
-            'clicks_down': {
+            'total_clicks': {
                 'type': 'Numeric',
                 'params': {
-                    'precision': 1,
+                    'precision': 15,
                     'asdecimal': False,
                 },
                 'others': None,
             },
-            'clicks_others': {
-                'type': 'Numeric',
-                'params': {
-                    'precision': 1,
-                    'asdecimal': False,
-                },
+            'clicks_average': {
+                'type': 'String',
+                'params': {},
                 'others': None,
             },
             'weekday': {
