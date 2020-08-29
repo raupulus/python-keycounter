@@ -47,6 +47,7 @@
 #######################################
 # #       Importar Librerías        # #
 #######################################
+from datetime import datetime
 
 #######################################
 # #             Variables           # #
@@ -60,3 +61,97 @@
 class MouseLogger:
     # Nombre de la tabla para almacenar datos
     tablename = 'mouse'
+
+    # Nombre del modelo
+    name = 'Mouse'
+
+    # Ruta para la API
+    api_path = '/keycounter/mouse/add-json'
+
+    # Map para almacenar todas las rachas no guardadas en DB
+    spurts = {}
+
+    def tablemodel(self):
+        """
+        Plantea campos como modelo de datos para una base de datos y poder ser
+        tomados desde el exterior.
+
+        - Timestamp de inicio racha → start_at
+        - Timestamp de fin racha → end_at
+        - Día de la semana (0 domingo) → weekday
+        - Timestamp en el que se crea el registro → created_at
+        """
+
+        return {
+            'start_at': {
+                'type': 'DateTime',
+                'params': None,
+                'others': None,
+            },
+            'end_at': {
+                'type': 'DateTime',
+                'params': None,
+                'others': None,
+            },
+            'clicks_left': {
+                'type': 'Numeric',
+                'params': {
+                    'precision': 15,
+                    'asdecimal': False,
+                },
+                'others': None,
+            },
+            'clicks_right': {
+                'type': 'Numeric',
+                'params': {
+                    'precision': 15,
+                    'asdecimal': False,
+                },
+                'others': None,
+            },
+
+            'clicks_center': {
+                'type': 'String',
+                'params': {},
+                'others': None,
+            },
+            'clicks_up': {
+                'type': 'Numeric',
+                'params': {
+                    'precision': 15,
+                    'asdecimal': False,
+                },
+                'others': None,
+            },
+            'clicks_down': {
+                'type': 'Numeric',
+                'params': {
+                    'precision': 1,
+                    'asdecimal': False,
+                },
+                'others': None,
+            },
+            'clicks_others': {
+                'type': 'Numeric',
+                'params': {
+                    'precision': 1,
+                    'asdecimal': False,
+                },
+                'others': None,
+            },
+            'weekday': {
+                'type': 'Numeric',
+                'params': {
+                    'precision': 1,
+                    'asdecimal': False,
+                },
+                'others': None,
+            },
+            'created_at': {
+                'type': 'DateTime',
+                'params': None,
+                'others': {
+                    'default': datetime.utcnow
+                },
+            },
+        }

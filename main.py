@@ -11,7 +11,8 @@
 
 # Create Date: 2020
 # Project Name: Python Keycounter
-# Description: Este script tomará datos de las pulsaciones de teclado, las almacenará
+# Description: Este script tomará datos de las pulsaciones de teclado,
+#              las almacenará
 # # # y periódicamente las subirá a una API.
 #
 # Dependencies:
@@ -51,12 +52,8 @@
 # #       Importar Librerías        # #
 #######################################
 from time import sleep
-#import datetime
-#import random  # Genera números aleatorios --> random.randrange(1,100)
-#import functions as func
 from dotenv import load_dotenv
 import os
-#from _thread import start_new_thread
 
 # Importo modelos
 from Models.Keylogger import Keylogger
@@ -77,28 +74,18 @@ SERIAL_BAUDRATE = os.getenv('SERIAL_BAUDRATE') or '9600'
 # Configuración pantalla.
 DISPLAY_ORIENTATION = os.getenv('DISPLAY_ORIENTATION') or 'horizontal'
 
+# Indica si se registran datos del mouse.
+MOUSE_ENABLED = (os.getenv('MOUSE_ENABLED') == "True") or \
+                (os.getenv('MOUSE_ENABLED') == "true")
+
 # Debug
 DEBUG = os.getenv("DEBUG") == "True"
 
-def insert_keyboard_spurts_in_db(keylogger, dbconnection):
-    insert_data_to_db(keylogger,
-                      dbconnection,
-                      keylogger.model_keyboard.tablename)
-
-def insert_mouse_spurts_in_db(keylogger, dbconnection):
-    """
-    insert_data_to_db(keylogger,
-                      dbconnection,
-                      keylogger.model_mouse.tablename)
-    """
-    pass
-
-
-def insert_data_to_db(keylogger, dbconnection, tablename):
+def insert_data_in_db(dbconnection, tablemodel):
     """
     Almacena los datos de los sensores en la base de datos.
     :param dbconnection: Conexión con la base de datos.
-    :param tablename: Nombre de la tabla.
+    :param tablemodel: Modelo de datos.
     :return:
     """
 
@@ -106,14 +93,14 @@ def insert_data_to_db(keylogger, dbconnection, tablename):
     saved = []
 
     # Guardo las estadísticas registradas para el teclado de todas las rachas.
-    for register in keylogger.spurts:
+    for register in tablemodel.spurts:
         # Compruebo que existan datos registrados, que existe una racha.
         try:
             if register is not None:
-                if keylogger.spurts[register]['pulsations'] > 1:
+                if tablemodel.spurts[register]['pulsations'] > 1:
                     save_data = dbconnection.table_save_data(
-                        tablename=keylogger.tablename,
-                        params=keylogger.spurts[register]
+                        tablename=tablemodel.tablename,
+                        params=tablemodel.spurts[register]
                     )
                 else:
                     save_data = True
@@ -128,25 +115,30 @@ def insert_data_to_db(keylogger, dbconnection, tablename):
 
     # Elimino los registros que fueron almacenados en la db correctamente.
     for key in saved:
-        del keylogger.spurts[key]
+        del tablemodel.spurts[key]
 
 
-def upload_data_to_api(dbconnection, apiconnection):
+def upload_data_to_api(dbconnection, apiconnection, tablemodel):
     """
     Procesa la subida de datos a la API.
     """
 
+    # El número de registros a subir a la api y eliminar de la DB
+    n_registers = 10
+
     if DEBUG:
-        print('Comprobando datos para subir a la API')
+        print('Comprobando datos para subir a la API del modelo ' + tablemodel.name)
 
-    ## Parámetros/tuplas desde la base de datos.
-    params_from_db = dbconnection.table_get_data_last('keyboard', 10)
+    # Parámetros/tuplas desde la base de datos.
+    params_from_db = dbconnection.table_get_data_last(
+                        tablemodel.tablename,
+                        n_registers)
 
-    ## Columnas del modelo.
-    columns = dbconnection.tables['keyboard'].columns.keys()
+    # Columnas del modelo.
+    columns = dbconnection.tables[tablemodel.tablename].columns.keys()
 
-    name = 'Keyboard'
-    path = '/keycounter/keyboard/add-json'
+    name = tablemodel.name
+    path = tablemodel.api_path
 
     try:
         if params_from_db:
@@ -165,7 +157,7 @@ def upload_data_to_api(dbconnection, apiconnection):
             if response:
                 if DEBUG:
                     print('Eliminando de la DB local rachas subidas')
-                dbconnection.table_drop_last_elements('keyboard', 10)
+                dbconnection.table_drop_last_elements(tablemodel.tablename, n_registers)
 
     except():
         if DEBUG:
@@ -176,30 +168,51 @@ def loop(keylogger, apiconnection=None):
     # Instancio el modelo para guardar datos en la DB cada minuto.
     dbconnection = DbConnection()
 
-    # Seteo tabla en el modelo de conexión a la DB.
+    # Seteo tabla en el modelo de conexión a la DB para el keyboard.
     dbconnection.table_set_new(
-        keylogger.tablename,    # Nombre de la tabla.
-        keylogger.tablemodel()  # Modelo de tabla y columnas.
+        keylogger.model_keyboard.tablename,    # Nombre de la tabla.
+        keylogger.model_keyboard.tablemodel()  # Modelo de tabla y columnas.
     )
 
-    # Pausa de 60 segundos para dar margen a tomar datos.
-    sleep(60)
+    # Seteo tabla en el modelo de conexión a la DB para el mouse.
+    dbconnection.table_set_new(
+        keylogger.model_mouse.tablename,  # Nombre de la tabla.
+        keylogger.model_mouse.tablemodel()  # Modelo de tabla y columnas.
+    )
+
+    # Pausa de 30 segundos para dar margen a tomar datos.
+    sleep(30)
 
     while True:
         if DEBUG:
             print('Entra en while para guardar en la DB')
 
         try:
-            #insert_data_to_db(keylogger, dbconnection)
-            insert_keyboard_spurts_in_db(keylogger, dbconnection)
-            insert_mouse_spurts_in_db(keylogger, dbconnection)
+            insert_data_in_db(dbconnection, keylogger.model_keyboard)
+
+            if MOUSE_ENABLED:
+                #insert_data_in_db(dbconnection, keylogger.model_mouse)
+                #insert_mouse_spurts_in_db(keylogger, dbconnection)
+                pass
 
             # Inicia la subida a la base de datos si está configurada.
             if apiconnection and apiconnection.API_TOKEN and apiconnection.API_URL:
                 if DEBUG:
                     print('Entra en if para subir a la API')
+
                 sleep(10)
-                upload_data_to_api(dbconnection, apiconnection)
+
+                upload_data_to_api(dbconnection,
+                                   apiconnection,
+                                   keylogger.model_keyboard)
+
+                if MOUSE_ENABLED:
+                    """
+                    upload_data_to_api(dbconnection,
+                                       apiconnection,
+                                       keylogger.model_mouse)
+                    """
+
                 sleep(10)
 
         except Exception as e:

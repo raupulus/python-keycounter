@@ -83,21 +83,15 @@ from Models.MouseLogger import MouseLogger
 
 
 class Keylogger:
-    # Nombre de la tabla para almacenar datos
-    tablename = 'keyboard'
-
+    ## Modelo que representa datos y registros del teclado.
     model_keyboard = KeyboardLogger()
+
+    ## Modelo que representa datos y registros del ratón.
     model_mouse = MouseLogger()
 
     # Lista con los dispositivos encontrados, se usa para recargar al
     # conectar algo como un teclado usb.
     devices = None
-
-    # Map para almacenar todas las rachas no guardadas en DB
-    spurts = {}
-
-    # Tecla para terminar el programa o None para no utilizar ninguna tecla.
-    terminate_key = None
 
     # Almacena si hay una tecla presionada.
     is_down = {}
@@ -223,7 +217,7 @@ class Keylogger:
     # Puntuación de combos en la racha actual.
     combo_score_current = 0
 
-    def __init__(self, display=None, has_debug=False, terminate_key='esc'):
+    def __init__(self, display=None, has_debug=False):
         # Establezco pantalla si existiera.
         self.display = display
 
@@ -233,9 +227,6 @@ class Keylogger:
         # Creo timestamp para inicializar contadores.
         current_timestamp = datetime.utcnow()
 
-        # Establezco tecla para finalizar la captura.
-        self.terminate_key = terminate_key
-
         # Establezco contadores para sesión completa por día
         self.reset_global_counter()
 
@@ -244,31 +235,34 @@ class Keylogger:
         self.pulsations_current_start_at = current_timestamp
 
         # Almaceno los dispositivos de entrada conectados
-        self.devices = self.readDevicesById()
+        self.devices = self.read_devices_by_id()
 
         # Comienza la escucha de teclas pulsadas
-        start_new_thread(self.start_read_keyboard, ())
+        start_new_thread(self.start_read_keycounter_callback, ())
 
         # Inicio hilo para comprobar cambios en dispositivos conectados/desconectados
-        start_new_thread(self.reloadKeycounterOnNewDevice, ())
+        start_new_thread(self.reload_keycounter_on_new_device, ())
 
-    def readDevicesById(self):
+    def read_devices_by_id(self):
         """
         Lee todos los dispositivos de entrada conectados en el sistema por id y
         los devuelve.
         """
         return subprocess.getoutput('ls /dev/input/by-id/')
 
-    def start_read_keyboard(self):
+    def start_read_keycounter_callback(self):
+        """
+        Inicia el callback para contar las teclas pulsadas
+        """
         keyboard.hook(self.callback)
 
-    def reloadKeycounterOnNewDevice(self):
+    def reload_keycounter_on_new_device(self):
         """
         Cuando se detecta un nuevo dispositivo conectado al sistema se recargará
         el keycounter para añadirlo a la lista de soportados.
         """
         while True:
-            new_devices = self.readDevicesById()
+            new_devices = self.read_devices_by_id()
 
             if self.devices != new_devices:
                 # Almaceno los nuevos dispositivos en la clase
@@ -368,7 +362,7 @@ class Keylogger:
         self.pulsations_total += 1
 
         # Comparo el tiempo desde la última pulsación para agrupar la racha.
-        if (timestamp_utc - self.last_pulsation_at).seconds > 15:
+        if (timestamp_utc - self.last_pulsation_at).seconds > self.COMBO_RESET:
             # Guardo la racha actual en el map de rachas antes de resetear.
             self.add_old_streak()
 
@@ -417,7 +411,7 @@ class Keylogger:
         Establece una racha pasada al map de rachas de forma que pueda ser
         insertado en la db o subido a la API.
         """
-        self.spurts[self.last_pulsation_at] = {
+        self.model_keyboard.spurts[self.last_pulsation_at] = {
             'start_at': self.pulsations_current_start_at,
             'end_at': self.last_pulsation_at,
             'pulsations': self.pulsations_current,
@@ -573,78 +567,6 @@ class Keylogger:
                 print('En Keylogger.py método send_to_display error al dibujar por pantalla')
             return False
 
-    def tablemodel(self):
-        """
-        Plantea campos como modelo de datos para una base de datos y poder ser
-        tomados desde el exterior.
-
-        - Timestamp de inicio racha → start_at
-        - Timestamp de fin racha → end_at
-        - Pulsación total racha → pulsations
-        - Pulsación total racha para teclas especiales → pulsations_special_keys
-        - Pulsaciones media por minuto → pulsation_average
-        - Puntuación del combo → score
-        - Día de la semana (0 domingo) → weekday
-        - Timestamp en el que se crea el registro → created_at
-        """
-
-        return {
-            'start_at': {
-                'type': 'DateTime',
-                'params': None,
-                'others': None,
-            },
-            'end_at': {
-                'type': 'DateTime',
-                'params': None,
-                'others': None,
-            },
-            'pulsations': {
-                'type': 'Numeric',
-                'params': {
-                    'precision': 15,
-                    'asdecimal': False,
-                },
-                'others': None,
-            },
-            'pulsations_special_keys': {
-                'type': 'Numeric',
-                'params': {
-                    'precision': 15,
-                    'asdecimal': False,
-                },
-                'others': None,
-            },
-
-            'pulsation_average': {
-                'type': 'String',
-                'params': {},
-                'others': None,
-            },
-            'score': {
-                'type': 'Numeric',
-                'params': {
-                    'precision': 15,
-                    'asdecimal': False,
-                },
-                'others': None,
-            },
-            'weekday': {
-                'type': 'Numeric',
-                'params': {
-                    'precision': 1,
-                    'asdecimal': False,
-                },
-                'others': None,
-            },
-            'created_at': {
-                'type': 'DateTime',
-                'params': None,
-                'others': {
-                    'default': datetime.utcnow
-                },
-            },
-        }
 
     def debug(self, keypress=None):
         """

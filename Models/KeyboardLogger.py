@@ -47,6 +47,7 @@
 #######################################
 # #       Importar Librerías        # #
 #######################################
+from datetime import datetime
 
 #######################################
 # #             Variables           # #
@@ -59,3 +60,85 @@
 class KeyboardLogger:
     # Nombre de la tabla para almacenar datos
     tablename = 'keyboard'
+
+    # Nombre del modelo
+    name = 'Keyboard'
+
+    # Ruta para la API
+    api_path = '/keycounter/keyboard/add-json'
+
+    # Map para almacenar todas las rachas no guardadas en DB
+    spurts = {}
+
+    def tablemodel(self):
+        """
+        Plantea campos como modelo de datos para una base de datos y poder ser
+        tomados desde el exterior.
+
+        - Timestamp de inicio racha → start_at
+        - Timestamp de fin racha → end_at
+        - Pulsación total racha → pulsations
+        - Pulsación total racha para teclas especiales → pulsations_special_keys
+        - Pulsaciones media por minuto → pulsation_average
+        - Puntuación del combo → score
+        - Día de la semana (0 domingo) → weekday
+        - Timestamp en el que se crea el registro → created_at
+        """
+
+        return {
+            'start_at': {
+                'type': 'DateTime',
+                'params': None,
+                'others': None,
+            },
+            'end_at': {
+                'type': 'DateTime',
+                'params': None,
+                'others': None,
+            },
+            'pulsations': {
+                'type': 'Numeric',
+                'params': {
+                    'precision': 15,
+                    'asdecimal': False,
+                },
+                'others': None,
+            },
+            'pulsations_special_keys': {
+                'type': 'Numeric',
+                'params': {
+                    'precision': 15,
+                    'asdecimal': False,
+                },
+                'others': None,
+            },
+
+            'pulsation_average': {
+                'type': 'String',
+                'params': {},
+                'others': None,
+            },
+            'score': {
+                'type': 'Numeric',
+                'params': {
+                    'precision': 15,
+                    'asdecimal': False,
+                },
+                'others': None,
+            },
+            'weekday': {
+                'type': 'Numeric',
+                'params': {
+                    'precision': 1,
+                    'asdecimal': False,
+                },
+                'others': None,
+            },
+            'created_at': {
+                'type': 'DateTime',
+                'params': None,
+                'others': {
+                    'default': datetime.utcnow
+                },
+            },
+        }
