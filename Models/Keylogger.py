@@ -242,7 +242,7 @@ class Keylogger:
         self.devices = self.readDevicesById()
 
         # Comienza la escucha de teclas pulsadas
-        keyboard.hook(self.callback)
+        start_new_thread(self.start_read_keyboard, ())
 
         # Inicio hilo para comprobar cambios en dispositivos conectados/desconectados
         start_new_thread(self.reloadKeycounterOnNewDevice, ())
@@ -254,6 +254,9 @@ class Keylogger:
         :return:
         """
         return subprocess.getoutput('ls /dev/input/by-id/')
+
+    def start_read_keyboard(self):
+        keyboard.hook(self.callback)
 
     def reloadKeycounterOnNewDevice(self):
         """
