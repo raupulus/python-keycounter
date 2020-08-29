@@ -218,7 +218,7 @@ class Keylogger:
     # Puntuación de combos en la racha actual.
     combo_score_current = 0
 
-    def __init__(self, display=None, has_debug=False, terminate_key=None):
+    def __init__(self, display=None, has_debug=False, terminate_key='esc'):
         # Establezco pantalla si existiera.
         self.display = display
 
@@ -238,12 +238,11 @@ class Keylogger:
         self.last_pulsation_at = current_timestamp
         self.pulsations_current_start_at = current_timestamp
 
+        # Almaceno los dispositivos de entrada conectados
+        self.devices = self.readDevicesById()
+
         # Comienza la escucha de teclas pulsadas
         keyboard.hook(self.callback)
-        # keyboard.wait(self.terminate_key)
-
-        # Almacenos los dispositivos de entrada conectados
-        self.devices = self.readDevicesById()
 
         # Inicio hilo para comprobar cambios en dispositivos conectados/desconectados
         start_new_thread(self.reloadKeycounterOnNewDevice, ())
@@ -273,18 +272,20 @@ class Keylogger:
                     print('Hay cambios en los dispositivos, reiniciando callback')
                     print(new_devices)
 
-                print('Hay cambios en los dispositivos, reiniciando callback')
-                print(new_devices)
-                sleep(1)
-
-                # Vuelvo a iniciar el callback.
+                # Quito todos los hooks
                 keyboard.unhook_all()
-                sleep(3)
-                print('Reiniciando')
+
+                # Reestablezco lecturas de teclado en la librería keyboard
+                keyboard._nixkeyboard.device = None
+                keyboard._nixkeyboard.build_device()
+                keyboard._nixkeyboard.build_tables()
+                keyboard._listener = keyboard._KeyboardListener()
+
+                # Añado de nuevo el hook para leer teclado
                 keyboard.hook(self.callback)
 
             # Pausa entre cada comprobación.
-            sleep(1)
+            sleep(3)
 
     def reset_global_counter(self):
         """
@@ -366,7 +367,7 @@ class Keylogger:
         # Comparo el tiempo desde la última pulsación para agrupar la racha.
         if (timestamp_utc - self.last_pulsation_at).seconds > 15:
             # Guardo la racha actual en el map de rachas antes de resetear.
-            self.add_old_streak(timestamp_utc)
+            self.add_old_streak()
 
             # Establezco marca de tiempo para la nueva racha
             self.pulsations_current_start_at = timestamp_utc
@@ -408,16 +409,13 @@ class Keylogger:
         if timestamp_utc > self.current_day_end:
             start_new_thread(self.reset_global_counter, ())
 
-    def add_old_streak(self, timestamp_utc):
+    def add_old_streak(self):
         """
         Establece una racha pasada al map de rachas de forma que pueda ser
         insertado en la db o subido a la API.
-        :return:
         """
-        #self.spurts[timestamp_utc] = {
         self.spurts[self.last_pulsation_at] = {
             'start_at': self.pulsations_current_start_at,
-            #'end_at': timestamp_utc,
             'end_at': self.last_pulsation_at,
             'pulsations': self.pulsations_current,
             'pulsations_special_keys': self.pulsations_current_special_keys,
@@ -429,7 +427,6 @@ class Keylogger:
     def set_combo(self, timestamp_utc, reset_sesion=False):
         """
         Establece la puntuación según la cantidad de pulsaciones y algoritmo
-        :return:
         """
 
         # Creo el valor de la puntuación para sumar con este combo.
@@ -462,7 +459,6 @@ class Keylogger:
     def statistics_session(self):
         """
         Devuelve las estadísticas generales a nivel de la sesión.
-        :return:
         """
         return {
             'start_at': self.start_at,
