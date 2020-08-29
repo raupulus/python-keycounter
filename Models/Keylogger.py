@@ -251,7 +251,6 @@ class Keylogger:
         """
         Lee todos los dispositivos de entrada conectados en el sistema por id y
         los devuelve.
-        :return:
         """
         return subprocess.getoutput('ls /dev/input/by-id/')
 
@@ -262,7 +261,6 @@ class Keylogger:
         """
         Cuando se detecta un nuevo dispositivo conectado al sistema se recargará
         el keycounter para añadirlo a la lista de soportados.
-        :return:
         """
         while True:
             new_devices = self.readDevicesById()
@@ -293,7 +291,6 @@ class Keylogger:
     def reset_global_counter(self):
         """
         Borra los contadores globales al acabar el día.
-        :return:
         """
         if self.has_debug:
             print('Restableciendo contadores de la sesión')
@@ -345,7 +342,6 @@ class Keylogger:
     def get_pulsation_average(self):
         """
         Devuelve la media de pulsaciones para la racha actual por segundos.
-        :return:
         """
         #timestamp_utc = datetime.utcnow()
         timestamp_utc = self.last_pulsation_at
@@ -361,7 +357,6 @@ class Keylogger:
     def increase_pulsation(self, special_key=False):
         """
         Aumenta una pulsación controlando la racha.
-        :return:
         """
         timestamp_utc = datetime.utcnow()
 
@@ -477,7 +472,6 @@ class Keylogger:
     def statistics_streak(self):
         """
         Devuelve las estadísticas solo para la racha actual.
-        :return:
         """
         return {
             'pulsations_current': self.pulsations_current,
@@ -491,7 +485,6 @@ class Keylogger:
     def statistics(self):
         """
         Devuelve todas las estadísticas.
-        :return:
         """
         return {
             'session': self.statistics_session(),
@@ -651,7 +644,6 @@ class Keylogger:
     def debug(self, keypress=None):
         """
         Utilizada para debug de la aplicación.
-        :return:
         """
         statistics = self.statistics()
         session = statistics['session']
