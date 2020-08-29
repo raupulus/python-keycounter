@@ -58,6 +58,8 @@ from datetime import datetime
 from _thread import start_new_thread
 import subprocess
 from time import sleep
+from Models.KeyboardLogger import KeyboardLogger
+from Models.MouseLogger import MouseLogger
 
 #######################################
 # #             Variables           # #
@@ -83,6 +85,9 @@ from time import sleep
 class Keylogger:
     # Nombre de la tabla para almacenar datos
     tablename = 'keyboard'
+
+    model_keyboard = KeyboardLogger()
+    model_mouse = MouseLogger()
 
     # Lista con los dispositivos encontrados, se usa para recargar al
     # conectar algo como un teclado usb.
