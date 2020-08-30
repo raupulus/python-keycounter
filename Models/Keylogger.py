@@ -570,19 +570,18 @@ class Keylogger:
         (no las continuadas).
         """
 
-        if event.event_type in ('up', 'down'):
+        # Almaceno el tipo de evento
+        event_type = event.event_type
+
+        # Las teclas desconocidas o eventos de ratón se descartan
+        if event.name == 'unknown':
+            return None
+
+        if event_type in ('up', 'down'):
             key = self.KEYS_MAP.get(event.name, event.name)
-            modifier = len(key) > 1
 
             # Almaceno si es una tecla especial
             special_key = True if event.name in self.KEYS_MAP else False
-
-            # Almaceno el tipo de evento
-            event_type = event.event_type
-
-            # Las teclas desconocidas o eventos de ratón se descartan
-            if event.name == 'unknown':
-                return None
 
             # Marco si está pulsado para evitar registrar teclas presionadas
             if event_type == "down":
