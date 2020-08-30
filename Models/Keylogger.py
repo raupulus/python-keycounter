@@ -608,7 +608,7 @@ class Keylogger:
                 self.debug(keypress=str(key))
 
             # Muestra datos actuales por la pantalla si esta existiera.
-            self.send_to_display()
+            start_new_thread(self.send_to_display, ())
 
     def send_to_display(self):
         """
