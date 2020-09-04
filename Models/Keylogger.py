@@ -224,7 +224,8 @@ class Keylogger:
     # Puntuación de combos en la racha actual.
     combo_score_current = 0
 
-    def __init__(self, display=None, has_debug=False, mouse_enabled=True):
+    def __init__(self, display=None, has_debug=False, mouse_enabled=True,
+                 model_keyboard = None, model_mouse = None):
         # Establezco pantalla si existiera.
         self.display = display
 
@@ -233,6 +234,18 @@ class Keylogger:
 
         # Establezco control para ratón
         self.MOUSE_ENABLED = mouse_enabled
+
+        # Instancio modelo para teclado
+        if model_keyboard:
+            self.model_keyboard = model_keyboard
+        else:
+            self.model_keyboard = KeyboardLogger()
+
+        # Instancio modelo para ratón si procede
+        if model_mouse and mouse_enabled:
+            self.model_mouse = model_mouse
+        elif mouse_enabled:
+            self.model_mouse = MouseLogger()
 
         # Creo timestamp para inicializar contadores.
         current_timestamp = datetime.utcnow()
