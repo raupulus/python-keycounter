@@ -139,9 +139,9 @@ class Socket:
                 data = connection.recv(2048)
 
                 if self.has_debug:
-                    print('Enviando Pulsaciones: ' + str(self.keylogger.pulsations_current))
+                    print('Enviando Pulsaciones: ' + str(self.keylogger.model_keyboard.pulsations_current))
 
-                connection.sendall(bytes(str(self.keylogger.pulsations_current), encoding='utf-8'))
+                connection.sendall(bytes(str(self.keylogger.model_keyboard.pulsations_current), encoding='utf-8'))
 
                 """
                 # Recibe los datos en pequeños trozos para retrasmitirlos.

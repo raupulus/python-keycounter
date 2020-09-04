@@ -71,6 +71,29 @@ class MouseLogger:
     # Map para almacenar todas las rachas no guardadas en DB
     spurts = {}
 
+    has_debug = False
+
+    # Representa el inicio del día actual, para resetear contadores totales cada día.
+    current_day_start = None
+    current_day_end = None
+
+    # Tiempo que dura una racha en segundos.
+    COMBO_RESET = 15
+
+    # Valores para el algoritmo del combo → clave_map: combo_puntuacion_a_sumar
+    COMBO_MAP = {
+        1: 0.01,
+        2: 0.03,
+        3: 0.05,
+        4: 0.15,
+        5: 0.30,
+        6: 0.50,
+        7: 0.70,
+        8: 0.80,
+        9: 0.90,
+        10: 1.00
+    }
+
     # Clicks por cada botón.
     click_left = 0
     click_right = 0
@@ -80,7 +103,7 @@ class MouseLogger:
     current_clicks = 0
 
     # Comienzo de la racha actual.
-    clicks_current_start_at = None
+    current_start_at = None
 
     # Momento de la última pulsación.
     last_pulsation_at = None
@@ -92,13 +115,25 @@ class MouseLogger:
     pulsations_hight = 0
     pulsations_hight_at = None
 
-    def __init__(self):
+    def __init__(self, has_debug=False):
         # Creo timestamp para inicializar contadores.
         current_timestamp = datetime.utcnow()
 
+        self.has_debug = has_debug
+
         # Establezco timestamps.
-        self.last_pulsation_at = current_timestamp
-        self.clicks_current_start_at = current_timestamp
+        if self.last_pulsation_at is None:
+            self.last_pulsation_at = current_timestamp
+
+        if self.current_start_at is None:
+            self.current_start_at = current_timestamp
+
+        self.current_day_start = current_timestamp.replace(hour=0, minute=0,
+                                                           second=0,
+                                                           microsecond=0)
+        self.current_day_end = current_timestamp.replace(hour=23, minute=59,
+                                                         second=59,
+                                                         microsecond=999999)
 
     def reset_global_counter(self):
         current_timestamp = datetime.utcnow()
@@ -111,7 +146,7 @@ class MouseLogger:
         insertado en la db o subido a la API.
         """
         self.spurts[self.last_pulsation_at] = {
-            'start_at': self.clicks_current_start_at,
+            'start_at': self.current_start_at,
             'end_at': self.last_pulsation_at,
             'clicks_left': self.click_left,
             'clicks_right': self.click_right,
@@ -126,7 +161,7 @@ class MouseLogger:
         Devuelve la media de pulsaciones para la racha actual por segundos.
         """
         timestamp_utc = self.last_pulsation_at
-        duration_seconds = (timestamp_utc - self.clicks_current_start_at).seconds
+        duration_seconds = (timestamp_utc - self.current_start_at).seconds
 
         if duration_seconds > 0 and self.current_clicks > 0:
             average_per_minute = (self.current_clicks / duration_seconds) * 60.0

