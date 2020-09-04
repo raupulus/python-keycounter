@@ -279,9 +279,10 @@ class Keylogger:
         """
         keyboard.hook(self.callback)
 
-        mouse.on_click(self.callback_mouse, ('left',))
-        mouse.on_right_click(self.callback_mouse, ('right',))
-        mouse.on_middle_click(self.callback_mouse, ('middle',))
+        if self.MOUSE_ENABLED:
+            mouse.on_click(self.callback_mouse, ('left',))
+            mouse.on_right_click(self.callback_mouse, ('right',))
+            mouse.on_middle_click(self.callback_mouse, ('middle',))
 
     def reload_keycounter_on_new_device(self):
         """
@@ -294,6 +295,8 @@ class Keylogger:
             if self.devices != new_devices:
                 # Almaceno los nuevos dispositivos en la clase
                 self.devices = new_devices
+
+                self.reboot = True
 
                 if self.has_debug:
                     print('Hay cambios en los dispositivos, reiniciando callback')
