@@ -56,11 +56,11 @@ from dotenv import load_dotenv
 import os
 
 # Importo modelos
-from Models.Keylogger import Keylogger
 from Models.DbConnection import DbConnection
 from Models.ApiConnection import ApiConnection
 from Models.Display import Display
 from Models.Socket import Socket
+from Models.Keylogger import Keylogger
 
 # Cargo archivos de configuración desde .env sobreescribiendo variables locales.
 load_dotenv(override=True)
@@ -173,6 +173,7 @@ def upload_data_to_api(dbconnection, apiconnection, tablemodel):
 
 
 def loop(keylogger, socket, apiconnection=None, display=None):
+    keylogger = keylogger
     # Instancio el modelo para guardar datos en la DB cada minuto.
     dbconnection = DbConnection()
 
@@ -210,7 +211,7 @@ def loop(keylogger, socket, apiconnection=None, display=None):
                 if DEBUG:
                     print('Entra en if para subir a la API')
 
-                sleep(10)
+                sleep(5)
 
                 upload_data_to_api(dbconnection,
                                    apiconnection,
@@ -221,15 +222,20 @@ def loop(keylogger, socket, apiconnection=None, display=None):
                                        apiconnection,
                                        keylogger.model_mouse)
 
-                sleep(10)
+                sleep(1)
 
+            """
             if keylogger.reboot:
                 tmp_model_keyboard = keylogger.model_keyboard
                 tmp_model_mouse = keylogger.model_mouse
 
+                print('Entra en reboot')
+
                 del keylogger
 
                 del socket
+
+                sleep(1)
 
                 keylogger = Keylogger(display=display,
                                       has_debug=DEBUG,
@@ -239,12 +245,14 @@ def loop(keylogger, socket, apiconnection=None, display=None):
 
                 socket = Socket(keylogger, has_debug=DEBUG)
 
+            sleep(2)
+            """
+
         except Exception as e:
             if DEBUG:
                 print('Tipo de error al leer datos:', e, e.__class__)
         finally:
             sleep(10)
-
 
 def main():
     display = Display(port=SERIAL_PORT,

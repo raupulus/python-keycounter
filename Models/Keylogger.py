@@ -232,22 +232,22 @@ class Keylogger:
                     print(new_devices)
 
                 # Quito todos los hooks
-                keyboard.unhook_all()
+                #keyboard.unhook_all()
 
                 # Reestablezco lecturas de teclado en la librería keyboard
                 keyboard._nixkeyboard.device = None
                 keyboard._nixkeyboard.build_device()
                 keyboard._nixkeyboard.build_tables()
                 sleep(0.2)
-                keyboard._hooks = {}
+                #keyboard._hooks = {}
                 keyboard._listener = keyboard._KeyboardListener()
                 sleep(0.2)
 
                 # Vuelvo a quitar todos los hooks, esto activa eventos por defecto
-                keyboard.unhook_all()
+                #keyboard.unhook_all()
 
                 # Añado de nuevo el hook para leer teclado
-                keyboard.hook(self.callback_keyboard)
+                #keyboard.hook(self.callback_keyboard)
 
                 # TODO → Reiniciar MOUSE
 
