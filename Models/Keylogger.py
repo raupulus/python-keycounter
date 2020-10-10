@@ -200,11 +200,22 @@ class Keylogger:
         Lee todos los dispositivos de entrada conectados en el sistema por id y
         los devuelve.
         """
-        sleep(0.1)
-        keyboard = subprocess.getoutput('cat /proc/bus/input/devices | grep -i -w "keyboard"')
-        mouse = subprocess.getoutput('cat /proc/bus/input/devices | grep -i -w "mouse"')
 
-        return subprocess.getoutput('ls /dev/input/by-id/') + keyboard + mouse
+        sleep(0.1)
+        try:
+            #keyboard = subprocess.getoutput('cat /proc/bus/input/devices | grep -i -w "keyboard"')
+            #sleep(0.1)
+            #mouse = subprocess.getoutput('cat /proc/bus/input/devices | grep -i -w "mouse"')
+            #sleep(0.1)
+
+            #return subprocess.getoutput('ls /dev/input/by-id/') + keyboard + mouse
+            return subprocess.getoutput('ls /dev/input/by-id/; cat /proc/bus/input/devices | grep -i -w "keyboard"; cat /proc/bus/input/devices | grep -i -w "mouse"')
+        except Exception as e:
+            print('Ha ocurrido un problema al comprobar lista de dispositivos')
+            print('Esperando 30 segundos para reintentar')
+            print(e)
+            sleep(30)
+            return ''
 
     def start_read_keyloggers_callback(self):
         """
@@ -223,6 +234,7 @@ class Keylogger:
         el keycounter para añadirlo a la lista de soportados.
         """
         while True:
+            sleep(0.2)
             new_devices = self.read_devices_by_id()
 
             if self.devices != new_devices:
@@ -241,14 +253,14 @@ class Keylogger:
                 # Reestablezco lecturas de teclado en la librería keyboard
                 keyboard._nixkeyboard.device = None
                 keyboard._nixkeyboard.build_device()
-                keyboard._nixkeyboard.build_tables()
+                #keyboard._nixkeyboard.build_tables()
 
                 if keyboard._nixkeyboard.device:
                     sleep(3)
                     # keyboard._hooks = {}
                     keyboard._listener = keyboard._KeyboardListener()
 
-                sleep(0.2)
+                sleep(1)
 
                 # Vuelvo a quitar todos los hooks, esto activa eventos por defecto
                 #keyboard.unhook_all()
@@ -261,7 +273,7 @@ class Keylogger:
                 #exit(0)
 
             # Pausa entre cada comprobación.
-            sleep(3)
+            sleep(4)
 
     def callback_mouse(self, button):
         """
