@@ -201,7 +201,7 @@ class Keylogger:
         los devuelve.
         """
 
-        sleep(0.2)
+        sleep(0.1)
 
         try:
             #keyboard = subprocess.getoutput('cat /proc/bus/input/devices | grep -i -w "keyboard"')
@@ -210,14 +210,15 @@ class Keylogger:
             #sleep(0.1)
 
             #return subprocess.getoutput('ls /dev/input/by-id/') + keyboard + mouse
-            return subprocess.getoutput('ls /dev/input/by-id/; cat /proc/bus/input/devices | grep -i -w "keyboard"; cat /proc/bus/input/devices | grep -i -w "mouse"')
+            #return subprocess.getoutput('ls /dev/input/by-id/; cat /proc/bus/input/devices | grep --color -i -E "^N: Name=\"[^(Virtual)].*"')
+            return subprocess.getoutput('ls /dev/input/by-id/; cat /proc/bus/input/devices | grep -i -v -E "[Vv][Ii][Rr][Tt][Uu][Aa][Ll]" | grep -E "([Kk][Ee][Yy][Bb][Oo][Aa][Rr][Dd]|[Mm][Oo][Uu][Ss][Ee])"')
         except Exception as e:
             if self.has_debug:
                 print('Ha ocurrido un problema al comprobar lista de dispositivos')
-                print('Esperando 30 segundos para reintentar')
+                print('Esperando 10 segundos para reintentar')
                 print(e)
 
-            sleep(30)
+            sleep(10)
             return ''
 
     def start_read_keyloggers_callback(self):
@@ -256,14 +257,12 @@ class Keylogger:
                 # Reestablezco lecturas de teclado en la librería keyboard
                 keyboard._nixkeyboard.device = None
                 keyboard._nixkeyboard.build_device()
-                #keyboard._nixkeyboard.build_tables()
+                keyboard._nixkeyboard.build_tables()
 
                 if keyboard._nixkeyboard.device:
-                    sleep(3)
+                    sleep(0.1)
                     # keyboard._hooks = {}
                     keyboard._listener = keyboard._KeyboardListener()
-
-                sleep(1)
 
                 # Vuelvo a quitar todos los hooks, esto activa eventos por defecto
                 #keyboard.unhook_all()
@@ -276,7 +275,7 @@ class Keylogger:
                 #exit(0)
 
             # Pausa entre cada comprobación.
-            sleep(4)
+            sleep(3)
 
     def callback_mouse(self, button):
         """
