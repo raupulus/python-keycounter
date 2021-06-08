@@ -67,7 +67,7 @@ class KeyboardLogger:
     name = 'Keyboard'
 
     # Ruta para la API
-    api_path = '/keycounter/keyboard/add-json'
+    api_path = '/keycounter/v1/keyboard/add-json'
 
     # Map para almacenar todas las rachas no guardadas en DB
     spurts = {}

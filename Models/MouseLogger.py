@@ -66,7 +66,7 @@ class MouseLogger:
     name = 'Mouse'
 
     # Ruta para la API
-    api_path = '/keycounter/mouse/add-json'
+    api_path = '/keycounter/v1/mouse/add-json'
 
     # Map para almacenar todas las rachas no guardadas en DB
     spurts = {}
