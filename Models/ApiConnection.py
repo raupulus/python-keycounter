@@ -9,7 +9,7 @@
 # @twitter    https://twitter.com/fryntiz
 # @telegram   https://t.me/fryntiz
 
-# Create Date: 2020
+# Create Date: 2022
 # Project Name:
 # Description:
 #
@@ -18,10 +18,10 @@
 # Revision 0.01 - File Created
 # Additional Comments:
 
-# @copyright  Copyright © 2020 Raúl Caro Pastorino
+# @copyright  Copyright © 2022 Raúl Caro Pastorino
 # @license    https://wwww.gnu.org/licenses/gpl.txt
 
-# Copyright (C) 2020  Raúl Caro Pastorino
+# Copyright (C) 2022  Raúl Caro Pastorino
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@
 # #           Descripción           # #
 #######################################
 ##
-# # Conexión a la API.
+# # Conexión a la base de datos.
 ##
 
 #######################################
@@ -52,6 +52,8 @@
 import datetime
 
 ## Cargo archivos de configuración desde .env
+import decimal
+
 from dotenv import load_dotenv
 load_dotenv(override=True)
 import os
@@ -60,9 +62,6 @@ import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 import time
-
-from dotenv import load_dotenv
-
 
 #######################################
 # #             Variables           # #
@@ -73,21 +72,14 @@ sleep = time.sleep
 # #             Funciones           # #
 #######################################
 
-# Cargo archivos de configuración desde .env sobreescribiendo variables locales.
-load_dotenv(override=True)
 
 class ApiConnection:
-    has_debug = os.getenv("DEBUG") == "True"
-
-    # Configuración API para el volcado de datos.
     API_URL = os.getenv("API_URL")
     API_TOKEN = os.getenv("API_TOKEN")
-
-    # Configuración para identificar el dispositivo que envía los datos.
-    PC_NAME = os.getenv("PC_NAME")
-    PC_ID = os.getenv("PC_ID")
+    DEBUG = os.getenv("DEBUG") == "True"
 
     def requests_retry_session(
+            self,
             retries=3,
             backoff_factor=0.3,
             status_forcelist=(500, 502, 504),
@@ -101,6 +93,7 @@ class ApiConnection:
         :return:
         """
         session = session or requests.Session()
+
         retry = Retry(
             total=retries,
             read=retries,
@@ -108,63 +101,74 @@ class ApiConnection:
             backoff_factor=backoff_factor,
             status_forcelist=status_forcelist,
         )
+
         adapter = HTTPAdapter(max_retries=retry)
         session.mount('http://', adapter)
         session.mount('https://', adapter)
 
         return session
 
-    def send(self, path, datas_json):
-        '''
+    def send(self, path, datas_json, method):
+        """
         Envía la petición a la API.
-        :param path: Directorio dentro de la api (ex: /keycounter/add-json)
-        '''
+        :param path: Directorio dentro de la api (ex: /api/path/endpoint)
+        :param datas_json:
+        :return:
+        """
 
         url = self.API_URL
         token = self.API_TOKEN
         full_url = url + path
 
-        data = {
-            'data': datas_json,
-            'info': 'Enviado desde ' + self.PC_NAME
+        info = {
+            'iot': 'Raspberry Pi',
         }
 
         headers = {
             'Content-type': 'application/json',
-            'Accept': 'text/plain',
+            'Accept': 'application/json',
             'Authorization': 'Bearer ' + str(token),
         }
 
+        ## TODO → Check method POST|GET|PUT|DELETE
+
+        ## TODO → Comprobar si no es un array (datas_json), convertirlo en uno.
+
+        ## TODO → Añadir metadatos a la subida (info sobre iot que envía)
+
+        #data.push(info)
         try:
             req = self.requests_retry_session().post(
                 full_url,
-                data=json.dumps(data),
+                #data=json.dumps(datas_json),
+                data=datas_json,
                 headers=headers,
                 timeout=30
             )
 
-            if self.has_debug:
+            if self.DEBUG:
                 print('Respuesta de API: ', req.status_code)
-            #print('Recibido: ', req.text)
+                print('Recibido: ', req.text)
 
-            # Guardado correctamente 201, con errores 200, mal 500
+            # Guardado correctamente 201, con errores 200, mal 500 u otro error
             if int(req.status_code) == 201:
                 return True
             elif int(req.status_code) == 200:
-                if self.has_debug:
+                if self.DEBUG:
                     print('Al guardar en la API algunos elementos tuvieron error.')
                 return True
             else:
                 return False
         except Exception as e:
-            if self.has_debug:
+            if self.DEBUG:
                 print('Ha fallado la petición http :', e.__class__.__name__)
-                #print('Ha fallado la petición http :', e)
+                print(e)
+
             sleep(5)
 
             return False
 
-    def parse_to_json(self, rows, columns):
+    def parse_array_to_json(self, rows, columns):
         """
         Convierte los datos recibidos en JSON
         :param rows: Tuplas con todas las entradas desde la DB.
@@ -176,17 +180,14 @@ class ApiConnection:
 
         # Compongo el objeto json que será devuelto.
         for row in rows:
-            tupla = {
-                'device_id': self.PC_ID,
-                'device_name': self.PC_NAME
-            }
+            tupla = { }
 
             # Por cada tupla creo la pareja de clave: valor
             for iteracion in range(len(columns)):
                 cell = str(row[iteracion])
 
                 if columns[iteracion] != 'id':
-                    tupla.update({columns[iteracion]: cell})
+                    tupla.update({ columns[iteracion]: cell })
 
             result.append(tupla)
 
@@ -198,7 +199,42 @@ class ApiConnection:
             indent=4,
         )
 
-    def upload(self, name, path, datas, columns):
+    def parse_to_json(self, row, columns):
+        """
+        Convierte los datos recibidos en JSON
+        :param rows: Tuplas con todas las entradas desde la DB.
+        :param columns: Nombre de las columnas en orden respecto a tuplas.
+        :return: Devuelve el objeto json
+        """
+
+        result = {}
+
+        # Compongo el objeto json que será devuelto.
+        for iteracion in range(len(columns)):
+            cell = row[iteracion]
+            #print('cell: ', cell)
+
+            if isinstance(cell, decimal.Decimal):
+                cell = float(cell)
+
+            if isinstance(cell, datetime.datetime):
+                cell = cell.strftime("%Y-%m-%d %H:%M:%S")
+
+            if columns[iteracion] != 'id':
+                result.update({ columns[iteracion]: cell })
+
+        return json.dumps(
+            result,
+            #default=None,
+            #ensure_ascii=False,
+            #sort_keys=True,
+            #indent=4,
+            skipkeys=False, ensure_ascii=True, check_circular=True,
+            allow_nan=True, cls=None, indent=None, separators=None,
+            default=None
+        )
+
+    def upload (self, name, path, datas, columns, method='GET'):
         """
         Recibe la ruta dentro de la API y los datos a enviar para procesar la
         subida atacando la API.
@@ -206,14 +242,17 @@ class ApiConnection:
         :param datas: Datos a enviar
         """
         if datas:
-            if self.has_debug:
-                print('Subiendo datos para: ' + name + ', ruta de api: ' + path)
+            if self.DEBUG:
+                print('Subiendo dato: ' + name + ', ruta de api: ' + path)
 
-            datas_json = self.parse_to_json(datas, columns)
+            result_send = False
 
-            #if self.has_debug:
-                #print('Datos formateados en JSON:', datas_json)
+            for data in datas:
+                # print(data)
+                datas_json = self.parse_to_json(data, columns)
+                # print('Datos formateados en JSON:', datas_json)
 
-            result_send = self.send(path, datas_json)
+                if (self.send(path, datas_json, method=method)):
+                    result_send = True
 
             return result_send

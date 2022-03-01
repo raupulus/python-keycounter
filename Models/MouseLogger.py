@@ -48,6 +48,7 @@
 # #       Importar Librerías        # #
 #######################################
 from datetime import datetime
+import os
 
 #######################################
 # #             Variables           # #
@@ -66,7 +67,9 @@ class MouseLogger:
     name = 'Mouse'
 
     # Ruta para la API
-    api_path = '/keycounter/v1/mouse/add-json'
+    api_path = '/keycounter/v1/mouse/store'
+
+    DEVICE_ID = os.getenv("DEVICE_ID")
 
     # Map para almacenar todas las rachas no guardadas en DB
     spurts = {}
@@ -154,6 +157,7 @@ class MouseLogger:
             'total_clicks': self.current_clicks,
             'clicks_average': self.get_clicks_average(),
             'weekday': datetime.today().weekday(),
+            'hardware_device_id': self.DEVICE_ID,
         }
 
     def get_clicks_average(self):
@@ -233,6 +237,14 @@ class MouseLogger:
                 'type': 'Numeric',
                 'params': {
                     'precision': 1,
+                    'asdecimal': False,
+                },
+                'others': None,
+            },
+            'hardware_device_id': {
+                'type': 'Numeric',
+                'params': {
+                    'precision': 15,
                     'asdecimal': False,
                 },
                 'others': None,

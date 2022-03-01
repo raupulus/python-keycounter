@@ -49,6 +49,7 @@
 #######################################
 from datetime import datetime
 from _thread import start_new_thread
+import os
 
 #######################################
 # #             Variables           # #
@@ -67,7 +68,9 @@ class KeyboardLogger:
     name = 'Keyboard'
 
     # Ruta para la API
-    api_path = '/keycounter/v1/keyboard/add-json'
+    api_path = '/keycounter/v1/keyboard/store'
+
+    DEVICE_ID = os.getenv("DEVICE_ID")
 
     # Map para almacenar todas las rachas no guardadas en DB
     spurts = {}
@@ -290,6 +293,7 @@ class KeyboardLogger:
             'pulsation_average': self.get_pulsation_average(),
             'score': self.combo_score_current,
             'weekday': datetime.today().weekday(),
+            'hardware_device_id': self.DEVICE_ID,
         }
 
     def set_combo(self, timestamp_utc, reset_sesion=False):
@@ -463,6 +467,14 @@ class KeyboardLogger:
                 'type': 'Numeric',
                 'params': {
                     'precision': 1,
+                    'asdecimal': False,
+                },
+                'others': None,
+            },
+            'hardware_device_id': {
+                'type': 'Numeric',
+                'params': {
+                    'precision': 15,
                     'asdecimal': False,
                 },
                 'others': None,

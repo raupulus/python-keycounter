@@ -72,6 +72,7 @@ SERIAL_PORT = os.getenv('SERIAL_PORT') or None
 SERIAL_BAUDRATE = os.getenv('SERIAL_BAUDRATE') or '9600'
 
 # Configuración pantalla.
+SERIAL_DISPLAY_ENABLED = os.getenv('SERIAL_DISPLAY_ENABLED') == 'True'
 DISPLAY_ORIENTATION = os.getenv('DISPLAY_ORIENTATION') or 'horizontal'
 
 # Indica si se registran datos del mouse.
@@ -80,6 +81,7 @@ MOUSE_ENABLED = (os.getenv('MOUSE_ENABLED') == "True") or \
 
 # Debug
 DEBUG = os.getenv("DEBUG") == "True"
+UPLOAD_API = os.getenv("UPLOAD_API") == "True"
 
 
 def insert_data_in_db(dbconnection, tablemodel):
@@ -205,7 +207,8 @@ def loop(keylogger, socket, apiconnection=None, display=None):
                 insert_data_in_db(dbconnection, keylogger.model_mouse)
 
             # Inicia la subida a la base de datos si está configurada.
-            if apiconnection and \
+            if UPLOAD_API and \
+               apiconnection and \
                apiconnection.API_TOKEN and \
                apiconnection.API_URL:
                 if DEBUG:
@@ -254,11 +257,12 @@ def loop(keylogger, socket, apiconnection=None, display=None):
         finally:
             sleep(10)
 
+
 def main():
     display = Display(port=SERIAL_PORT,
                       baudrate=SERIAL_BAUDRATE,
                       orientation=DISPLAY_ORIENTATION,
-                      has_debug=DEBUG) if SERIAL_PORT else None
+                      has_debug=DEBUG) if SERIAL_DISPLAY_ENABLED else None
 
     # Instancio el keylogger, este quedará en un subproceso leyendo teclas.
     keylogger = Keylogger(display=display,
