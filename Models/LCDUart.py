@@ -149,7 +149,7 @@ class LCDUart:
         try:
             self.ser.write(bytes(command))
         except:
-            time.sleep(1)
+            time.sleep(3)
             self.initialize()
 
     def get_screen_size(self):
@@ -180,7 +180,8 @@ class LCDUart:
             self.width = 176
             self.height = 220
             self.ser.write(b"DIR(0);\r\n")
-            time.sleep(0.1)
+            time.sleep(0.3)
+
             return True
         elif orientation == 'horizontal':
             if self.has_debug:
@@ -190,6 +191,7 @@ class LCDUart:
             self.width = 220
             self.height = 176
             self.ser.write(b"DIR(1);\r\n")
+            time.sleep(0.3)
 
             return True
 
