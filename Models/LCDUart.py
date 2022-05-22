@@ -28,6 +28,7 @@ import os
 #######################################
 sleep = time.sleep
 
+
 #######################################
 # #             CLASE               # #
 #######################################
@@ -65,7 +66,7 @@ class LCDUart:
         'white': 15
     }
 
-    def __init__(self, port='/dev/ttyUSB0', baudrate=115200, timeout=1,
+    def __init__ (self, port='/dev/ttyUSB0', baudrate=115200, timeout=1,
                   orientation='vertical', has_debug=False):
         if not port:
             return None
@@ -80,9 +81,9 @@ class LCDUart:
             return None
 
         if self.has_debug:
-            print('Pantalla Lista')
+            print('Pantalla Preparada e iniciada')
 
-    def initialize(self):
+    def initialize (self):
         """
         Abrir el puerto para comenzar la comunicación con la pantalla.
         :return:
@@ -90,25 +91,43 @@ class LCDUart:
         time.sleep(1)
 
         # Compruebo si existe el puerto.
-        if not os.system('ls ' + self.port + ' 2> /dev/null') == 0:
+        #if not os.system('ls ' + self.port + ' 2> /dev/null') == 0:
+        if not os.popen('ls ' + self.port + ' 2> /dev/null | head -n 1').read().rstrip() == self.port:
             if self.has_debug:
                 print('El puerto ' + self.port + ' para la pantalla no existe.')
+
             return None
 
         # Cierro el puerto para abrirlo posteriormente
         if self.ser and self.ser.is_open:
             time.sleep(1)
-            self.ser.close()
+
+            try:
+                self.ser.close()
+            except:
+                if self.has_debug:
+                    print('Error al cerrar el puerto ' + self.port)
+
+                return None
+
             time.sleep(3)
 
         # Abre el puerto
-        self.ser = serial.Serial(self.port, self.baudrate, timeout=self.timeout)
-
-        if not self.ser.is_open:
+        try:
+            self.ser = serial.Serial(self.port, self.baudrate,
+                                     timeout=self.timeout)
+        except:
             if self.has_debug:
-                print('No se pudo establecer la comunicación en el puerto ' + self.port)
+                print('Error al cerrar el puerto ' + self.port)
 
-        if self.has_debug:
+            return None
+
+        if not self.ser or not self.ser.is_open:
+            if self.has_debug:
+                print(
+                    'No se pudo establecer la comunicación en el puerto ' + self.port)
+
+        if self.ser and self.has_debug:
             print('Serial Open? → ' + str(self.ser.is_open))
 
         self.write(b"RESET;BPS(115200);BL(0);CLR(0);\r\n")
@@ -119,40 +138,49 @@ class LCDUart:
 
         self.configurations()
 
-    def configurations(self):
+    def configurations (self):
         if self.has_debug:
             print('Aplicando Configuraciones a la pantalla')
+
         return True
 
-    def stop(self):
+    def stop (self):
         """
         Detiene la comunicación con la pantalla.
         """
-        self.ser.close()
 
-    def on(self):
+        try:
+            self.ser.close()
+        except:
+            time.sleep(3)
+
+    def on (self):
         """
         Enciende la pantalla.
         """
-        self.ser.write(b"LCDON(1);\r\n")
+        self.write(b"LCDON(1);\r\n")
 
-    def off(self):
+    def off (self):
         """
         Apaga la pantalla.
         """
-        self.ser.write(b"LCDON(0);\r\n")
+        self.write(b"LCDON(0);\r\n")
 
-    def write(self, command):
+    def write (self, command):
         """
         Envía un comando en bruto a la pantalla
         """
-        try:
-            self.ser.write(bytes(command))
-        except:
-            time.sleep(3)
+        if self.ser and self.ser.is_open:
+            try:
+                self.ser.write(bytes(command))
+            except:
+                time.sleep(3)
+                #self.initialize()
+        else:
+            time.sleep(5)
             self.initialize()
 
-    def get_screen_size(self):
+    def get_screen_size (self):
         """
         Devuelve el tamaño de la pantalla
         """
@@ -161,13 +189,13 @@ class LCDUart:
             'height': self.height
         }
 
-    def get_screen_orientation(self):
+    def get_screen_orientation (self):
         """
         Devuelve la orientación actual de la pantalla
         """
         return self.orientation
 
-    def set_screen_orientation(self, orientation):
+    def set_screen_orientation (self, orientation):
         """
         Establece un nuevo modo para la orientación de la pantalla, admite los valores
         horizontal y vertical
@@ -179,7 +207,7 @@ class LCDUart:
             self.orientation = orientation
             self.width = 176
             self.height = 220
-            self.ser.write(b"DIR(0);\r\n")
+            self.write(b"DIR(0);\r\n")
             time.sleep(0.3)
 
             return True
@@ -190,21 +218,21 @@ class LCDUart:
             self.orientation = orientation
             self.width = 220
             self.height = 176
-            self.ser.write(b"DIR(1);\r\n")
+            self.write(b"DIR(1);\r\n")
             time.sleep(0.3)
 
             return True
 
         return False
 
-    def set_brigthness(self, value):
+    def set_brigthness (self, value):
         """
         Establece el brillo al que trabajará la pantalla.
         Los valores admitidos varían entre 0 y 255, siendo 255 la pantalla apagada.
         """
-        self.ser.write(bytes("BL(" + str(value) + ";\r\n"))
+        self.write(bytes("BL(" + str(value) + ";\r\n"))
 
-    def show_image(self, path):
+    def show_image (self, path):
         """
         Muestra por la pantalla la imagen recibida por su ruta conviertiéndola primero
         a binario.
@@ -231,8 +259,6 @@ class LCDUart:
         f.close()
 
 
-        self.ser.write(bytes("FSIMG(" + binimg + ",0,0,176,220,0);\r\n"))
+        self.write(bytes("FSIMG(" + binimg + ",0,0,176,220,0);\r\n"))
         time.sleep(0.1)
         """
-
-
