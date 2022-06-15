@@ -54,7 +54,6 @@
 # #       Importar Librerías        # #
 #######################################
 import keyboard
-import mouse
 from datetime import datetime
 from _thread import start_new_thread
 import subprocess
@@ -181,7 +180,8 @@ class Keylogger:
         if model_mouse and mouse_enabled:
             self.model_mouse = model_mouse
         elif mouse_enabled:
-            self.model_mouse = MouseLogger()
+           import mouse
+           self.model_mouse = MouseLogger()
 
         # Establezco contadores para sesión completa por día
         #self.model_keyboard.reset_global_counter()

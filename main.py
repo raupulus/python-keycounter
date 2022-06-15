@@ -188,10 +188,11 @@ def loop(keylogger, socket, apiconnection=None, display=None):
     sleep(1)
 
     # Seteo tabla en el modelo de conexión a la DB para el mouse.
-    dbconnection.table_set_new(
-        keylogger.model_mouse.tablename,  # Nombre de la tabla.
-        keylogger.model_mouse.tablemodel()  # Modelo de tabla y columnas.
-    )
+    if (keylogger.model_mouse):
+        dbconnection.table_set_new(
+            keylogger.model_mouse.tablename,  # Nombre de la tabla.
+            keylogger.model_mouse.tablemodel()  # Modelo de tabla y columnas.
+        )
 
     # Pausa de 30 segundos para dar margen a tomar datos.
     sleep(30)

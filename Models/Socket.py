@@ -119,7 +119,7 @@ class Socket:
         :return:
         """
         # Otorgo permisos de lectura a todos
-        os.chmod('/var/run/keycounter.socket', 755)
+        os.chmod(self.server_address, 755)
 
     def ready(self):
         """

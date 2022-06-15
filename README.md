@@ -97,7 +97,7 @@ python que existen en los repositorios en lugar de hacerlo desde el gestor
 de paquetes de python 3:
 
 ```bash
-sudo apt install python3-serial python3-dotenv python3-sqlalchemy
+sudo apt install python3-serial python3-dotenv python3-sqlalchemy python3-requests
 ```
 
 ## Ejecución
