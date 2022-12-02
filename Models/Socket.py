@@ -78,14 +78,24 @@ class Socket:
     # Almacena la instancia del keylogger para obtener sus datos.
     keylogger = None
 
-    # Conexión
-    connection = None
-
-    # Cliente
-    client_address = None
+    # Máximo de clientes conectados.
+    max_clients = 99
 
     # Indica si está en espera de una conexión.
     wait_client_connection = False
+
+    """
+    Listado de clientes conectados. Esto es una tupla llena de diccionarios.
+    connection, representa la conexión con el cliente, address, la dirección del cliente.
+    Ejemplo:
+    [
+        {
+            connection: <socket.socket fd=5, family=AddressFamily.AF_UNIX, type=SocketKind.SOCK_STREAM, proto=0, laddr=/var/run/keycounter.socket>,
+            client_address:
+        }
+    ]
+    """
+    clients_list = []
 
     def __init__(self, keylogger, has_debug=False):
         self.keylogger = keylogger
@@ -104,13 +114,25 @@ class Socket:
         self.sock.bind(self.server_address)
 
         # Comienza a escuchar conexiones entrantes.
-        self.sock.listen(99)
+        self.sock.listen(self.max_clients)
 
         # Cambio los permisos del socket.
         self.change_permissions_socket()
 
         # Comienza el bucle esperando conexiones.
-        start_new_thread(self.wait_client, ())
+        start_new_thread(self.startWaitClients, ())
+
+    def startWaitClients(self):
+        """
+        Comienza el bucle de espera de clientes.
+        :return:
+        """
+
+        while True:
+            if len(self.clients_list) < self.max_clients:
+                self.wait_client()
+            else:
+                sleep(10)
 
     def delete_old_socket(self):
         """
@@ -131,42 +153,6 @@ class Socket:
         # Otorgo permisos de lectura a todos (Escribir no es necesario, pero por ahora se establece).
         os.chmod(self.server_address, 0o666)
 
-    def ready(self):
-        """
-            Queda en bucle esperando conexiones.
-            :return:
-            """
-        while True:
-
-            try:
-
-                """
-                # Recibe los datos en pequeños trozos para retrasmitirlos.
-                while True:
-                    data = connection.recv(16)
-                    print('Recibido {!r}'.format(data))
-                    if data:
-                        # Envío los datos de conexión
-                        print('Enviando Pulsaciones: ' + \
-                            str(self.keylogger.pulsations_current))
-                        # connection.sendall(bytes(self.keylogger.pulsations_current, encoding='utf-8'))
-                        connection.sendall(str(self.keylogger.pulsations_current))
-
-                        # print('Devolviendo los datos al cliente.')
-                        # self.keylogger.debug()
-                        # connection.sendall(data)
-                    else:
-                        print('No hay más datos desde:', client_address)
-                        break
-                """
-            except Exception as e:
-                print('Error en la conexión: ' + str(e))
-
-                # Cierra y limpia la conexión.
-                self.connection.close()
-            finally:
-                sleep(1)
-
     def wait_client(self):
         """
         Espera a que se conecte un cliente.
@@ -177,39 +163,24 @@ class Socket:
         if self.has_debug:
             print('Socket Unix Esperando conexiones')
 
-        # DELETE: TMP DEBUG
-        print('Entra en wait_client, esperando conexiones. (wait_client_connection: ' +
-              str(self.wait_client_connection) + ')')
+        self.wait_client_connection = True
 
-        if self.wait_client_connection is False and (self.connection is None or self.client_address is None):
+        try:
+            # Espera a que se conecte un cliente, se pausa la ejecución hasta recibir un cliente.
+            connection, client_address = self.sock.accept()
 
-            self.wait_client_connection = True
-            print('COMPROBACION 1, wait_client_connection: ' +
-                  str(self.wait_client_connection))
-
-            self.connection, self.client_address = self.sock.accept()
+            self.clients_list.append({
+                'connection': connection,
+                'client_address': client_address
+            })
+        except Exception as e:
+            if self.has_debug:
+                print('Error al esperar cliente: ' + str(e))
+        finally:
             self.wait_client_connection = False
 
-            """
-            try:
-                pass
-            except Exception as e:
-                print('Error en la conexión: ' + str(e))
-
-                self.connection = None
-                self.client_address = None
-            finally:
-                self.wait_client_connection = False
-            """
-
-            print('COMPROBACION 3', self.wait_client_connection,
-                  self.connection, self.client_address)
-
-        # DELETE: TMP DEBUG
-        print('Conexión desde', self.client_address)
-
         if self.has_debug:
-            print('Conexión desde', self.client_address)
+            print('Conexión desde', client_address)
 
     def update(self):
         """
@@ -217,34 +188,37 @@ class Socket:
         :return:
         """
 
-        print('Entra en actualizar Socket')
+        if self.has_debug:
+            print('Entra en actualizar Socket, lista de clientes', self.clients_list)
 
-        if self.wait_client_connection is False and (self.connection is None or self.client_address is None):
-            print('Se va a realizar llamada para esperar cliente')
-            print('COMPROBACION 2:', self.wait_client_connection,
-                  self.connection, self.client_address)
+        for client in self.clients_list:
 
-            start_new_thread(self.wait_client, ())
+            connection = client.get('connection')
+            client_address = client.get('client_address')
 
-            return
+            if connection is not None and client_address is not None:
+                try:
 
-        if self.connection is not None and self.client_address is not None:
-            print('HAY CLIENTE')
-            try:
-                #data = self.connection.recv(2048)
+                    if self.has_debug:
+                        print('Enviando Pulsaciones: ' +
+                              str(self.keylogger.model_keyboard.pulsations_current))
+
+                    # print('Enviando Pulsaciones: ' +
+                    #      str(self.keylogger.model_keyboard.pulsations_current))
+
+                    # Envía los datos al cliente.
+                    connection.sendall(
+                        bytes(str(self.keylogger.model_keyboard.pulsations_current), encoding='utf-8'))
+
+                except Exception as e:
+                    if self.has_debug:
+                        print('ERROR, SE ELIMINA CLIENTE DE LA LISTA')
+                        print('Error en la conexión, excepción: ' + str(e))
+
+                    self.clients_list.remove(client)
+            else:
+                self.clients_list.remove(client)
 
                 if self.has_debug:
-                    print('Enviando Pulsaciones: ' +
-                          str(self.keylogger.model_keyboard.pulsations_current))
-
-                print('Enviando Pulsaciones: ' +
-                      str(self.keylogger.model_keyboard.pulsations_current))
-
-                self.connection.sendall(
-                    bytes(str(self.keylogger.model_keyboard.pulsations_current), encoding='utf-8'))
-            except Exception as e:
-                print('Error en la conexión, excepción: ' + str(e))
-                self.connection = None
-                self.client_address = None
-        else:
-            print('NO HAY CLIENTE')
+                    print('CLIENTE NO VÁLIDO, SE ELIMINA DE LA LISTA')
+                    print('Eliminando cliente de la lista', self.clients_list)

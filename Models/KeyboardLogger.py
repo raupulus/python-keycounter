@@ -269,10 +269,8 @@ class KeyboardLogger:
         if timestamp_utc > self.current_day_end:
             start_new_thread(self.reset_global_counter, ())
 
-        # TODO: Comunicar actualización al socket
-
+        # Envía la actualización a los clientes del socket.
         if self.socket is not None:
-            print('Entra en keyboardlogger actualizar pulsación')
             self.socket.update()
 
     def get_pulsation_average(self):
