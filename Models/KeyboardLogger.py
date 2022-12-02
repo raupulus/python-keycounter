@@ -98,6 +98,9 @@ class KeyboardLogger:
         10: 1.00
     }
 
+    # Socket asociado al keycounter
+    socket = None
+
     # ############# SESIÓN COMPLETA ############# #
 
     # Timestamp con el comienzo de las mediciones.
@@ -158,9 +161,9 @@ class KeyboardLogger:
             self.pulsations_current_start_at = current_timestamp
 
         self.current_day_start = current_timestamp.replace(hour=0, minute=0,
-                                                      second=0, microsecond=0)
+                                                           second=0, microsecond=0)
         self.current_day_end = current_timestamp.replace(hour=23, minute=59,
-                                                  second=59, microsecond=999999)
+                                                         second=59, microsecond=999999)
 
     def reset_global_counter(self):
         """
@@ -266,15 +269,23 @@ class KeyboardLogger:
         if timestamp_utc > self.current_day_end:
             start_new_thread(self.reset_global_counter, ())
 
+        # TODO: Comunicar actualización al socket
+
+        if self.socket is not None:
+            print('Entra en keyboardlogger actualizar pulsación')
+            self.socket.update()
+
     def get_pulsation_average(self):
         """
         Devuelve la media de pulsaciones para la racha actual por segundos.
         """
         timestamp_utc = self.last_pulsation_at
-        duration_seconds = (timestamp_utc - self.pulsations_current_start_at).seconds
+        duration_seconds = (
+            timestamp_utc - self.pulsations_current_start_at).seconds
 
         if duration_seconds > 0 and self.pulsations_current > 0:
-            average_per_minute = (self.pulsations_current / duration_seconds) * 60.0
+            average_per_minute = (
+                self.pulsations_current / duration_seconds) * 60.0
         else:
             return 0.00
 
@@ -388,23 +399,36 @@ class KeyboardLogger:
         print('---------------------------------')
         print('')
         print('La sesión comenzó: ' + str(session.get('start_at')))
-        print('Racha con número de pulsacionespulsaciones más alta: ' + str(session.get('pulsation_high')))
-        print('Momento de la puslación más alta: ' + str(session.get('pulsation_high_at')))
-        print('Número de pulsaciones total: ' + str(session.get('pulsations_total')))
-        print('Número de pulsaciones total en teclas especiales: ' + str(session.get('pulsations_total_especial_keys')))
-        print('Puntuación total obtenida en combos: ' + str(session.get('combo_score')))
-        print('Puntuación más alta obtenida en combos en una racha: ' + str(session.get('combo_score_high')))
-        print('Momento de la puntuación más alta obtenida en combos en una racha: ' + str(session.get('combo_score_high_at')))
+        print('Racha con número de pulsacionespulsaciones más alta: ' +
+              str(session.get('pulsation_high')))
+        print('Momento de la puslación más alta: ' +
+              str(session.get('pulsation_high_at')))
+        print('Número de pulsaciones total: ' +
+              str(session.get('pulsations_total')))
+        print('Número de pulsaciones total en teclas especiales: ' +
+              str(session.get('pulsations_total_especial_keys')))
+        print('Puntuación total obtenida en combos: ' +
+              str(session.get('combo_score')))
+        print('Puntuación más alta obtenida en combos en una racha: ' +
+              str(session.get('combo_score_high')))
+        print('Momento de la puntuación más alta obtenida en combos en una racha: ' +
+              str(session.get('combo_score_high_at')))
         print('')
         print('---------------------------------')
         print('---------- RACHA ACTUAL ---------')
         print('---------------------------------')
-        print('Pulsaciones en racha actual: ' + str(streak.get('pulsations_current')))
-        print('Pulsaciones de teclas especiales en racha actual: ' + str(streak.get('pulsations_current_special_keys')))
-        print('Velocidad media de pulsaciones por minuto: ' + str(streak.get('pulsation_average')))
-        print('Momento en el que inicia la racha: ' + str(streak.get('pulsations_current_start_at')))
-        print('Momento de la última pulsación: ' + str(streak.get('last_pulsation_at')))
-        print('Puntuación de combo para la racha actual: ' + str(streak.get('combo_score_current')))
+        print('Pulsaciones en racha actual: ' +
+              str(streak.get('pulsations_current')))
+        print('Pulsaciones de teclas especiales en racha actual: ' +
+              str(streak.get('pulsations_current_special_keys')))
+        print('Velocidad media de pulsaciones por minuto: ' +
+              str(streak.get('pulsation_average')))
+        print('Momento en el que inicia la racha: ' +
+              str(streak.get('pulsations_current_start_at')))
+        print('Momento de la última pulsación: ' +
+              str(streak.get('last_pulsation_at')))
+        print('Puntuación de combo para la racha actual: ' +
+              str(streak.get('combo_score_current')))
         print('')
 
     def tablemodel(self):

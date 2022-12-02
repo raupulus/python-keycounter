@@ -83,10 +83,10 @@ from Models.MouseLogger import MouseLogger
 
 
 class Keylogger:
-    ## Modelo que representa datos y registros del teclado.
+    # Modelo que representa datos y registros del teclado.
     model_keyboard = None
 
-    ## Modelo que representa datos y registros del ratón.
+    # Modelo que representa datos y registros del ratón.
     model_mouse = None
 
     # Indica si necesita reiniciar Keycounter
@@ -160,7 +160,7 @@ class Keylogger:
     #######################################
 
     def __init__(self, display=None, has_debug=False, mouse_enabled=True,
-                 model_keyboard = None, model_mouse = None):
+                 model_keyboard=None, model_mouse=None):
         # Establezco pantalla si existiera.
         self.display = display
 
@@ -180,11 +180,11 @@ class Keylogger:
         if model_mouse and mouse_enabled:
             self.model_mouse = model_mouse
         elif mouse_enabled:
-           import mouse
-           self.model_mouse = MouseLogger()
+            import mouse
+            self.model_mouse = MouseLogger()
 
         # Establezco contadores para sesión completa por día
-        #self.model_keyboard.reset_global_counter()
+        # self.model_keyboard.reset_global_counter()
 
         # Almaceno los dispositivos de entrada conectados
         self.devices = self.read_devices_by_id()
@@ -205,12 +205,12 @@ class Keylogger:
 
         try:
             #keyboard = subprocess.getoutput('cat /proc/bus/input/devices | grep -i -w "keyboard"')
-            #sleep(0.1)
+            # sleep(0.1)
             #mouse = subprocess.getoutput('cat /proc/bus/input/devices | grep -i -w "mouse"')
-            #sleep(0.1)
+            # sleep(0.1)
 
-            #return subprocess.getoutput('ls /dev/input/by-id/') + keyboard + mouse
-            #return subprocess.getoutput('ls /dev/input/by-id/; cat /proc/bus/input/devices | grep --color -i -E "^N: Name=\"[^(Virtual)].*"')
+            # return subprocess.getoutput('ls /dev/input/by-id/') + keyboard + mouse
+            # return subprocess.getoutput('ls /dev/input/by-id/; cat /proc/bus/input/devices | grep --color -i -E "^N: Name=\"[^(Virtual)].*"')
             return subprocess.getoutput('ls /dev/input/by-id/; cat /proc/bus/input/devices | grep -i -v -E "[Vv][Ii][Rr][Tt][Uu][Aa][Ll]" | grep -E "([Kk][Ee][Yy][Bb][Oo][Aa][Rr][Dd]|[Mm][Oo][Uu][Ss][Ee])"')
         except Exception as e:
             if self.has_debug:
@@ -252,7 +252,7 @@ class Keylogger:
                     print(new_devices)
 
                 # Quito todos los hooks
-                #keyboard.unhook_all()
+                # keyboard.unhook_all()
 
                 # Reestablezco lecturas de teclado en la librería keyboard
                 keyboard._nixkeyboard.device = None
@@ -265,14 +265,14 @@ class Keylogger:
                     keyboard._listener = keyboard._KeyboardListener()
 
                 # Vuelvo a quitar todos los hooks, esto activa eventos por defecto
-                #keyboard.unhook_all()
+                # keyboard.unhook_all()
 
                 # Añado de nuevo el hook para leer teclado
-                #keyboard.hook(self.callback_keyboard)
+                # keyboard.hook(self.callback_keyboard)
 
                 # TODO → Reiniciar MOUSE, comprobar si ya se realiza?
 
-                #exit(0)
+                # exit(0)
 
             # Pausa entre cada comprobación.
             sleep(3)
@@ -401,6 +401,13 @@ class Keylogger:
             return True
         except Exception as e:
             if self.has_debug:
-                print('En Keylogger.py método send_to_display error al dibujar por pantalla')
+                print(
+                    'En Keylogger.py método send_to_display error al dibujar por pantalla')
                 print(e)
             return False
+
+    def set_socket(self, socket):
+        """
+        Asocia el socket del sistema al contador para el teclado.
+        """
+        self.model_keyboard.socket = socket

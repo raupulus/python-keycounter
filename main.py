@@ -139,8 +139,8 @@ def upload_data_to_api(dbconnection, apiconnection, tablemodel):
 
     # Parámetros/tuplas desde la base de datos.
     params_from_db = dbconnection.table_get_data_last(
-                        tablemodel.tablename,
-                        n_registers)
+        tablemodel.tablename,
+        n_registers)
 
     # Columnas del modelo.
     columns = dbconnection.tables[tablemodel.tablename].columns.keys()
@@ -169,7 +169,7 @@ def upload_data_to_api(dbconnection, apiconnection, tablemodel):
                     tablemodel.tablename,
                     n_registers)
 
-    except():
+    except ():
         if DEBUG:
             print('Error al subir datos a la api')
 
@@ -275,6 +275,9 @@ def main():
 
     # Instancio socket pasándole el keylogger para que alcance sus datos.
     socket = Socket(keylogger, has_debug=DEBUG)
+
+    if socket:
+        keylogger.set_socket(socket)
 
     # Comienza el bucle para guardar datos y subirlos a la API.
     loop(keylogger, socket, apiconnection, display)

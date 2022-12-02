@@ -143,3 +143,6 @@ keycounter.socket
 # DB
 keycounter.db
 keycounter.sqbpro
+
+# Trashs
+.DS_Store

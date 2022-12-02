@@ -5,7 +5,7 @@ Herramienta en python 3 para contar la cantidad de teclas que se ha pulsado en u
 ## Objetivos
 
 Los objetivos de estos scripts es contar las pulsaciones de teclas, mostrarlo
-por una pantalla y en la barra de navegación teniendo la posibilidad de 
+por una pantalla y en la barra de navegación teniendo la posibilidad de
 subirlos a una API desde un caché temporal en una db sqlite que se crea bajo
 el mismo directorio del script.
 
@@ -25,23 +25,23 @@ Si pretendes utilizar otra pantalla distinta sería necesario adaptar la clase
 LCDUart.py manteniendo el mismo nombre para los métodos actuales.
 
 También puedes crear un modelo para tu propia pantalla y añadir una nueva
-variable de entorno al **.env** para posteriormente controlar su carga con 
+variable de entorno al **.env** para posteriormente controlar su carga con
 una condición if.
-  
+
 ### Unix Socket Server (Socket Unix)
 
-Se crea un servidor socket unix en **/var/run/keycounter.socket** al que se le 
+Se crea un servidor socket unix en **/var/run/keycounter.socket** al que se le
 pueden hacer peticiones para obtener las estadísticas de pulsaciones.
 
-En el archivo para debug ** ./Debug/client_socket.py** se puede encontrar un 
+En el archivo para debug ** ./Debug/client_socket.py** se puede encontrar un
 ejemplo del modo para conectar desde otras aplicaciones obteniendo los datos
 del momento en el que se hayan pedido.
-  
+
 Se crea un socket UNIX que permite acceder a los datos desde otras
 aplicaciones y desde el propio sistema operativo a través de un socket que
 será creado en la ruta: **/var/run/keycounter.socket**
-   
-Es posible modificar el comportamiento o ruta del socket desde el modelo Socket.py   
+
+Es posible modificar el comportamiento o ruta del socket desde el modelo Socket.py
 
 En el directorio de debug tienes algún ejemplo/prueba de como fuí depurando
 para lograr afinar esta parte.
@@ -55,8 +55,8 @@ Puedes utilizar el valor de pulsaciones para otros fines con creatividad.
 ### Base de datos SQLite para Caché
 
 Los registros serán almacenados temporalmente en un base de datos local
-situada en el mismo directorio del script llamada **keycounter.db** que se 
-gestiona desde el modelo **DbConnection.py** representando la conexión con 
+situada en el mismo directorio del script llamada **keycounter.db** que se
+gestiona desde el modelo **DbConnection.py** representando la conexión con
 dicha base de datos.
 
 Para la base de datos se utiliza el ORM **SQLAlchemy**
@@ -68,10 +68,10 @@ de forma parcial en fedora.
 
 ### Dependencias
 
-A continuación señalo las depenedencias que he necesitado para lograr 
-ejecutar con éxito esta herramienta. 
+A continuación señalo las depenedencias que he necesitado para lograr
+ejecutar con éxito esta herramienta.
 
-Puede ser que necesite alguna más y no me haya dado cuenta de ello al tenerla 
+Puede ser que necesite alguna más y no me haya dado cuenta de ello al tenerla
 previamente instalada de alguna otra aplicación en mi sistema.
 
 #### Con el gestor de paquetes de python, pip
@@ -82,17 +82,29 @@ Dependencias que instalo desde el gestor de paquetes **pip** para python:
 pip3 install keyboard mouse
 ```
 
-*Hay que tener en cuenta que para que funcione el keycounter es necesario
+_Hay que tener en cuenta que para que funcione el keycounter es necesario
 ejecutarlo como root, por lo tanto el comando anterior tal vez sea necesario
-hacerlo con tal usuario de la siguiente forma*
+hacerlo con tal usuario de la siguiente forma_
 
 ```bash
 sudo pip3 install keyboard mouse
 ```
 
+En caso de no estar en debian o no tenerlo en repositorios, deberá instalarse
+desde pip todas las dependencias así:
+
+```bash
+sudo pip3 install keyboard mouse serial sqlalchemy python-dotenv requests
+```
+
+De cualquier modo, adapta el comando a tu entorno.
+
 #### Desde el gestor de paquetes y repositorios oficiales para Debian stable
 
-A continuación la línea que he utilizado para obtener las dependencias de 
+Si estamos en debian, es mejor instalar las dependencias que existan en
+repositorios.
+
+A continuación la línea que he utilizado para obtener las dependencias de
 python que existen en los repositorios en lugar de hacerlo desde el gestor
 de paquetes de python 3:
 
@@ -148,7 +160,7 @@ Abrimos el archivo y añadimos la regla modificando el "serial", el "idVendor" y
 sudo nano /etc/udev/rules.d/10-usb-serial.rules
 ```
 
-SUBSYSTEM=="tty", ATTRS{idVendor}=="05e3", ATTRS{idProduct}=="0610", ATTRS{serial}=="0000:00:14.0",  SYMLINK+="ttyUSB_KEYCOUNTER"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="05e3", ATTRS{idProduct}=="0610", ATTRS{serial}=="0000:00:14.0", SYMLINK+="ttyUSB_KEYCOUNTER"
 
 ### Recargar nueva configuración
 

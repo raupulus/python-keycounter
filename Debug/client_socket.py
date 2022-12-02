@@ -3,7 +3,7 @@
 
 import socket
 import sys
-
+from time import sleep
 # Create a UDS socket
 sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
@@ -17,19 +17,24 @@ except socket.error as msg:
     sys.exit(1)
 
 try:
+
+    # sock.listen
+
+    # TOFIX: esperar evento y pintar todo, sin bucles!!
+
     # Pido cantidad de pulsaciones actual
-    message = b'pulsations_current'
-    print('Enviando {!r}'.format(message))
-    sock.sendall(message)
+    #message = b'pulsations_current'
+    #print('Enviando {!r}'.format(message))
+    # sock.sendall(message)
 
     # Recibo la cantidad de pulsaciones
-    data = sock.recv(2048)
-    print('Recibido {!r}'.format(data.decode("utf-8")))
+    #data = sock.recv(2048)
+    #print('Recibido {!r}'.format(data.decode("utf-8")))
 
     """
     amount_received = 0
     amount_expected = len(message)
-    
+
     while amount_received < amount_expected:
         #data = sock.recv(16)
         data = sock.recv()
@@ -37,7 +42,11 @@ try:
         print('received {!r}'.format(data))
     """
 
+    while sock.listen:
+        data = sock.recv(2048)
+        print('Recibido {!r}'.format(data.decode("utf-8")))
+
+
 finally:
     print('closing socket')
     sock.close()
-
