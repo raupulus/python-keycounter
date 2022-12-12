@@ -57,6 +57,7 @@
 
 import socket
 import os
+import json
 # import sys
 from _thread import start_new_thread
 from time import sleep
@@ -197,6 +198,21 @@ class Socket:
             client_address = client.get('client_address')
 
             if connection is not None and client_address is not None:
+                data = {
+                    'session': {
+                        'pulsations_total': int(self.keylogger.model_keyboard.pulsations_total),
+                    },
+                    'streak': {
+                        'pulsations_current': int(self.keylogger.model_keyboard.pulsations_current),
+                        'pulsation_average': int(self.keylogger.model_keyboard.get_pulsation_average()),
+                    }
+                }
+
+                dataJsonString = json.dumps(data, skipkeys=False,
+                                            ensure_ascii=True, check_circular=True,
+                                            allow_nan=True, cls=None, indent=None, separators=None,
+                                            default=None)
+
                 try:
 
                     if self.has_debug:
@@ -208,7 +224,7 @@ class Socket:
 
                     # Envía los datos al cliente.
                     connection.sendall(
-                        bytes(str(self.keylogger.model_keyboard.pulsations_current), encoding='utf-8'))
+                        bytes(dataJsonString, encoding='utf-8'))
 
                 except Exception as e:
                     if self.has_debug:

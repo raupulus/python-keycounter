@@ -49,19 +49,19 @@
 # #       Importar Librerías        # #
 #######################################
 
+import time
+from requests.packages.urllib3.util.retry import Retry
+from requests.adapters import HTTPAdapter
+import requests
+import json
+import os
 import datetime
 
-## Cargo archivos de configuración desde .env
+# Cargo archivos de configuración desde .env
 import decimal
 
 from dotenv import load_dotenv
 load_dotenv(override=True)
-import os
-import json
-import requests
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
-import time
 
 #######################################
 # #             Variables           # #
@@ -130,17 +130,17 @@ class ApiConnection:
             'Authorization': 'Bearer ' + str(token),
         }
 
-        ## TODO → Check method POST|GET|PUT|DELETE
+        # TODO → Check method POST|GET|PUT|DELETE
 
-        ## TODO → Comprobar si no es un array (datas_json), convertirlo en uno.
+        # TODO → Comprobar si no es un array (datas_json), convertirlo en uno.
 
-        ## TODO → Añadir metadatos a la subida (info sobre iot que envía)
+        # TODO → Añadir metadatos a la subida (info sobre iot que envía)
 
-        #data.push(info)
+        # data.push(info)
         try:
             req = self.requests_retry_session().post(
                 full_url,
-                #data=json.dumps(datas_json),
+                # data=json.dumps(datas_json),
                 data=datas_json,
                 headers=headers,
                 timeout=30
@@ -180,14 +180,14 @@ class ApiConnection:
 
         # Compongo el objeto json que será devuelto.
         for row in rows:
-            tupla = { }
+            tupla = {}
 
             # Por cada tupla creo la pareja de clave: valor
             for iteracion in range(len(columns)):
                 cell = str(row[iteracion])
 
                 if columns[iteracion] != 'id':
-                    tupla.update({ columns[iteracion]: cell })
+                    tupla.update({columns[iteracion]: cell})
 
             result.append(tupla)
 
@@ -221,20 +221,20 @@ class ApiConnection:
                 cell = cell.strftime("%Y-%m-%d %H:%M:%S")
 
             if columns[iteracion] != 'id':
-                result.update({ columns[iteracion]: cell })
+                result.update({columns[iteracion]: cell})
 
         return json.dumps(
             result,
-            #default=None,
-            #ensure_ascii=False,
-            #sort_keys=True,
-            #indent=4,
+            # default=None,
+            # ensure_ascii=False,
+            # sort_keys=True,
+            # indent=4,
             skipkeys=False, ensure_ascii=True, check_circular=True,
             allow_nan=True, cls=None, indent=None, separators=None,
             default=None
         )
 
-    def upload (self, name, path, datas, columns, method='GET'):
+    def upload(self, name, path, datas, columns, method='GET'):
         """
         Recibe la ruta dentro de la API y los datos a enviar para procesar la
         subida atacando la API.
