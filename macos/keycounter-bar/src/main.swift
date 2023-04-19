@@ -48,7 +48,19 @@ while true {
         let data = Data(bytes: buffer, count: bytesRead)
         if let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
             // Utilizar el diccionario recibido aquí "dict"
+            //print(dict)
+            
             print(dict)
+            
+            if let streakDict = dict["streak"] as? [String: Any],
+               let pulsationAverage = streakDict["pulsation_average"] as? Int {
+                let avg = pulsationAverage
+                print(avg)
+                //setMenuItemValue(value: avg ?? "N/A")
+                //setMenuItemValue(value: "N/A")
+            }
+            
+            
         } else {
             print("Error al convertir la cadena JSON en un diccionario")
         }
