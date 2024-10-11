@@ -95,6 +95,10 @@ def insert_data_in_db(dbconnection, tablemodel):
     # Almaceno la clave de los elementos guardados correctamente en db.
     saved = []
 
+    if DEBUG:
+        print('Comprobando datos para guardar en la DB del modelo ' + tablemodel.name)
+        print(tablemodel.spurts)
+
     # Guardo las estadísticas registradas para el teclado de todas las rachas.
     for register in tablemodel.spurts:
         # Compruebo que existan datos registrados, que existe una racha.
@@ -102,11 +106,19 @@ def insert_data_in_db(dbconnection, tablemodel):
             if register is not None:
                 if (tablemodel.tablename == 'keyboard' and tablemodel.spurts[register]['pulsations'] > 1) or \
                    (tablemodel.tablename == 'mouse' and tablemodel.spurts[register]['total_clicks'] > 1):
+
+                    if DEBUG:
+                        print('Entra en if para guardar en la DB, tabla: ' + tablemodel.name)
+                        print(tablemodel.spurts[register])
+
                     save_data = dbconnection.table_save_data(
                         tablename=tablemodel.tablename,
                         params=tablemodel.spurts[register]
                     )
                 else:
+                    if DEBUG:
+                        print('No hay datos válidos para guardar en la DB')
+
                     save_data = True
 
                 # Si se ha llevado a cabo el guardado, se quita del map.
@@ -199,7 +211,7 @@ def loop(keylogger, socket, apiconnection=None, display=None):
 
     while True:
         if DEBUG:
-            print('Entra en while para guardar en la DB')
+            print('Entra en while para guardar en la DB y subir a la API')
 
         try:
             insert_data_in_db(dbconnection, keylogger.model_keyboard)

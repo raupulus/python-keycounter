@@ -153,6 +153,9 @@ class KeyboardLogger:
 
         self.has_debug = has_debug
 
+        if self.start_at is None:
+            self.start_at = current_timestamp
+
         # Establezco timestamps.
         if self.last_pulsation_at is None:
             self.last_pulsation_at = current_timestamp
