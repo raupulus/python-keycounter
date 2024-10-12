@@ -5,9 +5,8 @@ import NIOFoundationCompat
 import NIOTransportServices
 import Dispatch
 
-let timeRefreshRate: TimeInterval = 2.0
+let timeRefreshRate: TimeInterval = 1.0
 
-// Define structs for decoding JSON data
 struct DataJSON: Decodable {
     let session: Session
     let streak: Streak
@@ -22,7 +21,6 @@ struct Streak: Decodable {
     let pulsation_average: Int
 }
 
-// Define DataHandler
 final class DataHandler: ChannelInboundHandler {
     typealias InboundIn = ByteBuffer
     var data: DataJSON?
@@ -34,13 +32,12 @@ final class DataHandler: ChannelInboundHandler {
         if let data = data, let message = try? decoder.decode(DataJSON.self, from: data) {
             self.data = message
             
-            // Close connection after reading data
+            // Cerramos la conexión al socket
             context.close(promise: nil)
         }
     }
 }
 
-// Define leerSocket function
 func leerSocket(group: NIOTSEventLoopGroup) -> EventLoopFuture<DataJSON> {
     let bootstrap = NIOTSConnectionBootstrap(group: group)
     let dataHandler = DataHandler()
@@ -54,7 +51,7 @@ func leerSocket(group: NIOTSEventLoopGroup) -> EventLoopFuture<DataJSON> {
     return channelFuture.flatMap { channel in
         channel.closeFuture.flatMapThrowing { _ in
             guard let data = dataHandler.data else {
-                // Handle error appropriately
+                // Control de errores cuando falla el socket
                 throw SocketError.noDataReceived
             }
             return data
@@ -68,7 +65,6 @@ struct SocketError: Error {
     static let noDataReceived = SocketError(reason: "No data was received from the socket.")
 }
 
-// AppDelegate class
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     let statusBar = NSStatusBar.system
@@ -76,7 +72,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
     let group = NIOTSEventLoopGroup()
 
-    // beginSocketReadingLoop definition
     func beginSocketReadingLoop() {
         leerSocket(group: group).whenComplete { result in
             switch result {
@@ -91,7 +86,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 print("Encountered error: \(error)")
             }
 
-            // call beginSocketReadingLoop with a delay of two seconds to create a loop
+            // Ejecuta beginSocketReadingLoop con delay de one segundo en loop
             DispatchQueue.global().asyncAfter(deadline: .now() + 1.0) {
                 self.beginSocketReadingLoop()
             }
@@ -100,7 +95,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         statusBarItem = statusBar.statusItem(withLength: NSStatusItem.variableLength)
-        beginSocketReadingLoop() // begin the loop of reading socket
+        beginSocketReadingLoop() // Comienza el bucle para leer el socket
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
