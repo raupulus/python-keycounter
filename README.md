@@ -9,9 +9,12 @@ por una pantalla y en la barra de navegación teniendo la posibilidad de
 subirlos a una API desde un caché temporal en una db sqlite que se crea bajo
 el mismo directorio del script.
 
-## Características
-
-Listado de características sobre esta herramienta.
+<p align="center">
+  <img src="docs/images/1.png" alt="Imagen del Proyecto 1" height="150">
+  <img src="docs/images/2.jpeg" alt="Imagen del Proyecto 2" height="150">
+  <img src="docs/images/3.jpeg" alt="Imagen del Proyecto 3" height="150">
+  <img src="docs/images/4.jpg" alt="Imagen del Proyecto 4" height="150">
+</p>
 
 ### Visualización de datos en pantalla serial UART
 
@@ -118,6 +121,24 @@ Se necesitan configurar las variables de nuestro entorno copiando el archivo
 .env.example a .env y modificando en este nuestros parámetros de configuración
 que se encuentran en su interior descritos.
 
+## Aplicación para MacOS
+
+En el directorio "macos" he dejado también el código fuente de una pequeña
+aplicación para conectar al socket unix que podemos crear y sacar la 
+información de las rachas en la sesión.
+
+Esta información la podemos usar con cualquier programa, en este caso se 
+coloca en la barra superior del sistema para mantenerla visible en todo momento.
+
+Algunas imágenes del keycounter para macos:
+
+<p align="center">
+  <img src="docs/images/macos_1.png" alt="Imagen del Proyecto 1" height="150">
+  <img src="docs/images/macos_2.png" alt="Imagen del Proyecto 2" height="150">
+  <img src="docs/images/macos_3.png" alt="Imagen del Proyecto 3" height="150">
+  <img src="docs/images/macos_4.png" alt="Imagen del Proyecto 4" height="150">
+</p>
+
 ## Ejecutar automáticamente al iniciar el sistema
 
 Posteriormente ejecutar **main.py** como root. Puede añadirse a un cron @reboot
@@ -137,6 +158,13 @@ Esto no es un gran problema ya que podemos crear una regla en nuestro sistema
 operativo para que quede de forma estática enlazando al punto de montaje de
 turno con dicha interfaz. De este modo pondremos en la configuración de esta
 herramienta el dispositivo que hemos renombrado o enlazado.
+
+<p align="center">
+  <img src="docs/images/serial1.jpeg" alt="Imagen del Proyecto 1" height="150">
+  <img src="docs/images/serial2.jpeg" alt="Imagen del Proyecto 2" height="150">
+  <img src="docs/images/serial3.jpeg" alt="Imagen del Proyecto 3" height="150">
+  <img src="docs/images/serial4.jpeg" alt="Imagen del Proyecto 4" height="150">
+</p>
 
 A continuación explico como realizarlo.
 
