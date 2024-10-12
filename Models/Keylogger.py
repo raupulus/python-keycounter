@@ -348,3 +348,13 @@ class Keylogger:
         Asocia el socket del sistema al contador para el teclado.
         """
         self.model_keyboard.socket = socket
+
+    def set_client_display_websocket(self, client):
+        """
+        Asocia una pantalla en la red local para mostrar datos siendo este
+        el cliente.
+        :param client: Datos del cliente.
+        :return:
+        """
+
+        self.model_keyboard.client_display_websocket = client

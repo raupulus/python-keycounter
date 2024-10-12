@@ -101,6 +101,9 @@ class KeyboardLogger:
     # Socket asociado al keycounter
     socket = None
 
+    # Pantalla en red local con servidor websocket
+    client_display_websocket = None
+
     # ############# SESIÓN COMPLETA ############# #
 
     # Timestamp con el comienzo de las mediciones.
@@ -152,6 +155,8 @@ class KeyboardLogger:
         current_timestamp = datetime.utcnow()
 
         self.has_debug = has_debug
+
+        self.SEND_DATA_TO_WEBSOCKET_SERVER = os.getenv("SEND_DATA_TO_WEBSOCKET_SERVER", False)
 
         if self.start_at is None:
             self.start_at = current_timestamp
@@ -275,6 +280,12 @@ class KeyboardLogger:
         # Envía la actualización a los clientes del socket.
         if self.socket is not None:
             self.socket.update()
+
+        if (self.SEND_DATA_TO_WEBSOCKET_SERVER and
+            self.client_display_websocket is not None and not
+            self.client_display_websocket.is_busy):
+            #self.client_display_websocket.update()
+            start_new_thread(self.client_display_websocket.update, ())
 
     def get_pulsation_average(self):
         """
