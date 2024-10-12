@@ -120,10 +120,6 @@ class ApiConnection:
         token = self.API_TOKEN
         full_url = url + path
 
-        info = {
-            'iot': 'Raspberry Pi',
-        }
-
         headers = {
             'Content-type': 'application/json',
             'Accept': 'application/json',
@@ -256,3 +252,31 @@ class ApiConnection:
                     result_send = True
 
             return result_send
+
+    def get_websocket_server_display_info(self):
+        """
+        Pide a la api información sobre el dispositivo en la red local que
+        actuará como servidor de websocket.
+        :return:
+        """
+        url = self.API_URL
+        token = self.API_TOKEN
+        full_url = url + '/hardware/v1/get/device/16/info'
+
+        headers = {
+            'Content-type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ' + str(token),
+        }
+
+        try:
+            req = self.requests_retry_session().get(headers=headers,
+                                                    url=full_url,
+                                                    timeout=30)
+
+            return json.loads(req.text)
+        except Exception as e:
+            if self.DEBUG:
+                print('Error en get_websocket_server_display_info: ', e)
+
+            return None
