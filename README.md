@@ -1,6 +1,7 @@
-# python-keycounter
+# Python KeyCounter (Contador de Pulsaciones para Linux y MacOS)
 
-Herramienta en python 3 para contar la cantidad de teclas que se ha pulsado en un tiempo determinado o sesión.
+Herramienta en python 3 para contar la cantidad de teclas que se ha pulsado en 
+un tiempo determinado o sesión.
 
 ## Objetivos
 
@@ -50,10 +51,17 @@ En el directorio de debug tienes algún ejemplo/prueba de como fuí depurando
 para lograr afinar esta parte.
 
 Yo personalmente utilizo esto para mostrar la cantidad de pulsación en mi barra
-de navegación **i3pystatus** para el entorno gráfico o más bien gestor de
-ventanas **i3wm**
+de navegación **i3pystatus** para el entorno gráfico o más bien gestores de
+ventanas como **i3wm** o **sway** que son los que suelo utilizar.
 
-Puedes utilizar el valor de pulsaciones para otros fines con creatividad.
+Puedes comprobar la información del socket si funciona correctamente usando
+el siguiente comando:
+
+```bash
+nc -U /var/run/keycounter.socket
+```
+
+![Imagen del Proyecto](docs/images/socket_unix1.png "Imagen del Proyecto 1")
 
 ### Base de datos SQLite para Caché
 
@@ -139,6 +147,11 @@ Algunas imágenes del keycounter para macos:
   <img src="docs/images/macos_4.png" alt="Imagen del Proyecto 4" height="150">
 </p>
 
+Puedes arrastrarla (adjunto el **app** en el directorio **macos** y el código 
+fuente si la quieres compilar por tu cuenta) al directorio de aplicaciones y 
+posteriormente añadirla a las aplicaciones ejecutadas al inicio del sistema para 
+que cargue automáticamente tras un reinicio.
+
 ## Ejecutar automáticamente al iniciar el sistema
 
 Posteriormente ejecutar **main.py** como root. Puede añadirse a un cron @reboot
@@ -166,7 +179,7 @@ herramienta el dispositivo que hemos renombrado o enlazado.
   <img src="docs/images/serial4.jpeg" alt="Imagen del Proyecto 4" height="150">
 </p>
 
-A continuación explico como realizarlo.
+A continuación explico como realizarlo en **GNU/Linux (Debian)**.
 
 ### Listar dispositivo conectado
 
