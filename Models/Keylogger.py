@@ -11,75 +11,19 @@
 
 # Create Date: 2020
 # Project Name: Python Keylogger
-# Description: Keylogger escrito en python 3 para detectar las teclas pulsadas
-# en un equipo linux. En principio debería funcionar también en windows
-# (no comprobado por no tener ese sistema)
+# Description: Keylogger escrito en python 3 para detectar las teclas pulsadas en un equipo linux.
+# En principio debería funcionar también en windows (no comprobado por no tener ese sistema)
 
-#
-# Dependencies: keyboard
-#
-# Revision 0.01 - File Created
-# Additional Comments:
+# Dependencies: keyboard, mouse
 
-# @copyright  Copyright © 2020 Raúl Caro Pastorino
-# @license    https://wwww.gnu.org/licenses/gpl.txt
-
-# Copyright (C) 2020  Raúl Caro Pastorino
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>
-
-# Guía de estilos aplicada: PEP8
-
-# Librería keyboard: https://pypi.org/project/keyboard/
-
-#######################################
-# #           Descripción           # #
-#######################################
-# Description: Keylogger escrito en python 3 para detectar las teclas pulsadas
-# en un equipo linux. En principio debería funcionar también en windows
-# (no comprobado por no tener ese sistema)
-
-#######################################
-# #       Importar Librerías        # #
-#######################################
-import keyboard
 from datetime import datetime
 from _thread import start_new_thread
-import subprocess
 from time import sleep
+import subprocess
+import keyboard
 from Models.KeyboardLogger import KeyboardLogger
 from Models.MouseLogger import MouseLogger
-
-#######################################
-# #             Variables           # #
-#######################################
-
-#######################################
-# #        NUEVAS FEATURES          # #
-#######################################
-# Esta lista describe las nuevas características que se "podría" implementar
-# para mejorar la herramienta. Es necesario barajar cada una y su utilidad real.
-
-# Implementar contador de clicks, algunas teclascomo PrtSC las detecta como
-# desconocidas y no puedo filtrar que todos los clicks sean el "unknown"
-
-# Implementar solo contador de carácteres para escribir (a-Z,.*[]}{:;),
-# no teclas especiales. El objetivo es saber cuantas veces pulsa cada tecla
-
-#######################################
-# #              Clase              # #
-#######################################
+import mouse
 
 
 class Keylogger:
@@ -97,7 +41,7 @@ class Keylogger:
     devices = None
 
     # Almacena si hay una tecla presionada.
-    is_down = {}
+    is_down = { }
 
     # Indica si se pintará por pantalla datos para depuración.
     has_debug = False
@@ -159,8 +103,8 @@ class Keylogger:
     # #           Estadísticas          # #
     #######################################
 
-    def __init__(self, display=None, has_debug=False, mouse_enabled=True,
-                 model_keyboard=None, model_mouse=None):
+    def __init__ (self, display=None, has_debug=False, mouse_enabled=True,
+                  model_keyboard=None, model_mouse=None):
         # Establezco pantalla si existiera.
         self.display = display
 
@@ -180,7 +124,6 @@ class Keylogger:
         if model_mouse and mouse_enabled:
             self.model_mouse = model_mouse
         elif mouse_enabled:
-            import mouse
             self.model_mouse = MouseLogger()
 
         # Establezco contadores para sesión completa por día
@@ -195,7 +138,7 @@ class Keylogger:
         # Inicio hilo para comprobar cambios en dispositivos conectados/desconectados
         start_new_thread(self.reload_keycounter_on_new_device, ())
 
-    def read_devices_by_id(self):
+    def read_devices_by_id (self):
         """
         Lee todos los dispositivos de entrada conectados en el sistema por id y
         los devuelve.
@@ -204,24 +147,20 @@ class Keylogger:
         sleep(0.1)
 
         try:
-            #keyboard = subprocess.getoutput('cat /proc/bus/input/devices | grep -i -w "keyboard"')
-            # sleep(0.1)
-            #mouse = subprocess.getoutput('cat /proc/bus/input/devices | grep -i -w "mouse"')
-            # sleep(0.1)
-
-            # return subprocess.getoutput('ls /dev/input/by-id/') + keyboard + mouse
-            # return subprocess.getoutput('ls /dev/input/by-id/; cat /proc/bus/input/devices | grep --color -i -E "^N: Name=\"[^(Virtual)].*"')
-            return subprocess.getoutput('ls /dev/input/by-id/; cat /proc/bus/input/devices | grep -i -v -E "[Vv][Ii][Rr][Tt][Uu][Aa][Ll]" | grep -E "([Kk][Ee][Yy][Bb][Oo][Aa][Rr][Dd]|[Mm][Oo][Uu][Ss][Ee])"')
+            return subprocess.getoutput(
+                'ls /dev/input/by-id/; cat /proc/bus/input/devices | grep -i -v -E "[Vv][Ii][Rr][Tt][Uu][Aa][Ll]" | grep -E "([Kk][Ee][Yy][Bb][Oo][Aa][Rr][Dd]|[Mm][Oo][Uu][Ss][Ee])"'
+            )
         except Exception as e:
             if self.has_debug:
-                print('Ha ocurrido un problema al comprobar lista de dispositivos')
+                print(
+                    'Ha ocurrido un problema al comprobar lista de dispositivos')
                 print('Esperando 10 segundos para reintentar')
                 print(e)
 
             sleep(10)
             return ''
 
-    def start_read_keyloggers_callback(self):
+    def start_read_keyloggers_callback (self):
         """
         Inicia el callback para contar las teclas pulsadas
         """
@@ -232,7 +171,7 @@ class Keylogger:
             mouse.on_right_click(self.callback_mouse, ('right',))
             mouse.on_middle_click(self.callback_mouse, ('middle',))
 
-    def reload_keycounter_on_new_device(self):
+    def reload_keycounter_on_new_device (self):
         """
         Cuando se detecta un nuevo dispositivo conectado al sistema se recargará
         el keycounter para añadirlo a la lista de soportados.
@@ -248,7 +187,8 @@ class Keylogger:
                 self.reboot = True
 
                 if self.has_debug:
-                    print('Hay cambios en los dispositivos, reiniciando callback')
+                    print(
+                        'Hay cambios en los dispositivos, reiniciando callback')
                     print(new_devices)
 
                 # Quito todos los hooks
@@ -264,20 +204,15 @@ class Keylogger:
                     # keyboard._hooks = {}
                     keyboard._listener = keyboard._KeyboardListener()
 
-                # Vuelvo a quitar todos los hooks, esto activa eventos por defecto
-                # keyboard.unhook_all()
-
                 # Añado de nuevo el hook para leer teclado
                 # keyboard.hook(self.callback_keyboard)
 
                 # TODO → Reiniciar MOUSE, comprobar si ya se realiza?
 
-                # exit(0)
-
             # Pausa entre cada comprobación.
             sleep(3)
 
-    def callback_mouse(self, button):
+    def callback_mouse (self, button):
         """
         Esta función registra las pulsaciones del ratón.
         :param button:
@@ -286,7 +221,8 @@ class Keylogger:
         timestamp_utc = datetime.utcnow()
 
         # Comparo el tiempo desde la última pulsación para agrupar la racha.
-        if (timestamp_utc - self.model_mouse.last_pulsation_at).seconds > self.model_mouse.COMBO_RESET:
+        if (
+                timestamp_utc - self.model_mouse.last_pulsation_at).seconds > self.model_mouse.COMBO_RESET:
             # Guardo la racha actual en la variable de rachas del modelo.
             self.model_mouse.add_old_streak()
 
@@ -331,7 +267,7 @@ class Keylogger:
             print('Rachas de ratón almacenadas')
             print(self.model_mouse.spurts)
 
-    def callback_keyboard(self, event):
+    def callback_keyboard (self, event):
         """
         Esta función se ejecuta como callback cada vez que una tecla es pulsada
         recibiendo el evento y filtrando solo por las primeras pulsaciones
@@ -361,7 +297,8 @@ class Keylogger:
                 self.is_down[key] = False
 
             # Aumento las pulsaciones de teclas indicando si es especial o no.
-            if (special_key or event.name == 'unknown') and event_type == 'down':
+            if (
+                    special_key or event.name == 'unknown') and event_type == 'down':
                 self.model_keyboard.increase_pulsation(True)
             elif event_type == 'down':
                 self.model_keyboard.increase_pulsation(False)
@@ -377,7 +314,7 @@ class Keylogger:
             # Muestra datos actuales por la pantalla si esta existiera.
             start_new_thread(self.send_to_display, ())
 
-    def send_to_display(self):
+    def send_to_display (self):
         """
         Muestra los datos por la pantalla usando el método: update_keycounter()
         que deberá existir en el modelo para la pantalla.
@@ -406,7 +343,7 @@ class Keylogger:
                 print(e)
             return False
 
-    def set_socket(self, socket):
+    def set_socket (self, socket):
         """
         Asocia el socket del sistema al contador para el teclado.
         """
