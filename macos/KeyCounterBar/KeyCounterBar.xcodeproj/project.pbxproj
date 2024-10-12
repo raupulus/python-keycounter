@@ -1,0 +1,494 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A61AC2C92CBA66C100E25678 /* BlueSocketTestCommonLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2C82CBA66C100E25678 /* BlueSocketTestCommonLibrary */; };
+		A61AC2CB2CBA66C100E25678 /* Socket in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2CA2CBA66C100E25678 /* Socket */; };
+		A61AC2CE2CBA68E600E25678 /* NIO in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2CD2CBA68E600E25678 /* NIO */; };
+		A61AC2D02CBA68E600E25678 /* NIOConcurrencyHelpers in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2CF2CBA68E600E25678 /* NIOConcurrencyHelpers */; };
+		A61AC2D22CBA68E600E25678 /* NIOCore in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2D12CBA68E600E25678 /* NIOCore */; };
+		A61AC2D42CBA68E600E25678 /* NIOEmbedded in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2D32CBA68E600E25678 /* NIOEmbedded */; };
+		A61AC2D62CBA68E600E25678 /* NIOFoundationCompat in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2D52CBA68E600E25678 /* NIOFoundationCompat */; };
+		A61AC2D82CBA68E600E25678 /* NIOHTTP1 in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2D72CBA68E600E25678 /* NIOHTTP1 */; };
+		A61AC2DA2CBA68E600E25678 /* NIOPosix in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2D92CBA68E600E25678 /* NIOPosix */; };
+		A61AC2DC2CBA68E600E25678 /* NIOTLS in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2DB2CBA68E600E25678 /* NIOTLS */; };
+		A61AC2DE2CBA68E600E25678 /* NIOTestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2DD2CBA68E600E25678 /* NIOTestUtils */; };
+		A61AC2E02CBA68E600E25678 /* NIOWebSocket in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2DF2CBA68E600E25678 /* NIOWebSocket */; };
+		A61AC2E22CBA68E600E25678 /* _NIOConcurrency in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2E12CBA68E600E25678 /* _NIOConcurrency */; };
+		A61AC2E42CBA68E600E25678 /* _NIOFileSystem in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2E32CBA68E600E25678 /* _NIOFileSystem */; };
+		A61AC2E62CBA68E600E25678 /* _NIOFileSystemFoundationCompat in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2E52CBA68E600E25678 /* _NIOFileSystemFoundationCompat */; };
+		A61AC2E92CBA694F00E25678 /* NIOTransportServices in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2E82CBA694F00E25678 /* NIOTransportServices */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A61AC2B52CBA65FF00E25678 /* KeyCounterBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeyCounterBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		A61AC2B72CBA65FF00E25678 /* KeyCounterBar */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = KeyCounterBar;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A61AC2B22CBA65FF00E25678 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A61AC2CE2CBA68E600E25678 /* NIO in Frameworks */,
+				A61AC2DA2CBA68E600E25678 /* NIOPosix in Frameworks */,
+				A61AC2D02CBA68E600E25678 /* NIOConcurrencyHelpers in Frameworks */,
+				A61AC2DE2CBA68E600E25678 /* NIOTestUtils in Frameworks */,
+				A61AC2C92CBA66C100E25678 /* BlueSocketTestCommonLibrary in Frameworks */,
+				A61AC2E02CBA68E600E25678 /* NIOWebSocket in Frameworks */,
+				A61AC2E42CBA68E600E25678 /* _NIOFileSystem in Frameworks */,
+				A61AC2D42CBA68E600E25678 /* NIOEmbedded in Frameworks */,
+				A61AC2DC2CBA68E600E25678 /* NIOTLS in Frameworks */,
+				A61AC2E62CBA68E600E25678 /* _NIOFileSystemFoundationCompat in Frameworks */,
+				A61AC2D62CBA68E600E25678 /* NIOFoundationCompat in Frameworks */,
+				A61AC2E92CBA694F00E25678 /* NIOTransportServices in Frameworks */,
+				A61AC2CB2CBA66C100E25678 /* Socket in Frameworks */,
+				A61AC2D22CBA68E600E25678 /* NIOCore in Frameworks */,
+				A61AC2E22CBA68E600E25678 /* _NIOConcurrency in Frameworks */,
+				A61AC2D82CBA68E600E25678 /* NIOHTTP1 in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A61AC2AC2CBA65FF00E25678 = {
+			isa = PBXGroup;
+			children = (
+				A61AC2B72CBA65FF00E25678 /* KeyCounterBar */,
+				A61AC2B62CBA65FF00E25678 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A61AC2B62CBA65FF00E25678 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A61AC2B52CBA65FF00E25678 /* KeyCounterBar.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A61AC2B42CBA65FF00E25678 /* KeyCounterBar */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A61AC2C42CBA660000E25678 /* Build configuration list for PBXNativeTarget "KeyCounterBar" */;
+			buildPhases = (
+				A61AC2B12CBA65FF00E25678 /* Sources */,
+				A61AC2B22CBA65FF00E25678 /* Frameworks */,
+				A61AC2B32CBA65FF00E25678 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A61AC2B72CBA65FF00E25678 /* KeyCounterBar */,
+			);
+			name = KeyCounterBar;
+			packageProductDependencies = (
+				A61AC2C82CBA66C100E25678 /* BlueSocketTestCommonLibrary */,
+				A61AC2CA2CBA66C100E25678 /* Socket */,
+				A61AC2CD2CBA68E600E25678 /* NIO */,
+				A61AC2CF2CBA68E600E25678 /* NIOConcurrencyHelpers */,
+				A61AC2D12CBA68E600E25678 /* NIOCore */,
+				A61AC2D32CBA68E600E25678 /* NIOEmbedded */,
+				A61AC2D52CBA68E600E25678 /* NIOFoundationCompat */,
+				A61AC2D72CBA68E600E25678 /* NIOHTTP1 */,
+				A61AC2D92CBA68E600E25678 /* NIOPosix */,
+				A61AC2DB2CBA68E600E25678 /* NIOTLS */,
+				A61AC2DD2CBA68E600E25678 /* NIOTestUtils */,
+				A61AC2DF2CBA68E600E25678 /* NIOWebSocket */,
+				A61AC2E12CBA68E600E25678 /* _NIOConcurrency */,
+				A61AC2E32CBA68E600E25678 /* _NIOFileSystem */,
+				A61AC2E52CBA68E600E25678 /* _NIOFileSystemFoundationCompat */,
+				A61AC2E82CBA694F00E25678 /* NIOTransportServices */,
+			);
+			productName = KeyCounterBar;
+			productReference = A61AC2B52CBA65FF00E25678 /* KeyCounterBar.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A61AC2AD2CBA65FF00E25678 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					A61AC2B42CBA65FF00E25678 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = A61AC2B02CBA65FF00E25678 /* Build configuration list for PBXProject "KeyCounterBar" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A61AC2AC2CBA65FF00E25678;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A61AC2C72CBA66C100E25678 /* XCRemoteSwiftPackageReference "BlueSocket" */,
+				A61AC2CC2CBA68E600E25678 /* XCRemoteSwiftPackageReference "swift-nio" */,
+				A61AC2E72CBA694F00E25678 /* XCRemoteSwiftPackageReference "swift-nio-transport-services" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = A61AC2B62CBA65FF00E25678 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A61AC2B42CBA65FF00E25678 /* KeyCounterBar */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A61AC2B32CBA65FF00E25678 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A61AC2B12CBA65FF00E25678 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A61AC2C22CBA660000E25678 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A61AC2C32CBA660000E25678 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		A61AC2C52CBA660000E25678 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = KeyCounterBar/KeyCounterBar.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = AJ9LVB6TDT;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Keycounter Bar";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.raupulus.KeyCounterBar;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A61AC2C62CBA660000E25678 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = KeyCounterBar/KeyCounterBar.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = AJ9LVB6TDT;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Keycounter Bar";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.raupulus.KeyCounterBar;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A61AC2B02CBA65FF00E25678 /* Build configuration list for PBXProject "KeyCounterBar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A61AC2C22CBA660000E25678 /* Debug */,
+				A61AC2C32CBA660000E25678 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A61AC2C42CBA660000E25678 /* Build configuration list for PBXNativeTarget "KeyCounterBar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A61AC2C52CBA660000E25678 /* Debug */,
+				A61AC2C62CBA660000E25678 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A61AC2C72CBA66C100E25678 /* XCRemoteSwiftPackageReference "BlueSocket" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Kitura/BlueSocket.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.4;
+			};
+		};
+		A61AC2CC2CBA68E600E25678 /* XCRemoteSwiftPackageReference "swift-nio" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-nio.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.74.0;
+			};
+		};
+		A61AC2E72CBA694F00E25678 /* XCRemoteSwiftPackageReference "swift-nio-transport-services" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-nio-transport-services.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.22.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A61AC2C82CBA66C100E25678 /* BlueSocketTestCommonLibrary */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A61AC2C72CBA66C100E25678 /* XCRemoteSwiftPackageReference "BlueSocket" */;
+			productName = BlueSocketTestCommonLibrary;
+		};
+		A61AC2CA2CBA66C100E25678 /* Socket */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A61AC2C72CBA66C100E25678 /* XCRemoteSwiftPackageReference "BlueSocket" */;
+			productName = Socket;
+		};
+		A61AC2CD2CBA68E600E25678 /* NIO */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A61AC2CC2CBA68E600E25678 /* XCRemoteSwiftPackageReference "swift-nio" */;
+			productName = NIO;
+		};
+		A61AC2CF2CBA68E600E25678 /* NIOConcurrencyHelpers */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A61AC2CC2CBA68E600E25678 /* XCRemoteSwiftPackageReference "swift-nio" */;
+			productName = NIOConcurrencyHelpers;
+		};
+		A61AC2D12CBA68E600E25678 /* NIOCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A61AC2CC2CBA68E600E25678 /* XCRemoteSwiftPackageReference "swift-nio" */;
+			productName = NIOCore;
+		};
+		A61AC2D32CBA68E600E25678 /* NIOEmbedded */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A61AC2CC2CBA68E600E25678 /* XCRemoteSwiftPackageReference "swift-nio" */;
+			productName = NIOEmbedded;
+		};
+		A61AC2D52CBA68E600E25678 /* NIOFoundationCompat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A61AC2CC2CBA68E600E25678 /* XCRemoteSwiftPackageReference "swift-nio" */;
+			productName = NIOFoundationCompat;
+		};
+		A61AC2D72CBA68E600E25678 /* NIOHTTP1 */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A61AC2CC2CBA68E600E25678 /* XCRemoteSwiftPackageReference "swift-nio" */;
+			productName = NIOHTTP1;
+		};
+		A61AC2D92CBA68E600E25678 /* NIOPosix */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A61AC2CC2CBA68E600E25678 /* XCRemoteSwiftPackageReference "swift-nio" */;
+			productName = NIOPosix;
+		};
+		A61AC2DB2CBA68E600E25678 /* NIOTLS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A61AC2CC2CBA68E600E25678 /* XCRemoteSwiftPackageReference "swift-nio" */;
+			productName = NIOTLS;
+		};
+		A61AC2DD2CBA68E600E25678 /* NIOTestUtils */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A61AC2CC2CBA68E600E25678 /* XCRemoteSwiftPackageReference "swift-nio" */;
+			productName = NIOTestUtils;
+		};
+		A61AC2DF2CBA68E600E25678 /* NIOWebSocket */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A61AC2CC2CBA68E600E25678 /* XCRemoteSwiftPackageReference "swift-nio" */;
+			productName = NIOWebSocket;
+		};
+		A61AC2E12CBA68E600E25678 /* _NIOConcurrency */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A61AC2CC2CBA68E600E25678 /* XCRemoteSwiftPackageReference "swift-nio" */;
+			productName = _NIOConcurrency;
+		};
+		A61AC2E32CBA68E600E25678 /* _NIOFileSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A61AC2CC2CBA68E600E25678 /* XCRemoteSwiftPackageReference "swift-nio" */;
+			productName = _NIOFileSystem;
+		};
+		A61AC2E52CBA68E600E25678 /* _NIOFileSystemFoundationCompat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A61AC2CC2CBA68E600E25678 /* XCRemoteSwiftPackageReference "swift-nio" */;
+			productName = _NIOFileSystemFoundationCompat;
+		};
+		A61AC2E82CBA694F00E25678 /* NIOTransportServices */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A61AC2E72CBA694F00E25678 /* XCRemoteSwiftPackageReference "swift-nio-transport-services" */;
+			productName = NIOTransportServices;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = A61AC2AD2CBA65FF00E25678 /* Project object */;
+}
