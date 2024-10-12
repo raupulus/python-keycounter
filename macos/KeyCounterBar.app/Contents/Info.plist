@@ -10,6 +10,10 @@
 	<string>Keycounter Bar</string>
 	<key>CFBundleExecutable</key>
 	<string>KeyCounterBar</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundleIconName</key>
+	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
 	<string>dev.raupulus.KeyCounterBar</string>
 	<key>CFBundleInfoDictionaryVersion</key>

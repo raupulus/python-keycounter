@@ -4,21 +4,21 @@
 <dict>
 	<key>files</key>
 	<dict>
+		<key>Resources/AppIcon.icns</key>
+		<data>
+		YVwyFutdsafikwlP69UtQeUX1gI=
+		</data>
+		<key>Resources/Assets.car</key>
+		<data>
+		rsPfFcbqbV4CyZMJuXkm9N9RbeU=
+		</data>
 		<key>Resources/Base.lproj/Main.storyboardc/Info.plist</key>
 		<data>
-		Vvxc/jh4elscxt7z3QlR8thQEKQ=
+		M1rS+Tcas1ZdM4/iibTlduTJ22M=
 		</data>
 		<key>Resources/Base.lproj/Main.storyboardc/MainMenu.nib</key>
 		<data>
-		Ea1UROAn1yF8SNHkhAsG19VTtk0=
-		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/NSWindowController-B8D-0N-5wS.nib</key>
-		<data>
-		7Z+QeV9nC9mbIqQGtdjCxqAd/cc=
-		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/XfG-lQ-9wD-view-m2S-Jp-Qdl.nib</key>
-		<data>
-		dcwLIQgURpAxDkq7VP/MHVMjaZg=
+		DUelYuwSu5G2lYAlA54b0shkb7w=
 		</data>
 		<key>Resources/swift-nio_NIOPosix.bundle/Contents/Info.plist</key>
 		<data>
@@ -39,32 +39,32 @@
 	</dict>
 	<key>files2</key>
 	<dict>
+		<key>Resources/AppIcon.icns</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			amLTyQ80aOBY3lrN3PESmGlm6puxM8t7ESBUjE1EBGA=
+			</data>
+		</dict>
+		<key>Resources/Assets.car</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			xLBrK/7TufB3pGiJM40AO6rx0Aj8t/IUSsuu30B3grQ=
+			</data>
+		</dict>
 		<key>Resources/Base.lproj/Main.storyboardc/Info.plist</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			+OYVa1KBI1CKTwM1E7kgAp9gcwoj5vdSw0Je2JMtII8=
+			6/2HagpKuzGhxFgQU55Lc/bxgR30qm5eqHSV+p9e4/4=
 			</data>
 		</dict>
 		<key>Resources/Base.lproj/Main.storyboardc/MainMenu.nib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			b77tHwhCBKzSqOFFmHgftXgNwIsvl04c6nEH5PCZfeY=
-			</data>
-		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/NSWindowController-B8D-0N-5wS.nib</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			8cEjC2ID5GEJnrYqnsjj1aNJl5g9fuUgyuqSeKqRZIE=
-			</data>
-		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/XfG-lQ-9wD-view-m2S-Jp-Qdl.nib</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			E5TydeWynoe7ikUTfd2H87wFEu4leIDPGUwzqgAM40o=
+			Vy+4HqNU/0KgoZ1tgd/WGl7g8+awZplZ/m5J4IQsvIQ=
 			</data>
 		</dict>
 		<key>Resources/swift-nio_NIOPosix.bundle/Contents/Info.plist</key>

@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A61AC2C92CBA66C100E25678 /* BlueSocketTestCommonLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2C82CBA66C100E25678 /* BlueSocketTestCommonLibrary */; };
-		A61AC2CB2CBA66C100E25678 /* Socket in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2CA2CBA66C100E25678 /* Socket */; };
 		A61AC2CE2CBA68E600E25678 /* NIO in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2CD2CBA68E600E25678 /* NIO */; };
 		A61AC2D02CBA68E600E25678 /* NIOConcurrencyHelpers in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2CF2CBA68E600E25678 /* NIOConcurrencyHelpers */; };
 		A61AC2D22CBA68E600E25678 /* NIOCore in Frameworks */ = {isa = PBXBuildFile; productRef = A61AC2D12CBA68E600E25678 /* NIOCore */; };
@@ -46,7 +44,6 @@
 				A61AC2DA2CBA68E600E25678 /* NIOPosix in Frameworks */,
 				A61AC2D02CBA68E600E25678 /* NIOConcurrencyHelpers in Frameworks */,
 				A61AC2DE2CBA68E600E25678 /* NIOTestUtils in Frameworks */,
-				A61AC2C92CBA66C100E25678 /* BlueSocketTestCommonLibrary in Frameworks */,
 				A61AC2E02CBA68E600E25678 /* NIOWebSocket in Frameworks */,
 				A61AC2E42CBA68E600E25678 /* _NIOFileSystem in Frameworks */,
 				A61AC2D42CBA68E600E25678 /* NIOEmbedded in Frameworks */,
@@ -54,7 +51,6 @@
 				A61AC2E62CBA68E600E25678 /* _NIOFileSystemFoundationCompat in Frameworks */,
 				A61AC2D62CBA68E600E25678 /* NIOFoundationCompat in Frameworks */,
 				A61AC2E92CBA694F00E25678 /* NIOTransportServices in Frameworks */,
-				A61AC2CB2CBA66C100E25678 /* Socket in Frameworks */,
 				A61AC2D22CBA68E600E25678 /* NIOCore in Frameworks */,
 				A61AC2E22CBA68E600E25678 /* _NIOConcurrency in Frameworks */,
 				A61AC2D82CBA68E600E25678 /* NIOHTTP1 in Frameworks */,
@@ -100,8 +96,6 @@
 			);
 			name = KeyCounterBar;
 			packageProductDependencies = (
-				A61AC2C82CBA66C100E25678 /* BlueSocketTestCommonLibrary */,
-				A61AC2CA2CBA66C100E25678 /* Socket */,
 				A61AC2CD2CBA68E600E25678 /* NIO */,
 				A61AC2CF2CBA68E600E25678 /* NIOConcurrencyHelpers */,
 				A61AC2D12CBA68E600E25678 /* NIOCore */,
@@ -146,7 +140,6 @@
 			mainGroup = A61AC2AC2CBA65FF00E25678;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				A61AC2C72CBA66C100E25678 /* XCRemoteSwiftPackageReference "BlueSocket" */,
 				A61AC2CC2CBA68E600E25678 /* XCRemoteSwiftPackageReference "swift-nio" */,
 				A61AC2E72CBA694F00E25678 /* XCRemoteSwiftPackageReference "swift-nio-transport-services" */,
 			);
@@ -383,14 +376,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		A61AC2C72CBA66C100E25678 /* XCRemoteSwiftPackageReference "BlueSocket" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Kitura/BlueSocket.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.4;
-			};
-		};
 		A61AC2CC2CBA68E600E25678 /* XCRemoteSwiftPackageReference "swift-nio" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-nio.git";
@@ -410,16 +395,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		A61AC2C82CBA66C100E25678 /* BlueSocketTestCommonLibrary */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A61AC2C72CBA66C100E25678 /* XCRemoteSwiftPackageReference "BlueSocket" */;
-			productName = BlueSocketTestCommonLibrary;
-		};
-		A61AC2CA2CBA66C100E25678 /* Socket */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A61AC2C72CBA66C100E25678 /* XCRemoteSwiftPackageReference "BlueSocket" */;
-			productName = Socket;
-		};
 		A61AC2CD2CBA68E600E25678 /* NIO */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A61AC2CC2CBA68E600E25678 /* XCRemoteSwiftPackageReference "swift-nio" */;

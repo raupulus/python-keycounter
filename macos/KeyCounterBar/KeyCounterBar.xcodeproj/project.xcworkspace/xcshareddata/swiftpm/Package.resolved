@@ -1,15 +1,6 @@
 {
-  "originHash" : "625f20ab65b8f2c3fe6b1d2f298f3c7188f8572147d2762788968b6a5dd3f32c",
+  "originHash" : "19eb16ecf5c4aef5dea4d129a82d9e6ab0c7203ea3ed81d4c0e02db65cfee86c",
   "pins" : [
-    {
-      "identity" : "bluesocket",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Kitura/BlueSocket.git",
-      "state" : {
-        "revision" : "7b23a867008e0027bfd6f4d398d44720707bc8ca",
-        "version" : "2.0.4"
-      }
-    },
     {
       "identity" : "swift-atomics",
       "kind" : "remoteSourceControl",
