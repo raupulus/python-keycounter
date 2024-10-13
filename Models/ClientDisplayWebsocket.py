@@ -25,7 +25,13 @@ class ClientDisplayWebsocket:
 
         self.prepare_client_thread = start_new_thread(self.prepare_client, ())
 
-    def prepare_client(self):
+    def prepare_client(self) -> None:
+        """
+        Prepare the client by retrieving and processing the WebSocket server display information from the API.
+        Sets the `is_busy` flag during the process to prevent concurrent operations.
+
+        :return: None
+        """
         self.is_busy = True
 
         try_counter = 0
@@ -40,14 +46,16 @@ class ClientDisplayWebsocket:
                 if "device" in res:
                     self.websocket_server_display_info = res["device"]
 
-                    print('IP LOCAL', self.websocket_server_display_info.get('ip_local'))
-
                     if self.DEBUG:
+                        print('IP LOCAL',
+                              self.websocket_server_display_info.get(
+                                  'ip_local'))
                         print('Datos obtenidos de la api para websockets:', res)
 
                     break
                 else:
-                    print("La clave 'device' no está presente en la respuesta.")
+                    if self.DEBUG:
+                        print("La clave 'device' no está presente en la respuesta.")
 
                 if self.DEBUG:
                     print('Datos obtenidos de la api para websockets:', res)
@@ -64,9 +72,26 @@ class ClientDisplayWebsocket:
                     sleep(10)
 
         sleep(10)
+
         self.is_busy = False
 
-    def update (self):
+    def update (self) -> None:
+        """
+        Handles updating the display information through websockets. This involves:
+
+        - Checking debug flags and logging appropriately.
+        - Returning early if the system is busy or does not contain necessary display information.
+        - Preparing client data from the API if too many errors occur.
+        - Marking the system as busy.
+        - Gathering current system datetime, keyboard pulsation data, device information, and creating a data dictionary.
+        - Converting data dictionary to a JSON string.
+        - Establishing a socket connection to the device IP and port, sending the JSON data, receiving and processing the response.
+        - Resetting error count if the response is successful, otherwise incrementing the error count.
+        - Logging socket errors in debug mode, if any.
+        - Handling cleanup by marking the system as not busy and introducing a pause based on error count.
+
+        :return:
+        """
         if self.DEBUG:
             print('Entra en actualizar pantalla por websockets')
 
@@ -79,8 +104,9 @@ class ClientDisplayWebsocket:
 
             return
 
-        # TODO: Si hay demasiados errores, volver a ejecutar
-        #  self.prepare_client() para actualizar datos de dónde está la pantalla
+        # Si hay demasiados errores, pido a la api datos del servidor actualizados
+        if self.errors > 10:
+            self.prepare_client()
 
         self.is_busy = True
 
@@ -106,7 +132,9 @@ class ClientDisplayWebsocket:
                 },
                 'timestamp': str_timestamp,
                 'time': str_time,
-                'so': self.DEVICE_NAME,
+                'system': {
+                    'so': self.DEVICE_NAME,
+                }
             }
 
             data_json_string = json.dumps(data, skipkeys=False,
@@ -129,18 +157,27 @@ class ClientDisplayWebsocket:
                     if self.DEBUG:
                         print('websocket_response', websocket_response)
 
-                    # Si todo va bien, reseteamos el contador de errores
-                    self.errors = 0
+                    # Convierto la respuesta a un diccionario
+                    response_dict = json.loads(
+                        websocket_response.decode('utf-8'))
+
+                    # Si va bien, reseteamos el contador de errores
+                    if response_dict.get('status') == 'ok':
+                        self.errors = 0
+                    else:
+                        if self.DEBUG:
+                            print('Errores:', self.errors)
 
                 except socket.error as e:
                     if self.DEBUG:
                         print(f"Socket error: {e}")
-                    self.errors += 1  # Incrementar el contador de errores
+
+                    self.errors += 1
         finally:
             self.is_busy = False
 
             # Pausa según el número de errores
-            if self.errors < 10:
+            if self.errors == 1:
                 sleep(10)  # Pausa de 10 segundos
             else:
                 sleep(60)  # Pausa de 1 minuto
