@@ -22,9 +22,9 @@ from Models.KeyboardLogger import KeyboardLogger
 from Models.MouseLogger import MouseLogger
 import os
 
-
 if os.getenv('MOUSE_ENABLED') == 'True':
     import mouse
+
 
 class Keylogger:
     # Modelo que representa datos y registros del teclado.
