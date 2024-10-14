@@ -2,12 +2,12 @@
 # -*- encoding: utf-8 -*-
 
 # @author     Raúl Caro Pastorino
-# @email      dev@fryntiz.es
-# @web        https://fryntiz.es
-# @gitlab     https://gitlab.com/fryntiz
-# @github     https://github.com/fryntiz
-# @twitter    https://twitter.com/fryntiz
-# @telegram   https://t.me/fryntiz
+# @email      public@raupulus.dev
+# @web        https://raupulus.dev
+# @gitlab     https://gitlab.com/raupulus
+# @github     https://github.com/raupulus
+# @twitter    https://twitter.com/raupulus
+# @telegram   https://t.me/raupulus_diffusion
 
 # Create Date: 2020
 # Project Name: Python Keycounter
@@ -60,6 +60,7 @@ from Models.DbConnection import DbConnection
 from Models.ApiConnection import ApiConnection
 from Models.Display import Display
 from Models.Socket import Socket
+from Models.ClientDisplayWebsocket import ClientDisplayWebsocket
 from Models.Keylogger import Keylogger
 
 # Cargo archivos de configuración desde .env sobreescribiendo variables locales.
@@ -82,6 +83,8 @@ MOUSE_ENABLED = (os.getenv('MOUSE_ENABLED') == "True") or \
 # Debug
 DEBUG = os.getenv("DEBUG") == "True"
 UPLOAD_API = os.getenv("UPLOAD_API") == "True"
+
+SEND_DATA_TO_WEBSOCKET_SERVER = os.getenv("SEND_DATA_TO_WEBSOCKET_SERVER") == "True"
 
 
 def insert_data_in_db(dbconnection, tablemodel):
@@ -200,7 +203,7 @@ def loop(keylogger, socket, apiconnection=None, display=None):
     sleep(1)
 
     # Seteo tabla en el modelo de conexión a la DB para el mouse.
-    if (keylogger.model_mouse):
+    if keylogger.model_mouse:
         dbconnection.table_set_new(
             keylogger.model_mouse.tablename,  # Nombre de la tabla.
             keylogger.model_mouse.tablemodel()  # Modelo de tabla y columnas.
@@ -290,6 +293,14 @@ def main():
 
     if socket:
         keylogger.set_socket(socket)
+
+    # Instancio cliente para pantalla con servidor websocket
+    if SEND_DATA_TO_WEBSOCKET_SERVER:
+        client_display_websocket = ClientDisplayWebsocket(keylogger, apiconnection,
+                                                      debug=DEBUG)
+        if client_display_websocket:
+            keylogger.set_client_display_websocket(client_display_websocket)
+
 
     # Comienza el bucle para guardar datos y subirlos a la API.
     loop(keylogger, socket, apiconnection, display)

@@ -1,20 +1,17 @@
 #!/usr/bin/python3
 # -*- encoding: utf-8 -*-
-
 # @author     Raúl Caro Pastorino
-# @email      dev@fryntiz.es
-# @web        https://fryntiz.es
-# @gitlab     https://gitlab.com/fryntiz
-# @github     https://github.com/fryntiz
-# @twitter    https://twitter.com/fryntiz
-# @telegram   https://t.me/fryntiz
+# @email      public@raupulus.dev
+# @web        https://raupulus.dev
+# @gitlab     https://gitlab.com/raupulus
+# @github     https://github.com/raupulus
+# @twitter    https://twitter.com/raupulus
+# @telegram   https://t.me/raupulus_diffusion
 
 # Create Date: 2020
 # Project Name: Python Keylogger
-# Description: Keylogger escrito en python 3 para detectar las teclas pulsadas en un equipo linux.
-# En principio debería funcionar también en windows (no comprobado por no tener ese sistema)
-
-# Dependencies: keyboard, mouse
+# Description: Keylogger escrito en python 3 para detectar las teclas
+# pulsadas en equipos Linux o MacOs.
 
 from datetime import datetime
 from _thread import start_new_thread
@@ -23,7 +20,10 @@ import subprocess
 import keyboard
 from Models.KeyboardLogger import KeyboardLogger
 from Models.MouseLogger import MouseLogger
-import mouse
+import os
+
+if os.getenv('MOUSE_ENABLED') == 'True':
+    import mouse
 
 
 class Keylogger:
@@ -348,3 +348,13 @@ class Keylogger:
         Asocia el socket del sistema al contador para el teclado.
         """
         self.model_keyboard.socket = socket
+
+    def set_client_display_websocket(self, client):
+        """
+        Asocia una pantalla en la red local para mostrar datos siendo este
+        el cliente.
+        :param client: Datos del cliente.
+        :return:
+        """
+
+        self.model_keyboard.client_display_websocket = client

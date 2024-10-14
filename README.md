@@ -17,6 +17,10 @@ el mismo directorio del script.
   <img src="docs/images/4.jpg" alt="Imagen del Proyecto 4" height="150">
 </p>
 
+## Observaciones
+
+Se necesita python 3.12 para funcionar correctamente.
+
 ### Visualización de datos en pantalla serial UART
 
 Existe la posibilidad de enviar datos a una pantalla (o dispositivo) por
@@ -71,6 +75,14 @@ gestiona desde el modelo **DbConnection.py** representando la conexión con
 dicha base de datos.
 
 Para la base de datos se utiliza el ORM **SQLAlchemy**
+
+## Instalando (En MacOS)
+
+Para macos tenemos que instalar unos paquetes
+
+```
+sudo python3.12 -m pip install serial mouse keyboard sqlalchemy --break-system-packages
+```
 
 ## Instalando (En Debian)
 
