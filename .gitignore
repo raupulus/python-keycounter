@@ -104,7 +104,10 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+# El .env contiene el API_TOKEN: nunca debe versionarse.
 .env
+.env.*
+!.env.example
 .venv
 .env/
 venv/
@@ -135,6 +138,15 @@ dmypy.json
 
 # IDEs
 /.idea
+.idea/
+*.iml
+.vscode/
+
+# Xcode (archivos de usuario, no del proyecto)
+xcuserdata/
+*.xcuserstate
+*.xcuserdatad/
+DerivedData/
 
 # Socket
 uds_socket
@@ -143,6 +155,15 @@ keycounter.socket
 # DB
 keycounter.db
 keycounter.sqbpro
+*.sqlite
+*.sqlite3
+
+# Documentación de planificación local (no se versiona)
+docs/planning/
 
 # Trashs
 .DS_Store
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db

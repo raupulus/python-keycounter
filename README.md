@@ -17,9 +17,42 @@ el mismo directorio del script.
   <img src="docs/images/4.jpg" alt="Imagen del Proyecto 4" height="150">
 </p>
 
+## Privacidad
+
+Esta herramienta **no registra qué se escribe**. Solo cuenta pulsaciones y
+guarda estadísticas agregadas por rachas (cantidad, velocidad y una puntuación).
+De cada tecla únicamente se distingue si es normal o especial. Los datos que se
+suben a la API son exclusivamente estadísticos.
+
+## Documentación técnica
+
+En [`docs/info`](docs/info/00-indice.md) está la documentación técnica del
+proyecto:
+
+- [Arquitectura general](docs/info/01-arquitectura-general.md) y detalle de cada módulo
+- [Configuración (`.env`)](docs/info/12-configuracion.md)
+- [Matriz de compatibilidad por plataforma](docs/info/14-matriz-compatibilidad.md)
+- [Problemas, riesgos y deuda técnica](docs/info/13-pendientes-y-mejoras.md)
+
+Las reglas para modificar el código (tipado y documentación) están en
+[`AGENTS.md`](AGENTS.md).
+
 ## Observaciones
 
 Se necesita python 3.12 para funcionar correctamente.
+
+La herramienta debe ejecutarse **como root**: la captura global de teclado lo
+exige en Linux y el socket UNIX se crea en `/var/run`.
+
+### Plataformas
+
+Probado en Debian, Fedora, SteamOS, macOS y Raspberry OS. La captura de teclado
+funciona en todas ellas.
+
+⚠️ **En macOS no funciona la detección de clicks de ratón** (limitación de la
+librería `mouse` y de los permisos del sistema). La captura de teclado sí
+funciona con normalidad. Detalle en la
+[matriz de compatibilidad](docs/info/14-matriz-compatibilidad.md).
 
 ### Visualización de datos en pantalla serial UART
 
@@ -81,13 +114,18 @@ Para la base de datos se utiliza el ORM **SQLAlchemy**
 Para macos tenemos que instalar unos paquetes
 
 ```
-sudo python3.12 -m pip install serial mouse keyboard sqlalchemy --break-system-packages
+sudo python3.12 -m pip install pyserial mouse keyboard sqlalchemy python-dotenv requests --break-system-packages
 ```
+
+> **Atención:** el paquete correcto es **`pyserial`**, no `serial`. En PyPI
+> existe otro paquete llamado `serial` que es una librería distinta y no provee
+> el puerto serie (el import sigue siendo `import serial`).
 
 ## Instalando (En Debian)
 
-Esta herramienta solo la he llegado a probar en Debian GNU/Linux, también
-de forma parcial en fedora.
+Las instrucciones de esta sección están escritas para Debian GNU/Linux, que es
+donde más rodada está. Son extrapolables a Fedora y Raspberry OS adaptando el
+gestor de paquetes.
 
 ### Dependencias
 
@@ -117,7 +155,7 @@ En caso de no estar en debian o no tenerlo en repositorios, deberá instalarse
 desde pip todas las dependencias así:
 
 ```bash
-sudo pip3 install keyboard mouse serial sqlalchemy python-dotenv requests
+sudo pip3 install keyboard mouse pyserial sqlalchemy python-dotenv requests
 ```
 
 De cualquier modo, adapta el comando a tu entorno.
@@ -220,3 +258,19 @@ SUBSYSTEM=="tty", ATTRS{idVendor}=="05e3", ATTRS{idProduct}=="0610", ATTRS{seria
 ```bash
 sudo udevadm trigger
 ```
+
+> En **macOS** no existe udev. Los dispositivos serie aparecen como
+> `/dev/tty.usbserial-*` o `/dev/cu.usbserial-*`, y hay que indicar el nombre
+> directamente en `SERIAL_PORT`.
+
+## Licencia
+
+Este proyecto se distribuye bajo la **GNU General Public License v3**. Ver el
+archivo [LICENSE](LICENSE).
+
+## Autor
+
+Raúl Caro Pastorino — [@raupulus](https://github.com/raupulus)
+
+- Web: [raupulus.dev](https://raupulus.dev)
+- Email: public@raupulus.dev
