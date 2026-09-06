@@ -68,7 +68,7 @@ class KeyboardLogger:
     name = 'Keyboard'
 
     # Ruta para la API
-    api_path = '/keycounter/v1/keyboard/store'
+    api_path = '/keycounter/keyboard-sessions'
 
     DEVICE_ID = os.getenv("DEVICE_ID")
 

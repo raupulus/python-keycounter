@@ -146,3 +146,7 @@ keycounter.sqbpro
 
 # Trashs
 .DS_Store
+
+# Documentación efímera por desarrollador (no versionada)
+/docs/planning/
+/docs/auditorias/

@@ -67,7 +67,7 @@ class MouseLogger:
     name = 'Mouse'
 
     # Ruta para la API
-    api_path = '/keycounter/v1/mouse/store'
+    api_path = '/keycounter/mouse-sessions'
 
     DEVICE_ID = os.getenv("DEVICE_ID")
 
