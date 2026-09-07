@@ -1,4 +1,4 @@
-# 13 — Problemas, riesgos y deuda técnica
+# Problemas, riesgos y deuda técnica
 
 Catálogo de todo lo detectado durante el análisis del código: bugs reales,
 riesgos latentes y deuda técnica. Es un documento de **diagnóstico**, no de
@@ -136,7 +136,7 @@ El fallo está en la librería y los permisos, **no en la lógica de KeyCounter*
 > La captura de **teclado** en macOS, en cambio, lleva años funcionando de forma
 > estable en este proyecto.
 
-Detalle en [14. Matriz de compatibilidad](14-matriz-compatibilidad.md).
+Detalle en [14. Matriz de compatibilidad](matriz-compatibilidad.md).
 
 ### C.2. 🟠 Detección de dispositivos solo válida en Linux
 
@@ -218,7 +218,7 @@ determinista y sería fácil de cubrir.
 
 Casi todas las variables se comparan con `== "True"` (sensible a mayúsculas),
 salvo `MOUSE_ENABLED`, que además acepta `"true"`. Ver
-[12. Configuración](12-configuracion.md).
+[12. Configuración](configuracion.md).
 
 ---
 
@@ -232,3 +232,6 @@ salvo `MOUSE_ENABLED`, que además acepta `"true"`. Ver
 
 Ninguno de estos puntos impide que el proyecto funcione hoy: lleva años en
 producción. Son riesgos de mantenimiento y de evolución, no fallos operativos.
+
+---
+> Creado: 2026-09-06 · Última revisión: 2026-09-07

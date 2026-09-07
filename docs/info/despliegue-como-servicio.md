@@ -1,4 +1,4 @@
-# 16 — Arranque y ejecución actual
+# Despliegue y ejecución como servicio
 
 Cómo se pone en marcha hoy el proyecto y qué limitaciones tiene ese mecanismo.
 Documento de **estado actual**, no de propuestas.
@@ -72,6 +72,7 @@ Referencia de qué ofrece cada sistema objetivo:
 | SteamOS | systemd | Rootfs de **solo lectura**; las actualizaciones por imagen pueden revertir lo escrito en él |
 | macOS | launchd | Los permisos de captura (**TCC**) se conceden por aplicación, lo que complica los demonios sin sesión |
 
-La propuesta concreta de unidades y estrategia por plataforma está en la
-planificación local (`docs/planning/02-despliegue-como-servicio.md`), fuera de
-este repositorio.
+La propuesta concreta de unidades y estrategia por plataforma se aborda en las fases de planificación de despliegue.
+
+---
+> Creado: 2026-09-06 · Última revisión: 2026-09-07

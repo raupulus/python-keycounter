@@ -28,6 +28,11 @@ de `tablemodel()`:
 | `hardware_device_id` | Numeric | `DEVICE_ID`. |
 | `created_at` | DateTime | Timestamp de creación (default). |
 
+## Diferencias frente a `KeyboardLogger`
+- No calcula puntuación (`score`/combos): solo cuenta clicks.
+- El incremento de contadores lo hace directamente `Keylogger.callback_mouse` (no tiene un `increase_pulsation` propio).
+- Registra el desglose específico por botón (`click_left`, `click_right`, `click_middle`).
+
 ## Flujos principales
 1. `add_old_streak()` — vuelca la racha actual a `spurts`.
 2. `get_clicks_average()` — media de clicks por minuto de la racha.

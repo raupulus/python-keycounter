@@ -20,7 +20,7 @@ que hereda de esta clase.
 1. `__init__(port, baudrate, timeout, orientation, has_debug)` — si no hay puerto
    devuelve `None`; si `initialize()` falla, `None`.
 2. `initialize()` — comprueba que el puerto existe (`ls`), lo abre, envía
-   `RESET;BPS;BL;CLR`, fija orientación y aplica `configurations()`.
+   `RESET;BPS;BL;CLR`, fija orientación (`vertical` = 176x220 con `DIR(0)`, `horizontal` = 220x176 con `DIR(1)`) y aplica `configurations()`.
 3. `write(command)` — escribe bytes si el puerto está abierto; si no, espera y
    reintenta `initialize`.
 4. `on`/`off`/`set_brigthness`/`set_screen_orientation`/`get_screen_size`.
@@ -48,7 +48,7 @@ Valores reales inyectados desde [main](main.md) vía `SERIAL_PORT`,
 ## Trampas conocidas
 - Comprueba la existencia del puerto con `ls`/`os.popen`, dependiente de Linux.
 - Ante errores de puerto hace `sleep` y reintenta; no lanza excepciones.
-- `set_brigthness` compone el comando sin `encoding` en `bytes(...)`, lo que puede
+- `set_brigthness(value)` genera `BL(<value>;` sin cerrar paréntesis y sin encoding en `bytes(...)` en `bytes(...)`, lo que puede
   fallar; usar con cuidado.
 - `show_image` está mayormente comentado (no funcional).
 
@@ -59,4 +59,4 @@ Ninguno ⚠️.
 - `show_image` sin implementar (carga de imagen en flash de la pantalla).
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-06
+> Creado: 2026-09-06 · Última revisión: 2026-09-07

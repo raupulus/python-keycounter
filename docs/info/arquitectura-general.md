@@ -1,4 +1,4 @@
-# 01 — Arquitectura general
+# Arquitectura general
 
 ## Objetivo global
 
@@ -52,6 +52,7 @@ tiene en cuenta si es "normal" o "especial" y el instante en que se pulsa.
 - **`DbConnection`** — Caché local. Crea las tablas dinámicamente a partir del
   `tablemodel()` de cada modelo y ofrece operaciones CRUD sobre SQLite (por
   defecto) u otro motor soportado por SQLAlchemy.
+- **`SystemInfo`** — Recolector nativo de telemetría de hardware (CPU, RAM, disco, uptime, etc.) para Linux y macOS.
 - **`ApiConnection`** — Serializa las tuplas de la base de datos a JSON y las
   envía a la API con reintentos HTTP.
 - **`Socket`** — Servidor de socket UNIX en `/var/run/keycounter.socket` que
@@ -143,3 +144,6 @@ captura y el hilo del bucle **sin locks**. Ver documento 13.
   `cat /proc/bus/input/devices` (Linux) para detectar dispositivos.
 
 Ver el detalle de cada componente en los documentos siguientes.
+
+---
+> Creado: 2026-09-06 · Última revisión: 2026-09-07

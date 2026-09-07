@@ -51,7 +51,7 @@ SQLite en el fichero `keycounter.db`.
 ## Trampas conocidas
 - La conexión y la `Session` se abren **a nivel de clase** (se crean al importar
   el módulo, no por instancia).
-- `truncate_db()` ejecuta `SET FOREIGN_KEY_CHECKS` (sintaxis MySQL) y no funciona
+- `truncate_db()` ejecuta `SET FOREIGN_KEY_CHECKS = 0;` (sintaxis propia de MySQL que falla en SQLite) (sintaxis MySQL) y no funciona
   en SQLite; `get_all_data`, `truncate_all_table_data` son `pass` (sin
   implementar).
 - El fichero `keycounter.db` está en `.gitignore`.
@@ -64,4 +64,4 @@ Ninguno ⚠️.
 - Revisar `truncate_db` para SQLite.
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-06
+> Creado: 2026-09-06 · Última revisión: 2026-09-07

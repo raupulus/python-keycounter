@@ -1,4 +1,4 @@
-# 17 — Archivos del proyecto y control de versiones
+# Archivos del proyecto y control de versiones
 
 Inventario de qué hay en el repositorio, qué está bajo seguimiento de git y qué
 no debería estarlo. Documento de **estado actual**.
@@ -146,3 +146,6 @@ y solo con documentación. Según lo previsto:
 
 - La documentación se consolida en la rama principal.
 - **Las modificaciones de código irán en una rama `dev`**, no en la principal.
+
+---
+> Creado: 2026-09-06 · Última revisión: 2026-09-07

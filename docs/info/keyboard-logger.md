@@ -38,8 +38,10 @@ Además mantiene contadores de sesión (`pulsations_total`, `combo_score`,
    (`add_old_streak`) y abre una nueva; recalcula combo (`set_combo`), récords y
    dispara `reset_global_counter` al cambiar de día. Notifica al `socket` y al
    `client_display_websocket` si están asociados.
-2. `set_combo(timestamp, reset_sesion)` — algoritmo de combos; suma puntuación
-   cuando `int((n*2.7)*((n+1)*3.4)) % 5 == 0`.
+2. `set_combo(timestamp, reset_sesion)` — algoritmo de combos. Si no es reseteo de racha, calcula puntuación candidata `new_combo_score = int(self.pulsations_current * 0.15)` y la suma al total si se cumple la condición determinista:
+   ```python
+   (int((self.pulsations_current * 2.7) * ((self.pulsations_current + 1) * 3.4)) % 5) == 0
+   ```
 3. `add_old_streak()` — vuelca la racha actual a `spurts`.
 4. `statistics()` / `statistics_session()` / `statistics_streak()` — datos para
    pantalla y socket.
@@ -73,8 +75,7 @@ Además mantiene contadores de sesión (`pulsations_total`, `combo_score`,
 - Varios atributos se declaran a nivel de clase (`spurts`, contadores); al ser un
   único proceso con una instancia funciona, pero **`spurts` es mutable de clase**
   y sería compartido entre instancias.
-- `COMBO_MAP` está definido pero no se usa en `set_combo` (el algoritmo usa otra
-  fórmula).
+- `COMBO_MAP` (tabla de 1→0.01 hasta 10→1.00) está declarada como constante pero no se usa en `set_combo` (el algoritmo usa la fórmula determinista indicada arriba).
 - `tablename = 'keyboard'`, `api_path = '/keycounter/keyboard-sessions'`.
 - **Día de la semana (`weekday`)**: Se calcula con `(datetime.today().weekday() + 1) % 7`
   para alinearse con la API V2 (0 = domingo, 1 = lunes).

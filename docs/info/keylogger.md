@@ -55,7 +55,12 @@ a la pantalla y al socket.
 - `reload_keycounter_on_new_device` accede a atributos privados de `keyboard`
   (`_nixkeyboard`, `_KeyboardListener`); depende de la implementación de la
   librería y es específico de Linux (`/dev/input`, `/proc/bus/input/devices`).
-- `read_devices_by_id` usa comandos Linux; en macOS no devuelve dispositivos.
+- `read_devices_by_id` ejecuta el subproceso shell:
+  ```bash
+  ls /dev/input/by-id/; cat /proc/bus/input/devices | grep -v -i -E "virtual" | grep -E "keyboard|mouse"
+  ```
+  Es específico de Linux; en macOS no devuelve dispositivos (espera 10 s ante error y retorna cadena vacía).
+- En `callback_keyboard`, `is_down` filtra la autorepetición de teclas mantenidas: marca `True` al recibir evento `down` y lo elimina al recibir `up`, contabilizando únicamente la primera pulsación.
 - Requiere ejecutarse como **root** para capturar teclado.
 - Uso intensivo de `start_new_thread` sin gestión de ciclo de vida de los hilos.
 
@@ -67,4 +72,4 @@ Ninguno ⚠️.
   dispositivos (`reload_keycounter_on_new_device`).
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-06
+> Creado: 2026-09-06 · Última revisión: 2026-09-07

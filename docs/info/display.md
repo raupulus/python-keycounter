@@ -57,4 +57,4 @@ Ninguno ⚠️.
   reinicialización periódica de la pantalla.
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-06
+> Creado: 2026-09-06 · Última revisión: 2026-09-07

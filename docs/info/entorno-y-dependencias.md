@@ -1,4 +1,4 @@
-# 15 — Entorno de ejecución y dependencias (estado actual)
+# Entorno de ejecución y dependencias
 
 Análisis de cómo se ejecuta hoy el proyecto y de qué depende. Documento de
 **estado actual y problemas detectados**, no de propuestas.
@@ -108,7 +108,7 @@ No es una causa, son tres acumuladas:
 
 3. **Acoplamiento a internals privados de `keyboard`.** El código usa
    `keyboard._nixkeyboard`, `keyboard._listener` y `keyboard._KeyboardListener()`
-   (ver [documento 03](03-keylogger.md)). Son API privadas: cualquier cambio de
+   (ver [documento 03](keylogger.md)). Son API privadas: cualquier cambio de
    versión puede romperlas silenciosamente.
 
 **Agravante:** la librería `keyboard` está **archivada desde el 13 de febrero de
@@ -125,9 +125,7 @@ No es una causa, son tres acumuladas:
 | `SQLAlchemy` | Mantenida | Bajo — API 2.x estable |
 | `python-dotenv`, `requests`, `pyserial` | Mantenidas | Bajo |
 
-La propuesta para abordarlo está en la planificación local
-(`docs/planning/01-entorno-virtual-y-dependencias.md`), fuera de este
-repositorio.
+La propuesta para abordarlo y modernizar el aislamiento se aborda en las fases de planificación técnica.
 
 ## Fuentes
 
@@ -137,3 +135,6 @@ repositorio.
   [boppreh/keyboard](https://github.com/boppreh/keyboard)
 - [mouse en PyPI](https://pypi.org/project/mouse/) ·
   [boppreh/mouse](https://github.com/boppreh/mouse)
+
+---
+> Creado: 2026-09-06 · Última revisión: 2026-09-07

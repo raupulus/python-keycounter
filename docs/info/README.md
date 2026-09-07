@@ -1,9 +1,9 @@
 # Documentación técnica viva — `docs/info/`
 
 Índice maestro de la documentación técnica **viva** del proyecto Python
-KeyCounter. Un archivo `.md` por módulo. Esta carpeta es la segunda fuente de
-verdad sobre el estado actual, sólo por detrás del código
-(código > `docs/info/` > `AGENTS.md` > el resto).
+KeyCounter. Un archivo `.md` por módulo y documentos técnicos transversales.
+Esta carpeta es la segunda fuente de verdad sobre el estado actual, sólo por
+detrás del código (código > `docs/info/` > `AGENTS.md` > el resto).
 
 Antes de tocar un módulo, lee **sólo** su `.md` (lectura dirigida, ver
 `AGENTS.md`). Si tocas el módulo, actualizas su `.md` en el mismo commit.
@@ -30,11 +30,21 @@ Antes de tocar un módulo, lee **sólo** su `.md` (lectura dirigida, ver
 |--------|---------|-------------|
 | [macos-keycounterbar](macos-keycounterbar.md) | `macos/KeyCounterBar/` | App de barra de estado en macOS que lee el UNIX socket. |
 
-## Otros documentos de esta carpeta
-- [commands.md](commands.md) — comandos y scripts del proyecto.
-- [decisiones-tecnicas.md](decisiones-tecnicas.md) — decisiones deliberadas que alguien podría querer «arreglar».
-- [apis/raupulus-api.md](apis/raupulus-api.md) — cómo integramos nosotros la API remota (especificación oficial en [`docs/apis/raupulus/keycounter.md`](../apis/raupulus/keycounter.md)).
-- [_MODULE_TEMPLATE.md](_MODULE_TEMPLATE.md) — plantilla para nuevos módulos.
+## Documentación transversal del sistema
+
+| Documento | Descripción |
+|-----------|-------------|
+| [arquitectura-general.md](arquitectura-general.md) | Visión global, flujo de datos, concurrencia (hilos), persistencia y ciclo de vida. |
+| [configuracion.md](configuracion.md) | Todas las variables de entorno (`.env`), valores por defecto y su efecto. |
+| [pendientes-y-mejoras.md](pendientes-y-mejoras.md) | Catálogo de bugs, riesgos latentes y deuda técnica priorizada. |
+| [matriz-compatibilidad.md](matriz-compatibilidad.md) | Matriz de compatibilidad por plataforma (Debian, Fedora, SteamOS, macOS, Raspberry OS). |
+| [entorno-y-dependencias.md](entorno-y-dependencias.md) | Entorno de ejecución, paquetes de sistema, dependencias Python y PEP 668. |
+| [despliegue-como-servicio.md](despliegue-como-servicio.md) | Mecanismos de despliegue y arranque en segundo plano (systemd, cron, launchd). |
+| [archivos-y-control-de-versiones.md](archivos-y-control-de-versiones.md) | Inventario de archivos del proyecto, políticas git e higiene de repositorio. |
+| [commands.md](commands.md) | Comandos y scripts de prueba y ejecución. |
+| [decisiones-tecnicas.md](decisiones-tecnicas.md) | Decisiones deliberadas que alguien podría querer «arreglar». |
+| [apis/raupulus-api.md](apis/raupulus-api.md) | Cómo integramos nosotros la API remota (especificación oficial en [`docs/apis/raupulus/keycounter.md`](../apis/raupulus/keycounter.md)). |
+| [_MODULE_TEMPLATE.md](_MODULE_TEMPLATE.md) | Plantilla para nuevos módulos. |
 
 > No hay `DESIGN.md` ni `COMPONENTS.md`: el proyecto no tiene frontend web ni
 > sistema de estilos. Se crearán si algún día se añade una interfaz gráfica.

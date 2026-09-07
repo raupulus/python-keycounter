@@ -1,4 +1,4 @@
-# 14 — Matriz de compatibilidad por plataforma
+# Matriz de compatibilidad por plataforma
 
 Estado real de cada capacidad en las cinco plataformas objetivo, deducido del
 código y contrastado con la documentación de las librerías. Sirve para saber
@@ -103,7 +103,7 @@ Hoy el arranque se hace con `cron @reboot` como root en todas las plataformas.
 Los gestores disponibles serían `systemd` en Debian, Fedora, Raspberry OS y
 SteamOS, y `launchd` en macOS, con los matices de SteamOS (rootfs de solo
 lectura) y de macOS (permisos TCC). Estado actual y limitaciones en
-[16. Arranque y ejecución actual](16-despliegue-como-servicio.md).
+[16. Arranque y ejecución actual](despliegue-como-servicio.md).
 
 ## Conclusiones
 
@@ -131,3 +131,6 @@ lectura) y de macOS (permisos TCC). Estado actual y limitaciones en
   — fallo de detección de clicks.
 - [everythingishacked/keyboard](https://github.com/everythingishacked/keyboard) —
   fork con correcciones para Mac Silicon (alternativa a evaluar).
+
+---
+> Creado: 2026-09-06 · Última revisión: 2026-09-07

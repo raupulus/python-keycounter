@@ -3,7 +3,7 @@
 > Ruta real en el repositorio: `main.py`
 
 ## Qué hace y qué NO hace
-Punto de entrada de la aplicación. Carga la configuración desde `.env`, instancia
+Punto de entrada de la aplicación. Carga la configuración desde `.env` mediante `python-dotenv` con `load_dotenv(override=True)` (dando prioridad al archivo sobre variables de entorno existentes), instancia
 los componentes (pantalla, keylogger, API, socket, cliente websocket, colector
 de telemetría de hardware [system-info](system-info.md)), gestiona la sincronización
 inicial de contadores acumulados del día desde la API (teclado y ratón vía
@@ -93,6 +93,7 @@ teclado y ratón y sobre las tablas de [db-connection](db-connection.md).
   de la API se suman a lo que se haya registrado localmente durante el arranque.
 - El objeto `hardware_device_info` es opcional para la API; si la recolección
   falla o lanza error, se omite y la subida de pulsaciones prosigue sin detenerse.
+- `except ():` en `upload_data_to_api` es una tupla vacía que no captura ninguna excepción (debería ser `except Exception`), por lo que cualquier fallo inesperado no controlado se propaga sin traza formateada.
 - El bloque de `reboot` (recarga del keylogger al conectar dispositivos) está
   **comentado** en el bucle; el flag `keylogger.reboot` se activa pero no se actúa
   sobre él aquí.

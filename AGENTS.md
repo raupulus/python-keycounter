@@ -86,6 +86,7 @@ documentación no se actualiza EN EL MISMO COMMIT que el código.**
 | keylogger | `Models/Keylogger.py` | `docs/info/keylogger.md` |
 | keyboard-logger | `Models/KeyboardLogger.py` | `docs/info/keyboard-logger.md` |
 | mouse-logger | `Models/MouseLogger.py` | `docs/info/mouse-logger.md` |
+| system-info | `Models/SystemInfo.py` | `docs/info/system-info.md` |
 | db-connection | `Models/DbConnection.py` | `docs/info/db-connection.md` |
 | api-connection | `Models/ApiConnection.py` | `docs/info/api-connection.md` |
 | socket | `Models/Socket.py` | `docs/info/socket.md` |
@@ -94,8 +95,7 @@ documentación no se actualiza EN EL MISMO COMMIT que el código.**
 | lcd-uart | `Models/LCDUart.py` | `docs/info/lcd-uart.md` |
 | macos-keycounterbar | `macos/KeyCounterBar/` | `docs/info/macos-keycounterbar.md` |
 
-Índice maestro navegable: `docs/info/README.md`. Otros: `commands.md`,
-`decisiones-tecnicas.md`, `apis/raupulus-api.md`, `_MODULE_TEMPLATE.md`.
+Índice maestro navegable: `docs/info/README.md`. Documentos transversales: `arquitectura-general.md`, `configuracion.md`, `pendientes-y-mejoras.md`, `matriz-compatibilidad.md`, `entorno-y-dependencias.md`, `despliegue-como-servicio.md`, `archivos-y-control-de-versiones.md`, `commands.md`, `decisiones-tecnicas.md`, `apis/raupulus-api.md`, `_MODULE_TEMPLATE.md`.
 
 ## Tabla de trampas conocidas (transversales)
 | Trampa | Dónde | Detalle |

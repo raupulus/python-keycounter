@@ -26,13 +26,13 @@ suben a la API son exclusivamente estadísticos.
 
 ## Documentación técnica
 
-En [`docs/info`](docs/info/00-indice.md) está la documentación técnica del
-proyecto:
+En [`docs/info`](docs/info/README.md) está el índice maestro de la documentación
+técnica del proyecto:
 
-- [Arquitectura general](docs/info/01-arquitectura-general.md) y detalle de cada módulo
-- [Configuración (`.env`)](docs/info/12-configuracion.md)
-- [Matriz de compatibilidad por plataforma](docs/info/14-matriz-compatibilidad.md)
-- [Problemas, riesgos y deuda técnica](docs/info/13-pendientes-y-mejoras.md)
+- [Arquitectura general](docs/info/arquitectura-general.md) y detalle de cada módulo
+- [Configuración (`.env`)](docs/info/configuracion.md)
+- [Matriz de compatibilidad por plataforma](docs/info/matriz-compatibilidad.md)
+- [Problemas, riesgos y deuda técnica](docs/info/pendientes-y-mejoras.md)
 
 Las reglas para modificar el código (tipado y documentación) están en
 [`AGENTS.md`](AGENTS.md).
@@ -52,7 +52,7 @@ funciona en todas ellas.
 ⚠️ **En macOS no funciona la detección de clicks de ratón** (limitación de la
 librería `mouse` y de los permisos del sistema). La captura de teclado sí
 funciona con normalidad. Detalle en la
-[matriz de compatibilidad](docs/info/14-matriz-compatibilidad.md).
+[matriz de compatibilidad](docs/info/matriz-compatibilidad.md).
 
 ### Visualización de datos en pantalla serial UART
 

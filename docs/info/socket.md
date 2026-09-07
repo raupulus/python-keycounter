@@ -63,4 +63,4 @@ Ninguno ⚠️. Existe un cliente manual de prueba en `Debug/client_socket.py` (
 - Ninguno verificado en el código.
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-06
+> Creado: 2026-09-06 · Última revisión: 2026-09-07

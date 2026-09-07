@@ -12,6 +12,19 @@ actualiza el título del `NSStatusItem` una vez por segundo.
 **NO** captura pulsaciones ni escribe en la DB: es sólo un cliente visualizador
 del socket que crea el proceso Python.
 
+## Datos del bundle y compilación
+- **Bundle ID:** `dev.raupulus.KeyCounterBar`
+- **Versión:** 1.0 (build 1)
+- **macOS mínimo:** 15.0 (compilado con Xcode 16)
+- **Entitlements:** Vacíos (sin sandbox, lo que le permite conectar al socket UNIX en `/var/run`).
+- **Nota Info.plist:** No declara `LSUIElement = true`, por lo que aparece en el Dock y barra de menús en lugar de ser un elemento exclusivo de la barra de estado.
+- **Dependencias SwiftPM (fijadas en `Package.resolved`):**
+  - `swift-nio` (2.74.0)
+  - `swift-nio-transport-services` (1.22.0)
+  - `swift-atomics` (1.2.0)
+  - `swift-collections` (1.1.4)
+  - `swift-system` (1.3.2)
+
 ## Modelo de datos
 Decodifica (Swift `Decodable`) el JSON del socket:
 ```swift
@@ -55,4 +68,4 @@ Ninguno ⚠️.
 - Ninguno verificado en el código.
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-06
+> Creado: 2026-09-06 · Última revisión: 2026-09-07

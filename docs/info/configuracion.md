@@ -1,4 +1,4 @@
-# 12 — Configuración (`.env`)
+# Configuración (`.env`)
 
 La configuración se gestiona por **variables de entorno**, cargadas con
 `python-dotenv` (`load_dotenv(override=True)`). Existe un `.env.example` como
@@ -8,7 +8,7 @@ tenga prioridad sobre variables ya presentes en el entorno.
 > El `.env` cubre la configuración **en tiempo de ejecución** y funciona
 > correctamente. Es distinto del **entorno de ejecución de Python** (intérprete y
 > dependencias), que se analiza en
-> [15. Entorno y dependencias](15-entorno-y-dependencias.md).
+> [15. Entorno y dependencias](entorno-y-dependencias.md).
 
 ## Variables
 
@@ -22,6 +22,12 @@ tenga prioridad sobre variables ya presentes en el entorno.
 | `DB_DATABASE` | `keycounter.db` | Nombre del fichero/BD. |
 | `DB_USERNAME` | `dbuser` | Usuario (no SQLite). |
 | `DB_PASSWORD` | `dbpassword` | Contraseña (no SQLite). |
+
+### Sistema operativo y telemetría
+
+| Variable | Ejemplo | Descripción |
+|----------|---------|-------------|
+| `SYSTEM_OS` | `auto` | Sistema operativo para telemetría de hardware (`auto`, `linux`, `macos`). |
 
 ### API remota
 
@@ -46,6 +52,8 @@ tenga prioridad sobre variables ya presentes en el entorno.
 | `SERIAL_PORT` | `/dev/ttyUSB1` | Puerto serie de la pantalla. |
 | `SERIAL_BAUDRATE` | `115200` | Baudios. |
 | `DISPLAY_ORIENTATION` | `horizontal` | `horizontal` o `vertical`. |
+| `DISPLAY_ID` | `16` | ID del dispositivo pantalla en la API para consultar su IP local. |
+| `DISPLAY_API_TOKEN` | `token` | Token propio del dispositivo pantalla para leer su info en la API v2. |
 
 ### Ratón
 
@@ -83,3 +91,6 @@ tenga prioridad sobre variables ya presentes en el entorno.
 Las variables se leen principalmente en `main.py`, `DbConnection`,
 `ApiConnection`, `KeyboardLogger`/`MouseLogger` (`DEVICE_ID`) y
 `ClientDisplayWebsocket` (`DEVICE_ID`, `DEVICE_NAME`).
+
+---
+> Creado: 2026-09-06 · Última revisión: 2026-09-07
