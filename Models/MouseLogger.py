@@ -177,7 +177,7 @@ class MouseLogger:
             'clicks_middle': self.click_middle,
             'total_clicks': self.current_clicks,
             'clicks_average': self.get_clicks_average(),
-            'weekday': datetime.today().weekday(),
+            'weekday': (datetime.today().weekday() + 1) % 7,
             'hardware_device_id': self.DEVICE_ID,
         }
 

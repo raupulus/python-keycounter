@@ -107,7 +107,7 @@ documentación no se actualiza EN EL MISMO COMMIT que el código.**
 | Estado a nivel de clase | modelos y `DbConnection` | Varios atributos/conexiones se definen en la clase, no por instancia. |
 | SQLite como caché | `keycounter.db` | Se vacía tras subir a la API; está en `.gitignore`. |
 | Rate limit API (60 req/min) | `Models/ApiConnection.py` / `main.py` | La API V2 limita a 60 req/min por token. Subir rachas acumuladas fila a fila puede disparar HTTP 429. |
-| Formato `weekday` en API | `Models/KeyboardLogger.py` / `MouseLogger.py` | Python devuelve 0 para lunes; la API V2 espera 0 para domingo. |
+| Formato `weekday` en API | `Models/KeyboardLogger.py` / `MouseLogger.py` | Resuelto: se calcula con `(weekday() + 1) % 7` para alinear con la API (0 = domingo). |
 
 ---
 

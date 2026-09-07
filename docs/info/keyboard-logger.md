@@ -76,9 +76,8 @@ Además mantiene contadores de sesión (`pulsations_total`, `combo_score`,
 - `COMBO_MAP` está definido pero no se usa en `set_combo` (el algoritmo usa otra
   fórmula).
 - `tablename = 'keyboard'`, `api_path = '/keycounter/keyboard-sessions'`.
-- **Día de la semana (`weekday`)**: `datetime.today().weekday()` de Python devuelve
-  `0` para lunes y `6` para domingo, mientras que el contrato API V2 de Laravel
-  documenta `0 = domingo`.
+- **Día de la semana (`weekday`)**: Se calcula con `(datetime.today().weekday() + 1) % 7`
+  para alinearse con la API V2 (0 = domingo, 1 = lunes).
 - `duration` y `user_id` no se incluyen en el modelo ni se envían a la API: el
   servidor los calcula/asigna automáticamente.
 
@@ -87,7 +86,6 @@ Ninguno ⚠️.
 
 ## Pendiente real
 - Aclarar el uso previsto de `COMBO_MAP` (código muerto o pendiente de integrar).
-- Alinear el cálculo de `weekday` con la convención de la API V2 (0 = domingo).
 
 ---
 > Creado: 2026-09-06 · Última revisión: 2026-09-07

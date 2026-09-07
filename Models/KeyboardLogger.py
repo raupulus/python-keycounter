@@ -351,7 +351,7 @@ class KeyboardLogger:
             'pulsations_special_keys': self.pulsations_current_special_keys,
             'pulsation_average': self.get_pulsation_average(),
             'score': self.combo_score_current,
-            'weekday': datetime.today().weekday(),
+            'weekday': (datetime.today().weekday() + 1) % 7,
             'hardware_device_id': self.DEVICE_ID,
         }
 
