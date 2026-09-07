@@ -76,7 +76,7 @@ JSON de un registro por petición, con los campos de `tablemodel()` de cada mode
   - `user_id`: se fuerza en el servidor al dueño del token; no se envía desde el cliente.
 - **Día de la semana (`weekday`)**:
   - La API espera un entero entre `0` y `6`, donde `0 = domingo`.
-  - *Discrepancia conocida*: Python `datetime.today().weekday()` devuelve `0` para lunes y `6` para domingo.
+  - Alineado: el cliente calcula `(datetime.today().weekday() + 1) % 7` para enviar `0 = domingo`, `1 = lunes`, etc.
 - **Sesiones de ratón**:
   - La tabla de ratón en la API no tiene campo `score` (el recurso `MouseResource` no lo incluye). Si se envía, la API lo ignora silenciosamente.
 - **Info de hardware opcional**:

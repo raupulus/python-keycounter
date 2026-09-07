@@ -65,9 +65,8 @@ de este modelo.
 - **Sin `score`**: a diferencia de teclado, la tabla `keycounter_mouse` en la API
   V2 no tiene columna `score` (`MouseResource` no lo incluye). Este modelo no lo
   genera ni lo persiste.
-- **Día de la semana (`weekday`)**: `datetime.today().weekday()` de Python devuelve
-  `0` para lunes y `6` para domingo, mientras que el contrato API V2 de Laravel
-  documenta `0 = domingo`.
+- **Día de la semana (`weekday`)**: Se calcula con `(datetime.today().weekday() + 1) % 7`
+  para alinearse con la API V2 (0 = domingo, 1 = lunes).
 - `duration` y `user_id` no se incluyen en el modelo ni se envían a la API: el
   servidor los calcula/asigna automáticamente.
 
@@ -75,7 +74,7 @@ de este modelo.
 Ninguno ⚠️.
 
 ## Pendiente real
-- Alinear el cálculo de `weekday` con la convención de la API V2 (0 = domingo).
+Ninguno.
 
 ---
 > Creado: 2026-09-06 · Última revisión: 2026-09-07
