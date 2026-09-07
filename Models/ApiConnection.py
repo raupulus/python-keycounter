@@ -154,6 +154,8 @@ class ApiConnection:
                     print('Al guardar en la API algunos elementos tuvieron error.')
                 return True
             else:
+                if self.DEBUG:
+                    print(f'Error en la API ({req.status_code}): {req.text}')
                 return False
         except Exception as e:
             if self.DEBUG:
@@ -195,11 +197,12 @@ class ApiConnection:
             indent=4,
         )
 
-    def parse_to_json(self, row, columns):
+    def parse_to_json(self, row, columns, extra_fields=None):
         """
-        Convierte los datos recibidos en JSON
-        :param rows: Tuplas con todas las entradas desde la DB.
-        :param columns: Nombre de las columnas en orden respecto a tuplas.
+        Convierte los datos recibidos en JSON normalizando formatos para la API V2.
+        :param row: Tupla con la entrada desde la DB.
+        :param columns: Nombre de las columnas en orden respecto a tupla.
+        :param extra_fields: Diccionario opcional con campos adicionales (ej: hardware_device_info)
         :return: Devuelve el objeto json
         """
 
@@ -207,35 +210,43 @@ class ApiConnection:
 
         # Compongo el objeto json que será devuelto.
         for iteracion in range(len(columns)):
+            col = columns[iteracion]
             cell = row[iteracion]
-            #print('cell: ', cell)
 
             if isinstance(cell, decimal.Decimal):
                 cell = float(cell)
 
             if isinstance(cell, datetime.datetime):
                 cell = cell.strftime("%Y-%m-%d %H:%M:%S")
+            elif col in ('start_at', 'end_at', 'created_at') and isinstance(cell, str):
+                # SQLite almacena cadenas con microsegundos (ej: '2026-09-07 10:52:25.729175')
+                try:
+                    clean_val = cell.split('.')[0].replace('T', ' ')
+                    dt = datetime.datetime.strptime(clean_val, "%Y-%m-%d %H:%M:%S")
+                    cell = dt.strftime("%Y-%m-%d %H:%M:%S")
+                except Exception:
+                    pass
 
-            if columns[iteracion] != 'id':
-                result.update({columns[iteracion]: cell})
+            if col != 'id':
+                result.update({col: cell})
+
+        if extra_fields and isinstance(extra_fields, dict):
+            result.update(extra_fields)
 
         return json.dumps(
             result,
-            # default=None,
-            # ensure_ascii=False,
-            # sort_keys=True,
-            # indent=4,
             skipkeys=False, ensure_ascii=True, check_circular=True,
             allow_nan=True, cls=None, indent=None, separators=None,
             default=None
         )
 
-    def upload(self, name, path, datas, columns, method='GET'):
+    def upload(self, name, path, datas, columns, method='GET', extra_fields=None):
         """
         Recibe la ruta dentro de la API y los datos a enviar para procesar la
         subida atacando la API.
         :param path: Ruta dentro de la api
         :param datas: Datos a enviar
+        :param extra_fields: Diccionario opcional con campos adicionales para el JSON
         """
         if datas:
             if self.DEBUG:
@@ -244,9 +255,7 @@ class ApiConnection:
             result_send = False
 
             for data in datas:
-                # print(data)
-                datas_json = self.parse_to_json(data, columns)
-                # print('Datos formateados en JSON:', datas_json)
+                datas_json = self.parse_to_json(data, columns, extra_fields=extra_fields)
 
                 if (self.send(path, datas_json, method=method)):
                     result_send = True
@@ -283,5 +292,53 @@ class ApiConnection:
         except Exception as e:
             if self.DEBUG:
                 print('Error en get_websocket_server_display_info: ', e)
+
+            return None
+
+    def get_summary(self, device_id=None, date='today'):
+        """
+        Obtiene el resumen de estadísticas acumuladas (teclado y ratón) para el
+        dispositivo y periodo indicados desde GET /keycounter/summary.
+        :param device_id: ID del dispositivo (por defecto toma DEVICE_ID del entorno)
+        :param date: Periodo ('today', 'month', 'AAAA-MM-DD', 'AAAA-MM')
+        :return: dict con los datos de data, o None si falla / no existe
+        """
+        url = self.API_URL
+        token = self.API_TOKEN
+
+        if not url or not token:
+            return None
+
+        dev_id = device_id or os.getenv("DEVICE_ID")
+        if not dev_id:
+            return None
+
+        full_url = f"{url}/keycounter/summary?device_id={dev_id}&date={date}"
+
+        headers = {
+            'Content-type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ' + str(token),
+        }
+
+        try:
+            req = self.requests_retry_session(retries=1).get(
+                full_url,
+                headers=headers,
+                timeout=10
+            )
+
+            if self.DEBUG:
+                print('Respuesta GET /keycounter/summary:', req.status_code, req.text)
+
+            if req.status_code == 200:
+                res = req.json()
+                if isinstance(res, dict) and res.get('success'):
+                    return res.get('data')
+
+            return None
+        except Exception as e:
+            if self.DEBUG:
+                print('Error al obtener /keycounter/summary de la API:', e)
 
             return None

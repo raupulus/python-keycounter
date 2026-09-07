@@ -4,8 +4,9 @@
 
 ## Qué hace y qué NO hace
 Modelo de datos y estadísticas del ratón. Cuenta clicks por botón (izquierdo,
-central, derecho) agrupados en rachas, calcula la media por minuto y define el
-esquema de tabla `mouse`. Sólo se instancia si `MOUSE_ENABLED`.
+central, derecho) agrupados en rachas, calcula la media por minuto, define el
+esquema de tabla `mouse` y permite sincronizar los totales acumulados del día
+desde la API (`apply_initial_summary`). Sólo se instancia si `MOUSE_ENABLED`.
 
 **NO** captura eventos (los recibe desde [keylogger](keylogger.md)) ni persiste
 datos.
@@ -32,6 +33,9 @@ de `tablemodel()`:
 2. `get_clicks_average()` — media de clicks por minuto de la racha.
 3. `reset_global_counter()` — reinicia el récord de racha.
 4. `tablemodel()` — esquema de columnas para la DB.
+5. `apply_initial_summary(summary_data)` — suma `clicks_total` al contador local
+   acumulado `total_clicks` y actualiza el récord de racha `pulsations_hight = max(local, clicks_high)`
+   a partir de los datos recibidos de `/keycounter/summary`.
 
 La lógica de conteo (incremento por botón, apertura/cierre de racha por
 `COMBO_RESET`) vive en `Keylogger.callback_mouse`, que actúa sobre los atributos
@@ -39,7 +43,8 @@ de este modelo.
 
 ## Puntos de entrada
 - `MouseLogger(has_debug)`.
-- `add_old_streak`, `get_clicks_average`, `reset_global_counter`, `tablemodel`.
+- `add_old_streak`, `get_clicks_average`, `reset_global_counter`, `tablemodel`,
+  `apply_initial_summary`.
 
 ## Dependencias en ambos sentidos
 - **Depende de:** `datetime`, `os` (lee `DEVICE_ID`).
@@ -57,12 +62,20 @@ de este modelo.
 - `COMBO_MAP` declarado pero no utilizado.
 - En [main](main.md) sólo se guarda la racha si `total_clicks > 1`.
 - `tablename = 'mouse'`, `api_path = '/keycounter/mouse-sessions'`.
+- **Sin `score`**: a diferencia de teclado, la tabla `keycounter_mouse` en la API
+  V2 no tiene columna `score` (`MouseResource` no lo incluye). Este modelo no lo
+  genera ni lo persiste.
+- **Día de la semana (`weekday`)**: `datetime.today().weekday()` de Python devuelve
+  `0` para lunes y `6` para domingo, mientras que el contrato API V2 de Laravel
+  documenta `0 = domingo`.
+- `duration` y `user_id` no se incluyen en el modelo ni se envían a la API: el
+  servidor los calcula/asigna automáticamente.
 
 ## Tests que lo cubren
 Ninguno ⚠️.
 
 ## Pendiente real
-- Ninguno verificado en el código.
+- Alinear el cálculo de `weekday` con la convención de la API V2 (0 = domingo).
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-06
+> Creado: 2026-09-06 · Última revisión: 2026-09-07

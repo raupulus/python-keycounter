@@ -17,6 +17,7 @@ Antes de tocar un módulo, lee **sólo** su `.md` (lectura dirigida, ver
 | [keylogger](keylogger.md) | `Models/Keylogger.py` | Captura de teclado y ratón mediante hooks en hilos. |
 | [keyboard-logger](keyboard-logger.md) | `Models/KeyboardLogger.py` | Modelo de datos y estadísticas del teclado (rachas, combos). |
 | [mouse-logger](mouse-logger.md) | `Models/MouseLogger.py` | Modelo de datos y estadísticas del ratón (clicks, rachas). |
+| [system-info](system-info.md) | `Models/SystemInfo.py` | Telemetría nativa de hardware (RAM, CPU, disco, uptime, etc.) para Linux y macOS. |
 | [db-connection](db-connection.md) | `Models/DbConnection.py` | Caché local en SQLite/SQLAlchemy. |
 | [api-connection](api-connection.md) | `Models/ApiConnection.py` | Subida de datos a la API remota. |
 | [socket](socket.md) | `Models/Socket.py` | Servidor UNIX socket para exponer estadísticas en tiempo real. |
@@ -32,11 +33,11 @@ Antes de tocar un módulo, lee **sólo** su `.md` (lectura dirigida, ver
 ## Otros documentos de esta carpeta
 - [commands.md](commands.md) — comandos y scripts del proyecto.
 - [decisiones-tecnicas.md](decisiones-tecnicas.md) — decisiones deliberadas que alguien podría querer «arreglar».
-- [apis/raupulus-api.md](apis/raupulus-api.md) — cómo integramos nosotros la API remota.
+- [apis/raupulus-api.md](apis/raupulus-api.md) — cómo integramos nosotros la API remota (especificación oficial en [`docs/apis/raupulus/keycounter.md`](../apis/raupulus/keycounter.md)).
 - [_MODULE_TEMPLATE.md](_MODULE_TEMPLATE.md) — plantilla para nuevos módulos.
 
 > No hay `DESIGN.md` ni `COMPONENTS.md`: el proyecto no tiene frontend web ni
 > sistema de estilos. Se crearán si algún día se añade una interfaz gráfica.
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-06
+> Creado: 2026-09-06 · Última revisión: 2026-09-07

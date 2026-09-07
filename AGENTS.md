@@ -106,6 +106,8 @@ documentación no se actualiza EN EL MISMO COMMIT que el código.**
 | «WebSocket» = TCP plano | `Models/ClientDisplayWebsocket.py` | No es protocolo WebSocket; TCP al puerto 80. |
 | Estado a nivel de clase | modelos y `DbConnection` | Varios atributos/conexiones se definen en la clase, no por instancia. |
 | SQLite como caché | `keycounter.db` | Se vacía tras subir a la API; está en `.gitignore`. |
+| Rate limit API (60 req/min) | `Models/ApiConnection.py` / `main.py` | La API V2 limita a 60 req/min por token. Subir rachas acumuladas fila a fila puede disparar HTTP 429. |
+| Formato `weekday` en API | `Models/KeyboardLogger.py` / `MouseLogger.py` | Python devuelve 0 para lunes; la API V2 espera 0 para domingo. |
 
 ---
 
@@ -150,7 +152,10 @@ python-keycounter/
     │   └── apis/raupulus-api.md  # Cómo integramos la API
     ├── deploys/                  # Guías de despliegue (versionado)
     ├── images/                   # Imágenes del README
-    ├── apis/<api>/               # Doc oficial destilada de terceros (cuando exista)
+    ├── apis/                     # Doc oficial destilada de terceros
+    │   └── raupulus/
+    │       ├── README.md         # Índice de contratos raupulus.dev
+    │       └── keycounter.md     # Contrato oficial API V2 KeyCounter
     ├── future/                   # Decidido pero aplazado (cuando exista)
     ├── planning/                 # [NO GIT · efímero por desarrollador]
     └── auditorias/               # [NO GIT · efímero por desarrollador]

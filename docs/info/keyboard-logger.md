@@ -7,7 +7,8 @@ Modelo de datos y estadísticas del teclado. Contabiliza pulsaciones agrupadas e
 «rachas» (spurts), calcula puntuación de combos, mantiene contadores de sesión y
 de racha actual, y define el esquema de tabla que persiste
 [db-connection](db-connection.md). Reinicia los contadores globales al cambiar de
-día.
+día y permite aplicar los totales acumulados del día desde la API
+(`apply_initial_summary`).
 
 **NO** captura eventos (eso lo hace [keylogger](keylogger.md)) ni persiste nada.
 
@@ -28,7 +29,7 @@ valor con los campos que devuelve `tablemodel()`:
 | `created_at` | DateTime | Timestamp de creación (default). |
 
 Además mantiene contadores de sesión (`pulsations_total`, `combo_score`,
-`pulsation_high`…) y de racha actual (`pulsations_current`,
+`combo_score_high`, `pulsation_high`…) y de racha actual (`pulsations_current`,
 `combo_score_current`…).
 
 ## Flujos principales
@@ -43,11 +44,16 @@ Además mantiene contadores de sesión (`pulsations_total`, `combo_score`,
 4. `statistics()` / `statistics_session()` / `statistics_streak()` — datos para
    pantalla y socket.
 5. `tablemodel()` — esquema de columnas para la DB.
+6. `apply_initial_summary(summary_data)` — suma las estadísticas acumuladas
+   recibidas de la API (`pulsations_total`, `pulsations_total_special_keys`) sobre
+   los contadores actuales y actualiza récords del periodo (`combo_score_high`,
+   `pulsation_high`, `combo_score`). Notifica a `socket` y
+   `client_display_websocket`.
 
 ## Puntos de entrada
 - `KeyboardLogger(has_debug)`.
 - `increase_pulsation`, `add_old_streak`, `statistics`, `tablemodel`,
-  `reset_global_counter`.
+  `reset_global_counter`, `apply_initial_summary`.
 - Atributos inyectables: `socket`, `client_display_websocket`.
 
 ## Dependencias en ambos sentidos
@@ -70,12 +76,18 @@ Además mantiene contadores de sesión (`pulsations_total`, `combo_score`,
 - `COMBO_MAP` está definido pero no se usa en `set_combo` (el algoritmo usa otra
   fórmula).
 - `tablename = 'keyboard'`, `api_path = '/keycounter/keyboard-sessions'`.
+- **Día de la semana (`weekday`)**: `datetime.today().weekday()` de Python devuelve
+  `0` para lunes y `6` para domingo, mientras que el contrato API V2 de Laravel
+  documenta `0 = domingo`.
+- `duration` y `user_id` no se incluyen en el modelo ni se envían a la API: el
+  servidor los calcula/asigna automáticamente.
 
 ## Tests que lo cubren
 Ninguno ⚠️.
 
 ## Pendiente real
 - Aclarar el uso previsto de `COMBO_MAP` (código muerto o pendiente de integrar).
+- Alinear el cálculo de `weekday` con la convención de la API V2 (0 = domingo).
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-06
+> Creado: 2026-09-06 · Última revisión: 2026-09-07

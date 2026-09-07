@@ -52,6 +52,8 @@
 # #       Importar Librerías        # #
 #######################################
 from time import sleep
+import time
+from _thread import start_new_thread
 from dotenv import load_dotenv
 import os
 
@@ -62,6 +64,7 @@ from Models.Display import Display
 from Models.Socket import Socket
 from Models.ClientDisplayWebsocket import ClientDisplayWebsocket
 from Models.Keylogger import Keylogger
+from Models.SystemInfo import SystemInfo
 
 # Cargo archivos de configuración desde .env sobreescribiendo variables locales.
 load_dotenv(override=True)
@@ -85,6 +88,45 @@ DEBUG = os.getenv("DEBUG") == "True"
 UPLOAD_API = os.getenv("UPLOAD_API") == "True"
 
 SEND_DATA_TO_WEBSOCKET_SERVER = os.getenv("SEND_DATA_TO_WEBSOCKET_SERVER") == "True"
+
+# Control de sincronización inicial desde la API
+SYNC_RETRY_INTERVAL_SECONDS = 3600  # 1 hora tras fallo
+is_synced = False
+last_sync_attempt = 0
+
+
+def try_sync_initial_stats(keylogger, apiconnection):
+    """
+    Intenta descargar las estadísticas acumuladas del día desde la API (/keycounter/summary).
+    Sincroniza teclado y (si MOUSE_ENABLED) ratón.
+    Si falla (error, 404 o 403), registra el intento para esperar 1 hora antes del próximo.
+    Si tiene éxito, marca is_synced = True y no vuelve a sincronizar.
+    """
+    global is_synced, last_sync_attempt
+
+    if is_synced or apiconnection is None:
+        return
+
+    last_sync_attempt = time.time()
+
+    if DEBUG:
+        print('Intentando sincronizar estadísticas acumuladas del día desde la API (/keycounter/summary)...')
+
+    summary = apiconnection.get_summary(date='today')
+    if summary is not None:
+        if keylogger.model_keyboard:
+            keylogger.model_keyboard.apply_initial_summary(summary)
+
+        if MOUSE_ENABLED and keylogger.model_mouse and 'mouse' in summary and summary['mouse']:
+            keylogger.model_mouse.apply_initial_summary(summary['mouse'])
+
+        is_synced = True
+        if DEBUG:
+            print('Sincronización inicial con la API completada exitosamente.')
+    else:
+        if DEBUG:
+            print('No se pudo sincronizar estadísticas iniciales de la API. '
+                  'Próximo reintento en 1 hora.')
 
 
 def insert_data_in_db(dbconnection, tablemodel):
@@ -140,9 +182,10 @@ def insert_data_in_db(dbconnection, tablemodel):
         del tablemodel.spurts[key]
 
 
-def upload_data_to_api(dbconnection, apiconnection, tablemodel):
+def upload_data_to_api(dbconnection, apiconnection, tablemodel, system_info=None):
     """
-    Procesa la subida de datos a la API.
+    Procesa la subida de datos a la API inyectando opcionalmente estadísticas
+    de hardware del dispositivo.
     """
 
     # El número de registros a subir a la api y eliminar de la DB
@@ -163,6 +206,18 @@ def upload_data_to_api(dbconnection, apiconnection, tablemodel):
     name = tablemodel.name
     path = tablemodel.api_path
 
+    # Obtengo telemetría de hardware de forma protegida (si falla no interrumpe la subida)
+    extra_fields = None
+    if system_info is not None:
+        try:
+            hw_info = system_info.get_hardware_device_info()
+            if hw_info and isinstance(hw_info, dict):
+                extra_fields = {'hardware_device_info': hw_info}
+        except Exception as e:
+            if DEBUG:
+                print('Error al recopilar hardware_device_info (ignorado):', e)
+            extra_fields = None
+
     try:
         if params_from_db:
             if DEBUG:
@@ -172,6 +227,7 @@ def upload_data_to_api(dbconnection, apiconnection, tablemodel):
                 path,
                 params_from_db,
                 columns,
+                extra_fields=extra_fields
             )
 
             sleep(1)
@@ -184,12 +240,12 @@ def upload_data_to_api(dbconnection, apiconnection, tablemodel):
                     tablemodel.tablename,
                     n_registers)
 
-    except ():
+    except Exception as e:
         if DEBUG:
-            print('Error al subir datos a la api')
+            print('Error al subir datos a la api:', e)
 
 
-def loop(keylogger, socket, apiconnection=None, display=None):
+def loop(keylogger, socket, apiconnection=None, display=None, system_info=None):
     keylogger = keylogger
     # Instancio el modelo para guardar datos en la DB cada minuto.
     dbconnection = DbConnection()
@@ -234,14 +290,20 @@ def loop(keylogger, socket, apiconnection=None, display=None):
 
                 upload_data_to_api(dbconnection,
                                    apiconnection,
-                                   keylogger.model_keyboard)
+                                   keylogger.model_keyboard,
+                                   system_info=system_info)
 
                 if MOUSE_ENABLED:
                     upload_data_to_api(dbconnection,
                                        apiconnection,
-                                       keylogger.model_mouse)
+                                       keylogger.model_mouse,
+                                       system_info=system_info)
 
                 sleep(1)
+
+                # Reintento de sincronización si nunca se sincronizó y ya pasó 1 hora
+                if not is_synced and (time.time() - last_sync_attempt >= SYNC_RETRY_INTERVAL_SECONDS):
+                    start_new_thread(try_sync_initial_stats, (keylogger, apiconnection))
 
             """
             if keylogger.reboot:
@@ -288,6 +350,9 @@ def main():
     # Instancio conexión con la API
     apiconnection = ApiConnection()
 
+    # Instancio colector de telemetría de hardware (Linux / macOS nativo)
+    system_info = SystemInfo.create(debug=DEBUG)
+
     # Instancio socket pasándole el keylogger para que alcance sus datos.
     socket = Socket(keylogger, has_debug=DEBUG)
 
@@ -301,9 +366,12 @@ def main():
         if client_display_websocket:
             keylogger.set_client_display_websocket(client_display_websocket)
 
+    # Intenta sincronizar estadísticas del día al arrancar en segundo plano
+    if UPLOAD_API and apiconnection and apiconnection.API_TOKEN and apiconnection.API_URL:
+        start_new_thread(try_sync_initial_stats, (keylogger, apiconnection))
 
     # Comienza el bucle para guardar datos y subirlos a la API.
-    loop(keylogger, socket, apiconnection, display)
+    loop(keylogger, socket, apiconnection, display, system_info=system_info)
 
 
 if __name__ == "__main__":
