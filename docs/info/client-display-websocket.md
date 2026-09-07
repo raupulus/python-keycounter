@@ -23,15 +23,19 @@ JSON enviado en `update()`:
   "system": { "so": "<DEVICE_NAME>" }
 }
 ```
-- `websocket_server_display_info` — datos del dispositivo servidor (incluye
-  `ip_local`).
+- `websocket_server_display_info` — el objeto `status` del dispositivo servidor
+  (`data.status` de la API v2), que incluye `ip_local`, `ip_public`, `temp`,
+  `battery_level`... Sólo se asigna si `ip_local` viene presente.
 - `is_busy: bool`, `errors: int`.
 
 ## Flujos principales
 1. `__init__` — lanza `prepare_client` en un hilo.
 2. `prepare_client()` — pide a la API
-   (`ApiConnection.get_websocket_server_display_info`) hasta obtener la clave
-   `device`; con reintentos escalonados (10/30/60 s).
+   (`ApiConnection.get_websocket_server_display_info`, que consulta con
+   `?include=status`) y lee `data.status` (envelope v2, estado anidado); con
+   reintentos escalonados (10/30/60 s) mientras la respuesta sea `None`. Sólo fija
+   `websocket_server_display_info` si `status` trae `ip_local`; si no, el envío
+   por red queda inactivo.
 3. `update()` — si no está ocupado y hay info del servidor, conecta a
    `ip_local:80`, envía el JSON, lee la respuesta y espera `status == 'ok'`.
    Cuenta errores; si superan 10 vuelve a `prepare_client`. Lo invoca el modelo de
@@ -51,20 +55,27 @@ JSON enviado en `update()`:
 |----------|---------|--------|
 | `DEVICE_ID` | `None` | Se envía en el JSON. |
 | `DEVICE_NAME` | `N/D` | Se envía como `system.so`. |
+| `DISPLAY_ID` | (vacío) | Id del dispositivo pantalla a consultar en la API. |
+| `DISPLAY_API_TOKEN` | (vacío) | Token propio del display para leer su info. |
 | `SEND_DATA_TO_WEBSOCKET_SERVER` | `False` | El modelo de teclado sólo llama a `update()` si está activo. |
 
 ## Trampas conocidas
-- El id de dispositivo del servidor está fijado a **16** dentro de
-  `ApiConnection.get_websocket_server_display_info` (no en este módulo).
+- El id y token del servidor los toma `get_websocket_server_display_info` de
+  `DISPLAY_ID` y `DISPLAY_API_TOKEN` (`.env`), distintos de `DEVICE_ID`/`API_TOKEN`
+  (que son de este equipo): en v2 el token de keycounter no puede leer otros
+  dispositivos.
+- El `ip_local` sólo llega si la petición incluye `?include=status`; sin ese
+  parámetro la API v2 omite el estado dinámico por completo.
 - El puerto destino está **hardcodeado a 80**.
-- `prepare_client` puede bucle-esperar indefinidamente si la API nunca devuelve
-  `device`.
+- `prepare_client` puede bucle-esperar indefinidamente sólo si la API responde
+  `None` (error/timeout); ante un `200` sin `ip_local` sale limpio y deja el
+  envío inactivo.
 
 ## Tests que lo cubren
 Ninguno ⚠️.
 
 ## Pendiente real
-- Parametrizar id de dispositivo y puerto destino.
+- Parametrizar el puerto destino.
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-06
+> Creado: 2026-09-06 · Última revisión: 2026-09-07

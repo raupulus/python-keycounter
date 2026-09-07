@@ -43,22 +43,24 @@ class ClientDisplayWebsocket:
                 if self.DEBUG:
                     print('Comenzando a pedir datos a la api para websockets')
 
-                if "device" in res:
-                    self.websocket_server_display_info = res["device"]
+                # La API v2 envuelve el recurso en "data"; el estado dinámico
+                # (con ip_local) va anidado en data.status (pedido con
+                # ?include=status).
+                device = res.get("data") if isinstance(res, dict) else None
+                status = device.get("status") if device else None
+
+                if status and status.get("ip_local"):
+                    self.websocket_server_display_info = status
 
                     if self.DEBUG:
-                        print('IP LOCAL',
-                              self.websocket_server_display_info.get(
-                                  'ip_local'))
+                        print('IP LOCAL', status.get('ip_local'))
                         print('Datos obtenidos de la api para websockets:', res)
-
-                    break
                 else:
+                    # Sin ip_local no hay a dónde conectar; el envío a la
+                    # pantalla en red queda inactivo hasta que la API lo reporte.
                     if self.DEBUG:
-                        print("La clave 'device' no está presente en la respuesta.")
-
-                if self.DEBUG:
-                    print('Datos obtenidos de la api para websockets:', res)
+                        print("La API no devuelve ip_local del dispositivo; "
+                              "el display por red queda inactivo.")
 
                 break
             else:

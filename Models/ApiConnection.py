@@ -260,13 +260,18 @@ class ApiConnection:
         :return:
         """
         url = self.API_URL
-        token = self.API_TOKEN
-        full_url = url + '/hardware/v1/get/device/16/info'
+        # El display es otro dispositivo: por seguridad el token de keycounter no
+        # puede leerlo, se usan credenciales propias del display.
+        display_id = os.getenv("DISPLAY_ID")
+        display_token = os.getenv("DISPLAY_API_TOKEN")
+        # include=status añade el estado dinámico (ip_local, etc.) anidado en
+        # data.status; sin él la API no lo devuelve.
+        full_url = url + '/hardware/devices/' + str(display_id) + '?include=status'
 
         headers = {
             'Content-type': 'application/json',
             'Accept': 'application/json',
-            'Authorization': 'Bearer ' + str(token),
+            'Authorization': 'Bearer ' + str(display_token),
         }
 
         try:

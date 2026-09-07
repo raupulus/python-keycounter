@@ -21,7 +21,7 @@ peticiones reales, debe vivir en `docs/apis/raupulus/`).
 |-----|--------|-----------------------------|--------|
 | Subir rachas de teclado | `POST` | `/keycounter/keyboard-sessions` | `KeyboardLogger.api_path` |
 | Subir rachas de ratón | `POST` | `/keycounter/mouse-sessions` | `MouseLogger.api_path` |
-| Info del dispositivo pantalla en red | `GET` | `/hardware/v1/get/device/16/info` | `ApiConnection.get_websocket_server_display_info` (id **16** hardcodeado) |
+| Info del dispositivo pantalla | `GET` | `/hardware/devices/{DISPLAY_ID}?include=status` | `ApiConnection.get_websocket_server_display_info` (id `DISPLAY_ID`, token `DISPLAY_API_TOKEN`) |
 
 > Nota: aunque `ApiConnection.send` recibe un parámetro `method`, siempre realiza
 > `POST` (ver [api-connection](../api-connection.md), trampas conocidas).
@@ -36,10 +36,30 @@ JSON de un registro por petición, con los campos del `tablemodel()` del modelo
 correspondiente (ver [keyboard-logger](../keyboard-logger.md) y
 [mouse-logger](../mouse-logger.md)), omitiendo la columna `id`.
 
-## Respuesta esperada de la info de dispositivo
-Se espera un objeto con clave `device` que contenga, entre otros, `ip_local`
-(usado por [client-display-websocket](../client-display-websocket.md)). Estructura
-**sin verificar**.
+## Respuesta de la info de dispositivo (verificada)
+`GET /hardware/devices/{id}?include=status` responde con el envelope v2
+`{ "success": true, "message": ..., "data": { ...dispositivo... } }`. Se consulta
+el dispositivo pantalla (`DISPLAY_ID`) con su propio token (`DISPLAY_API_TOKEN`),
+porque el token de keycounter no puede leer otros dispositivos. Verificado con
+petición real (device 16 = Raspberry Pi Pico Display, `200`): `data` trae datos
+estáticos (`id`, `user_id`, `name`, `type`, `brand`, `model`, versiones...) **y**,
+gracias a `include=status`, un objeto anidado `data.status` con el estado
+dinámico:
+
+```json
+"status": {
+  "hardware_device_id": 16,
+  "temp": null, "voltage": null, "battery_level": null,
+  "cpu": null, "disk": null, "ram": null, "uptime": null,
+  "ip_local": "172.18.1.209",
+  "ip_public": "139.47.158.109",
+  "extra": null,
+  "last_seen_at": "2026-09-05T10:59:24.000000Z"
+}
+```
+
+`ip_local` vive ahí, no en `data` directamente. Sin `include=status` la API omite
+este bloque por completo.
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-06
+> Creado: 2026-09-06 · Última revisión: 2026-09-07

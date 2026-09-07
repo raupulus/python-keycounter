@@ -23,7 +23,11 @@ No mantiene estado persistente. Convierte filas + nombres de columna a JSON
 3. `requests_retry_session(...)` — sesión `requests` con reintentos
    (`status_forcelist=(500,502,504)`, `backoff_factor=0.3`).
 4. `get_websocket_server_display_info()` — `GET` a
-   `/hardware/v1/get/device/16/info` para obtener la IP local de la pantalla.
+   `/hardware/devices/{DISPLAY_ID}?include=status` (API v2) usando
+   `DISPLAY_API_TOKEN` (el token de keycounter no puede leer otros dispositivos
+   por seguridad). El `include=status` es imprescindible: sin él, la respuesta no
+   trae el estado dinámico y falta `ip_local` (ver
+   [client-display-websocket](client-display-websocket.md)).
 
 ## Puntos de entrada
 - `ApiConnection()`.
@@ -42,13 +46,18 @@ No mantiene estado persistente. Convierte filas + nombres de columna a JSON
 | `API_URL` | `http://example.com` | Base de la API (en producción: `https://api.raupulus.dev/api/v2`). |
 | `API_TOKEN` | `apitoken` | Token Bearer. |
 | `DEBUG` | `False` | Traza peticiones y respuestas. |
+| `DISPLAY_ID` | (vacío) | Id del dispositivo pantalla en `get_websocket_server_display_info`. |
+| `DISPLAY_API_TOKEN` | (vacío) | Token Bearer propio del display (lectura de ese dispositivo). |
 
 ## Trampas conocidas
 - El parámetro `method` se recibe pero `send` **siempre** hace `POST` (hay un
   `TODO` para comprobar el método). `upload` pasa `method='GET'` por defecto, que
   se ignora.
-- La ruta `/hardware/v1/get/device/16/info` tiene el id de dispositivo **16
-  hardcodeado**.
+- La ruta es `/hardware/devices/{DISPLAY_ID}?include=status` (API v2), con
+  `DISPLAY_ID` y `DISPLAY_API_TOKEN` propios del display (antes era el id **16**
+  hardcodeado con el token de keycounter, que en v2 ya no puede leer otros
+  dispositivos). `ip_local` va anidado en `data.status.ip_local`, no en `data`
+  directamente; el consumidor lo comprueba y no conecta si falta.
 - `parse_to_json` serializa un único registro; `parse_array_to_json` existe pero
   `upload` usa el primero fila a fila.
 - `TODO` pendientes: validar método HTTP, normalizar a array, añadir metadatos.
@@ -58,7 +67,6 @@ Ninguno ⚠️.
 
 ## Pendiente real
 - Implementar la comprobación de método HTTP (`POST|GET|PUT|DELETE`).
-- Parametrizar el id de dispositivo en `get_websocket_server_display_info`.
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-06
+> Creado: 2026-09-06 · Última revisión: 2026-09-07

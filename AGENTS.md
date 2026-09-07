@@ -103,7 +103,6 @@ documentación no se actualiza EN EL MISMO COMMIT que el código.**
 | Requiere root | proceso Python | Captura de teclado + socket en `/var/run/`. |
 | Internos de `keyboard` | `Models/Keylogger.py` | Usa `keyboard._nixkeyboard`/`_KeyboardListener`; frágil ante cambios de la librería, específico de Linux. |
 | `method` ignorado | `Models/ApiConnection.py` | `send` siempre hace `POST`. |
-| id de dispositivo 16 hardcodeado | `Models/ApiConnection.py` | `get_websocket_server_display_info`. |
 | «WebSocket» = TCP plano | `Models/ClientDisplayWebsocket.py` | No es protocolo WebSocket; TCP al puerto 80. |
 | Estado a nivel de clase | modelos y `DbConnection` | Varios atributos/conexiones se definen en la clase, no por instancia. |
 | SQLite como caché | `keycounter.db` | Se vacía tras subir a la API; está en `.gitignore`. |
@@ -162,4 +161,4 @@ python-keycounter/
 > cuando haya contenido real (no se dejan carpetas vacías).
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-06
+> Creado: 2026-09-06 · Última revisión: 2026-09-07
