@@ -1,199 +1,169 @@
 # AGENTS.md — Python KeyCounter
 
-Guía para agentes de IA y personas que trabajen en este repositorio. **Léela
-antes de tocar nada.**
+Instrucciones para cualquier agente (y persona) que trabaje en este repositorio.
+Archivo central de agentes. `CLAUDE.md` es un enlace a este archivo.
+
+- Configuración de agentes centralizada en `.agents/` (el directorio `.claude`
+  es un enlace simbólico a `.agents/`).
+- Documentación técnica viva en `docs/info/` (una fuente de verdad por módulo).
+
+## Idioma
+- Documentación, comentarios y textos de usuario en **español** (con acentos).
+- Identificadores, nombres de fichero y de directorio, y mensajes de log en
+  **inglés**. Excepción: los campos que devuelve una API de terceros se usan tal
+  como los manda.
+
+## Atribución
+- Nick `@raupulus`, email `public@raupulus.dev`.
+- Sin firmas de agente en commits, PRs ni documentación (nada de
+  `Co-Authored-By`, «Generated with…» ni identificadores de sesión).
 
 ---
 
-## 1. ⚠️ Fase actual: análisis y documentación
+# Documentación
 
-**No se modifica código.** El proyecto lleva años en producción funcionando
-correctamente y debe seguir ejecutándose exactamente igual.
+**Documentar es parte de la tarea. Ninguna tarea está terminada si su
+documentación no se actualiza EN EL MISMO COMMIT que el código.**
 
-Reglas vigentes en esta fase:
+## Reglas permanentes
+1. Toda la documentación técnica detallada vive en `docs/info/`, **un `.md` por
+   módulo**, y debe mantenerse actualizada de forma **obligatoria** al editar los
+   módulos.
+2. Jerarquía de verdad sobre el estado actual:
+   **código > `docs/info/` > `AGENTS.md` > el resto**. `docs/planning/`,
+   `docs/future/` y `docs/auditorias/` **NUNCA** son fuente de verdad del estado.
+3. Discrepancia entre documentación y código: se corrige en el commit en que se
+   detecta, no se anota para después.
+4. Tocas un módulo → actualizas su `.md`. Creas uno → lo creas desde
+   `docs/info/_MODULE_TEMPLATE.md` y lo indexas en `docs/info/README.md` y en este
+   archivo. Eliminas uno → borras su `.md` y lo quitas de TODOS los índices.
+5. Todo archivo bajo `docs/`, en cualquier subdirectorio, termina con esta línea
+   exacta, tras un separador `---`:
+   `> Creado: YYYY-MM-DD · Última revisión: YYYY-MM-DD`. La fecha de creación no
+   se toca nunca; la de revisión se actualiza en el mismo commit que el documento.
+6. Toda fase o módulo de una planificación empieza con una descripción y termina
+   con un checklist `- [ ]`. `[x]` significa verificado funcionando y cumpliendo.
+   Escribir el código no marca la casilla.
+7. `docs/planning/` y `docs/auditorias/` son trabajo temporal de UN desarrollador:
+   no compartido, no versionado, no existe en un clon nuevo. Ciclo:
+   crear → trabajar → verificar → promocionar lo duradero → BORRAR. `archived/` es
+   sala de espera hasta confirmar la implementación, no archivo histórico.
+8. Antes de borrar lo efímero, promociona: comportamiento del módulo →
+   `docs/info/<modulo>.md`; decisión deliberada que alguien querrá «arreglar» →
+   `docs/info/decisiones-tecnicas.md`; trampa duradera → tabla de trampas de este
+   archivo; cambio de arquitectura, rutas o comandos → este archivo; idea aplazada
+   → `docs/future/`; regresión → un test, no un documento.
+9. Nada versionado puede enlazar a `docs/planning/` ni a `docs/auditorias/`: sería
+   un enlace roto para quien clone. Y no los saques del `.gitignore` por
+   conveniencia puntual.
+10. **Lectura dirigida:** trabajando en un módulo lees SOLO su `.md`; si tocas una
+    API de terceros añades `docs/apis/<api>/` en este orden: `README.md` →
+    `00-fundamentos.md` + `ERRATAS.md` + `LIMITACIONES.md` → solo el dominio que
+    necesites. No leas el resto de `docs/info/`, ni `docs/future/`, ni `archived/`,
+    ni `src/`. (No hay `DESIGN.md`/`COMPONENTS.md`: el proyecto no tiene frontend.)
+11. Nunca configures nada a partir de la especificación oficial de una API externa
+    sin verificarlo con una petición real. Lo no comprobado se marca como
+    `⚠️ sin verificar`.
 
-| Regla | Detalle |
-|-------|---------|
-| ❌ **No modificar código** | Ni `.py`, ni Swift, ni comportamiento de ejecución |
-| ❌ **No introducir entorno virtual** | Se sigue ejecutando contra el Python del sistema, como hasta ahora |
-| ❌ **No trabajar en la rama principal** para cambios de código | Las modificaciones irán en una rama **`dev`** |
-| ❌ **No desindexar ni reescribir el historial de git** | Se documenta lo que habría que hacer; lo ejecuta el autor |
-| ✅ **Sí documentar** | Estado actual, problemas encontrados y propuestas |
+## Disparadores
+- Modificas un módulo (campos, lógica, rutas, contratos) → su `.md` en
+  `docs/info/`.
+- Cambias un contrato público (socket, JSON, esquema DB, endpoints API) → actualiza
+  el `.md` del módulo y comprueba qué clientes lo consumen antes de romperlo.
+- Integras o tocas la API remota → `docs/info/apis/raupulus-api.md` (sin duplicar
+  el dato oficial, que iría destilado y verificado en `docs/apis/raupulus/`).
+- Añades comando o script → `docs/info/commands.md`.
+- Añades o quitas directorios → el árbol de estructura de este archivo.
+- Planificas → fase en `docs/planning/` con descripción + checklist.
+- Te piden auditoría → informe en `docs/auditorias/`; al cerrar hallazgos,
+  promocionar y borrar.
+- Idea decidida pero aplazada → `docs/future/`, nunca `docs/info/`.
 
-Lo único que se modifica ahora son **documentación y configuración de
-repositorio**: `docs/`, `README.md`, `AGENTS.md` y `.gitignore`.
+## Índice de `docs/info/`
+| Módulo | Fichero real | Doc |
+|--------|--------------|-----|
+| main | `main.py` | `docs/info/main.md` |
+| keylogger | `Models/Keylogger.py` | `docs/info/keylogger.md` |
+| keyboard-logger | `Models/KeyboardLogger.py` | `docs/info/keyboard-logger.md` |
+| mouse-logger | `Models/MouseLogger.py` | `docs/info/mouse-logger.md` |
+| db-connection | `Models/DbConnection.py` | `docs/info/db-connection.md` |
+| api-connection | `Models/ApiConnection.py` | `docs/info/api-connection.md` |
+| socket | `Models/Socket.py` | `docs/info/socket.md` |
+| client-display-websocket | `Models/ClientDisplayWebsocket.py` | `docs/info/client-display-websocket.md` |
+| display | `Models/Display.py` | `docs/info/display.md` |
+| lcd-uart | `Models/LCDUart.py` | `docs/info/lcd-uart.md` |
+| macos-keycounterbar | `macos/KeyCounterBar/` | `docs/info/macos-keycounterbar.md` |
 
-**No improvises implementaciones.** Si algo parece obvio de arreglar, se anota
-en la documentación de problemas; no se arregla.
+Índice maestro navegable: `docs/info/README.md`. Otros: `commands.md`,
+`decisiones-tecnicas.md`, `apis/raupulus-api.md`, `_MODULE_TEMPLATE.md`.
 
-### Secuencia prevista
-
-1. Documentar por completo lo que hay hoy → `docs/info/`
-2. Documentar problemas y potenciales problemas → `docs/info/13`
-3. Planificar ampliaciones → `docs/planning/` (local, fuera de git)
-4. Commit de la documentación en la rama principal
-5. Crear rama **`dev`** y empezar las modificaciones allí
-
----
-
-## 2. Qué es este proyecto
-
-Contador de pulsaciones de teclado (y opcionalmente ratón) para GNU/Linux y
-macOS. Registra **estadísticas agregadas por rachas** —cantidad, velocidad y una
-puntuación—, las cachea en SQLite y opcionalmente las sube a una API. **No
-guarda el contenido tecleado**: solo métricas.
-
-- **Plataformas objetivo:** Debian, Fedora, SteamOS (Steam Machine de Valve),
-  macOS y Raspberry OS.
-- **En producción desde 2020.**
-- **Licencia:** GNU GPL v3.
-- **Requiere root** y **Python 3.12**.
-
-Documentación técnica completa: [`docs/info`](docs/info/00-indice.md).
-
----
-
-## 3. Reglas para cuando se retome el código
-
-Aplicables a partir de la rama `dev`. Todo cambio **debe** cumplirlas.
-
-### 3.1. Tipado estático (obligatorio)
-
-- **Todo el código nuevo va tipado** con *type hints* (PEP 484 / PEP 604).
-- Anota **parámetros y valores de retorno** de toda función y método (usa
-  `-> None` cuando no devuelva nada).
-- Anota atributos relevantes (PEP 526), preferentemente en `__init__`. Usa
-  `X | None` para lo que pueda ser `None`.
-- Sintaxis moderna: `list[str]`, `dict[str, Any]`, `str | None`.
-- Debe pasar un *type checker* (`mypy` o `pyright`) sin errores nuevos.
-- Al **editar** una función existente sin tipar, **añádele los tipos** en el
-  mismo cambio.
-
-### 3.2. Documentación (obligatorio)
-
-- **Docstrings en todo módulo, clase, función y método**, según **PEP 257**.
-- Una línea para lo trivial; multilínea para el resto, describiendo propósito,
-  parámetros, retorno y excepciones.
-- Mantener el estilo ya presente en el repositorio (**español**, con `:param:` /
-  `:return:`) para no mezclar convenciones.
-- Si un cambio afecta al comportamiento de un módulo, **actualiza su documento**
-  en `docs/info/` **en el mismo commit**.
-
-### 3.3. Estilo (PEP 8)
-
-- Sigue **PEP 8**, la guía declarada en las cabeceras del proyecto.
-- Formateo con `black`, imports con `isort`, *linting* con `ruff`/`flake8`.
-- Líneas ≤ 79/88 caracteres. `snake_case` para funciones y variables,
-  `PascalCase` para clases.
-
-### 3.4. Cabecera de autoría
-
-Los archivos nuevos mantienen el estilo de cabecera del proyecto (licencia GPL y
-autoría):
-
-- Autor / nick: **@raupulus**
-- Email público: **public@raupulus.dev**
-- Licencia: **GNU GPL v3**
-
-### 3.5. Ejemplo de referencia
-
-```python
-def get_pulsation_average(self) -> float:
-    """
-    Devuelve la velocidad media de la racha actual en pulsaciones por minuto.
-
-    :return: Pulsaciones por minuto redondeadas a 2 decimales; 0.0 si no
-             hay duración o pulsaciones suficientes.
-    """
-    duration_seconds: int = (
-        self.last_pulsation_at - self.pulsations_current_start_at
-    ).seconds
-
-    if duration_seconds > 0 and self.pulsations_current > 0:
-        return round((self.pulsations_current / duration_seconds) * 60.0, 2)
-
-    return 0.0
-```
+## Tabla de trampas conocidas (transversales)
+| Trampa | Dónde | Detalle |
+|--------|-------|---------|
+| Requiere root | proceso Python | Captura de teclado + socket en `/var/run/`. |
+| Internos de `keyboard` | `Models/Keylogger.py` | Usa `keyboard._nixkeyboard`/`_KeyboardListener`; frágil ante cambios de la librería, específico de Linux. |
+| `method` ignorado | `Models/ApiConnection.py` | `send` siempre hace `POST`. |
+| «WebSocket» = TCP plano | `Models/ClientDisplayWebsocket.py` | No es protocolo WebSocket; TCP al puerto 80. |
+| Estado a nivel de clase | modelos y `DbConnection` | Varios atributos/conexiones se definen en la clase, no por instancia. |
+| SQLite como caché | `keycounter.db` | Se vacía tras subir a la API; está en `.gitignore`. |
+| Rate limit API (60 req/min) | `Models/ApiConnection.py` / `main.py` | La API V2 limita a 60 req/min por token. Subir rachas acumuladas fila a fila puede disparar HTTP 429. |
+| Formato `weekday` en API | `Models/KeyboardLogger.py` / `MouseLogger.py` | Python devuelve 0 para lunes; la API V2 espera 0 para domingo. |
 
 ---
 
-## 4. Estructura del repositorio
+# Estructura del repositorio
 
 ```
-main.py                 # Punto de entrada: arranca captura, socket, API y bucle
-functions.py            # (vacío) reservado para utilidades comunes
-configuration.py        # (vacío) reservado para configuración
-.env / .env.example     # Configuración por variables de entorno
-LICENSE                 # GNU GPL v3
-Models/
-  Keylogger.py          # Orquestador de captura (teclado + ratón)
-  KeyboardLogger.py     # Estadísticas y puntuación del teclado
-  MouseLogger.py        # Estadísticas del ratón
-  DbConnection.py       # Caché local SQLite (SQLAlchemy)
-  ApiConnection.py      # Subida de estadísticas a la API
-  Socket.py             # Servidor socket UNIX
-  Display.py            # Puente de pantalla (formatea datos)
-  LCDUart.py            # Driver de pantalla por UART/serie
-  ClientDisplayWebsocket.py  # Cliente hacia pantalla en red (TCP, no WebSocket)
-Debug/
-  client_socket.py      # Ejemplo de cliente del socket UNIX
-macos/                  # App Swift (KeyCounterBar) para la barra de menús
-docs/
-  images/               # Capturas
-  info/                 # Documentación técnica (empezar por 00-indice.md)
-  planning/             # Planificación local — EXCLUIDA de git
+python-keycounter/
+├── AGENTS.md                     # Este archivo (instrucciones de agentes)
+├── CLAUDE.md                     # Enlace simbólico → AGENTS.md
+├── README.md                     # Documentación de usuario
+├── LICENSE
+├── .env.example                  # Plantilla de configuración
+├── .agents/                      # Config de agentes (real)
+│   ├── settings.local.json
+│   └── hooks/
+├── .claude                       # Enlace simbólico → .agents/
+├── main.py                       # Orquestador / punto de entrada
+├── configuration.py              # Vacío (placeholder sin uso)
+├── functions.py                  # Vacío (placeholder sin uso)
+├── Models/                       # Módulos de dominio (Python)
+│   ├── Keylogger.py
+│   ├── KeyboardLogger.py
+│   ├── MouseLogger.py
+│   ├── DbConnection.py
+│   ├── ApiConnection.py
+│   ├── Socket.py
+│   ├── ClientDisplayWebsocket.py
+│   ├── Display.py
+│   └── LCDUart.py
+├── Debug/
+│   └── client_socket.py          # Cliente de ejemplo del UNIX socket
+├── macos/
+│   ├── KeyCounterBar/            # Fuente Xcode de la app de barra de estado
+│   └── KeyCounterBar.app/        # App compilada
+└── docs/
+    ├── info/                     # Documentación técnica VIVA (versionada)
+    │   ├── README.md             # Índice maestro
+    │   ├── _MODULE_TEMPLATE.md
+    │   ├── commands.md
+    │   ├── decisiones-tecnicas.md
+    │   ├── <modulo>.md           # Uno por módulo
+    │   └── apis/raupulus-api.md  # Cómo integramos la API
+    ├── deploys/                  # Guías de despliegue (versionado)
+    ├── images/                   # Imágenes del README
+    ├── apis/                     # Doc oficial destilada de terceros
+    │   └── raupulus/
+    │       ├── README.md         # Índice de contratos raupulus.dev
+    │       └── keycounter.md     # Contrato oficial API V2 KeyCounter
+    ├── future/                   # Decidido pero aplazado (cuando exista)
+    ├── planning/                 # [NO GIT · efímero por desarrollador]
+    └── auditorias/               # [NO GIT · efímero por desarrollador]
 ```
 
-Consulta [`docs/info/00-indice.md`](docs/info/00-indice.md) antes de modificar
-cualquier módulo.
+> `docs/planning/` y `docs/auditorias/` están en `.gitignore` y sólo existen en la
+> copia local de quien las crea. `docs/apis/<api>/` y `docs/future/` se crean sólo
+> cuando haya contenido real (no se dejan carpetas vacías).
 
 ---
-
-## 5. Configuración y ejecución
-
-- Configuración por **variables de entorno** (`.env`, plantilla en
-  `.env.example`). Ver [`docs/info/12`](docs/info/12-configuracion.md).
-- Se ejecuta **como root** (captura global de entrada, socket en `/var/run`,
-  acceso a `/dev/input`).
-- Se arranca vía **`cron @reboot`**. Ver
-  [`docs/info/16`](docs/info/16-despliegue-como-servicio.md).
-
----
-
-## 6. Convenciones y decisiones vigentes
-
-- **Idioma:** código, comentarios y documentación en **español**.
-- **Privacidad:** nunca registrar ni transmitir el contenido tecleado; solo
-  métricas agregadas. Cualquier dato nuevo enviado a la API debe ser estadístico
-  y no privado.
-- **Secretos:** el `API_TOKEN` vive en `.env`, que **no se versiona**. Nunca
-  incluir credenciales en código ni en documentación.
-- **Zonas horarias:** la captura usa UTC. El código nuevo debe usar *datetime
-  timezone-aware*, evitando `datetime.utcnow()` (obsoleto).
-- **Concurrencia:** el código actual usa `_thread`; para código nuevo se prefiere
-  `threading` (o `asyncio`), con parada limpia.
-- **Logging:** se prefiere `logging` sobre `print` en código nuevo.
-- **Dependencias:** al añadir una, **fíjala con versión** y refléjala en el
-  README. Ojo: el paquete del puerto serie es **`pyserial`**, no `serial`.
-
----
-
-## 7. Antes de dar un cambio por terminado
-
-**En la fase actual:**
-
-- [ ] No se ha modificado ningún archivo de código.
-- [ ] La documentación refleja el estado real, verificado contra el código.
-- [ ] La planificación está en `docs/planning/` y sigue excluida de git.
-- [ ] No se ha ejecutado ningún comando de git que altere el índice.
-
-**Cuando se retome el código (rama `dev`):**
-
-- [ ] Código nuevo/editado **tipado** y con **docstrings** (PEP 257).
-- [ ] Cumple **PEP 8**; linting y *type checker* sin errores nuevos.
-- [ ] Documentación de `docs/info/` actualizada en el mismo commit.
-- [ ] Sin secretos en el código ni en el repositorio.
-- [ ] Respeta la privacidad (no se captura contenido tecleado).
-- [ ] Compatibilidad con las cinco plataformas considerada, o la limitación
-      documentada.
-- [ ] Verificado que **sigue funcionando lo que ya funcionaba**.
+> Creado: 2026-09-06 · Última revisión: 2026-09-07

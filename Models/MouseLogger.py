@@ -67,7 +67,7 @@ class MouseLogger:
     name = 'Mouse'
 
     # Ruta para la API
-    api_path = '/keycounter/v1/mouse/store'
+    api_path = '/keycounter/mouse-sessions'
 
     DEVICE_ID = os.getenv("DEVICE_ID")
 
@@ -137,6 +137,27 @@ class MouseLogger:
         self.current_day_end = current_timestamp.replace(hour=23, minute=59,
                                                          second=59,
                                                          microsecond=999999)
+
+    def apply_initial_summary(self, summary_data):
+        """
+        Aplica las estadísticas acumuladas recibidas de la API para el ratón al iniciar o reintentar.
+        :param summary_data: dict con campos clicks_total, clicks_high, sessions, duration_seconds
+        :return: bool indicando si se aplicó con éxito
+        """
+        if not summary_data or not isinstance(summary_data, dict):
+            return False
+
+        clicks_total = summary_data.get('clicks_total', 0) or 0
+        clicks_high = summary_data.get('clicks_high', 0) or 0
+
+        self.total_clicks += int(clicks_total)
+        self.pulsations_hight = max(self.pulsations_hight, int(clicks_high))
+
+        if self.has_debug:
+            print(f'Estadísticas de ratón sincronizadas desde la API: +{clicks_total} clicks, '
+                  f'total: {self.total_clicks}, récord racha: {self.pulsations_hight}')
+
+        return True
 
     def reset_global_counter(self):
         current_timestamp = datetime.utcnow()

@@ -68,7 +68,7 @@ class KeyboardLogger:
     name = 'Keyboard'
 
     # Ruta para la API
-    api_path = '/keycounter/v1/keyboard/store'
+    api_path = '/keycounter/keyboard-sessions'
 
     DEVICE_ID = os.getenv("DEVICE_ID")
 
@@ -172,6 +172,42 @@ class KeyboardLogger:
                                                            second=0, microsecond=0)
         self.current_day_end = current_timestamp.replace(hour=23, minute=59,
                                                          second=59, microsecond=999999)
+
+    def apply_initial_summary(self, summary_data):
+        """
+        Aplica las estadísticas acumuladas recibidas de la API al iniciar o reintentar.
+        Suma sobre las pulsaciones locales actuales para no perder lo escrito entre arranque y respuesta.
+        :param summary_data: dict con campos pulsations_total, pulsations_total_special_keys, combo_score, pulsation_high
+        :return: bool indicando si se aplicó con éxito
+        """
+        if not summary_data or not isinstance(summary_data, dict):
+            return False
+
+        pulsations_total = summary_data.get('pulsations_total', 0) or 0
+        pulsations_special = summary_data.get('pulsations_total_special_keys', 0) or 0
+        combo_score = summary_data.get('combo_score', 0) or 0
+        pulsation_high = summary_data.get('pulsation_high', 0) or 0
+
+        self.pulsations_total += int(pulsations_total)
+        self.pulsations_total_especial_keys += int(pulsations_special)
+        self.combo_score_high = max(self.combo_score_high, int(combo_score))
+        self.combo_score = max(self.combo_score, int(combo_score))
+        self.pulsation_high = max(self.pulsation_high, int(pulsation_high))
+
+        if self.has_debug:
+            print('Estadísticas de teclado sincronizadas desde la API: ' +
+                  f'+{pulsations_total} pulsaciones, total: {self.pulsations_total}, récord racha: {self.pulsation_high}')
+
+        # Notificar a los clientes conectados para reflejar el nuevo total
+        if self.socket is not None:
+            self.socket.update()
+
+        if (self.SEND_DATA_TO_WEBSOCKET_SERVER and
+            self.client_display_websocket is not None and not
+            self.client_display_websocket.is_busy):
+            start_new_thread(self.client_display_websocket.update, ())
+
+        return True
 
     def reset_global_counter(self):
         """
@@ -292,11 +328,11 @@ class KeyboardLogger:
         Devuelve la media de pulsaciones para la racha actual por segundos.
         """
         timestamp_utc = self.last_pulsation_at
-        duration_seconds = (
+        duration_seconds = (\
             timestamp_utc - self.pulsations_current_start_at).seconds
 
         if duration_seconds > 0 and self.pulsations_current > 0:
-            average_per_minute = (
+            average_per_minute = (\
                 self.pulsations_current / duration_seconds) * 60.0
         else:
             return 0.00
