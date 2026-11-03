@@ -30,7 +30,8 @@ JSON enviado a cada cliente en `update()`:
 2. `startWaitClients()` — acepta clientes mientras haya menos de `max_clients`
    (99).
 3. `update()` — recorre `clients_list`, serializa las estadísticas actuales y hace
-   `sendall`; elimina de la lista los clientes que fallan. Lo invoca
+   `sendall` con timeout de `send_timeout_seconds` (0.5 s) por cliente; elimina
+   y cierra (`remove_client`) los clientes que fallan o no leen. Lo invoca
    `KeyboardLogger.increase_pulsation`.
 
 ## Puntos de entrada
@@ -47,12 +48,14 @@ JSON enviado a cada cliente en `update()`:
 
 ## Configuración
 Sin variables de entorno. Constantes de clase: `server_address`
-(`/var/run/keycounter.socket`), `max_clients` (99).
+(`/var/run/keycounter.socket`), `max_clients` (99), `send_timeout_seconds` (0.5).
 
 ## Trampas conocidas
 - Ruta fija en `/var/run/`, que exige **root**; para cambiarla hay que editar
   `server_address`.
-- `update()` puede modificar `clients_list` mientras la itera al eliminar
+- `update()` se ejecuta en el hilo que procesa las teclas: un cliente que no lee
+  ya no lo bloquea (timeout), pero se desconecta y debe reconectar.
+- `update()` itera sobre una copia de `clients_list` para poder eliminar
   clientes caídos.
 
 ## Tests que lo cubren
@@ -63,4 +66,4 @@ Ninguno ⚠️. Existe un cliente manual de prueba en `Debug/client_socket.py` (
 - Ninguno verificado en el código.
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-07
+> Creado: 2026-09-06 · Última revisión: 2026-11-03

@@ -82,6 +82,10 @@ class Socket:
     # Máximo de clientes conectados.
     max_clients = 99
 
+    # Tiempo máximo (s) para enviar a un cliente. Un cliente que no lee no
+    # puede bloquear el conteo de pulsaciones: se descarta al superarlo.
+    send_timeout_seconds = 0.5
+
     # Indica si está en espera de una conexión.
     wait_client_connection = False
 
@@ -170,6 +174,8 @@ class Socket:
             # Espera a que se conecte un cliente, se pausa la ejecución hasta recibir un cliente.
             connection, client_address = self.sock.accept()
 
+            connection.settimeout(self.send_timeout_seconds)
+
             self.clients_list.append({
                 'connection': connection,
                 'client_address': client_address
@@ -192,7 +198,8 @@ class Socket:
         if self.has_debug:
             print('Entra en actualizar Socket, lista de clientes', self.clients_list)
 
-        for client in self.clients_list:
+        # Se itera sobre una copia porque se eliminan clientes caídos.
+        for client in list(self.clients_list):
 
             connection = client.get('connection')
             client_address = client.get('client_address')
@@ -231,10 +238,28 @@ class Socket:
                         print('ERROR, SE ELIMINA CLIENTE DE LA LISTA')
                         print('Error en la conexión, excepción: ' + str(e))
 
-                    self.clients_list.remove(client)
+                    self.remove_client(client)
             else:
-                self.clients_list.remove(client)
+                self.remove_client(client)
 
                 if self.has_debug:
                     print('CLIENTE NO VÁLIDO, SE ELIMINA DE LA LISTA')
                     print('Eliminando cliente de la lista', self.clients_list)
+
+    def remove_client(self, client):
+        """
+        Quita un cliente de la lista y cierra su conexión.
+        :param client: Diccionario del cliente en clients_list.
+        """
+        try:
+            self.clients_list.remove(client)
+        except ValueError:
+            pass
+
+        connection = client.get('connection')
+
+        if connection is not None:
+            try:
+                connection.close()
+            except Exception:
+                pass

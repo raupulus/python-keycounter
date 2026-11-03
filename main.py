@@ -56,6 +56,9 @@ import time
 from _thread import start_new_thread
 from dotenv import load_dotenv
 import os
+import signal
+import sys
+import threading
 
 # Importo modelos
 from Models.DbConnection import DbConnection
@@ -93,6 +96,51 @@ SEND_DATA_TO_WEBSOCKET_SERVER = os.getenv("SEND_DATA_TO_WEBSOCKET_SERVER") == "T
 SYNC_RETRY_INTERVAL_SECONDS = 3600  # 1 hora tras fallo
 is_synced = False
 last_sync_attempt = 0
+
+# Keylogger activo, para poder liberar la captura de teclado al terminar.
+active_keylogger = None
+
+# Segundos máximos para el cierre ordenado antes de forzar la salida.
+SHUTDOWN_TIMEOUT_SECONDS = 5
+
+
+def shutdown(signum=None, frame=None):
+    """
+    Cierre controlado ante SIGINT (Ctrl+C), SIGTERM o SIGHUP.
+
+    Primero se libera la captura de teclado (en macOS se desactiva e invalida
+    el event tap) y después se termina el proceso con os._exit, sin pasar por
+    el apagado del intérprete con hilos daemon vivos. Una segunda señal o
+    superar SHUTDOWN_TIMEOUT_SECONDS fuerza la salida inmediata.
+    """
+    if getattr(shutdown, 'in_progress', False):
+        os._exit(1)
+
+    shutdown.in_progress = True
+
+    # Red de seguridad: si algo se bloquea durante el cierre, salir igualmente.
+    timer = threading.Timer(SHUTDOWN_TIMEOUT_SECONDS, os._exit, (1,))
+    timer.daemon = True
+    timer.start()
+
+    try:
+        print('Stopping keycounter (signal {})...'.format(signum),
+              file=sys.stderr)
+
+        if active_keylogger is not None:
+            active_keylogger.stop()
+    except Exception as e:
+        print('Error while stopping keycounter:', e, file=sys.stderr)
+    finally:
+        os._exit(0)
+
+
+def register_signal_handlers():
+    """
+    Registra el cierre controlado para las señales de terminación habituales.
+    """
+    for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+        signal.signal(sig, shutdown)
 
 
 def try_sync_initial_stats(keylogger, apiconnection):
@@ -337,6 +385,11 @@ def loop(keylogger, socket, apiconnection=None, display=None, system_info=None):
 
 
 def main():
+    global active_keylogger
+
+    # Antes de crear ningún hilo ni capturar teclado.
+    register_signal_handlers()
+
     display = Display(port=SERIAL_PORT,
                       baudrate=SERIAL_BAUDRATE,
                       orientation=DISPLAY_ORIENTATION,
@@ -346,6 +399,8 @@ def main():
     keylogger = Keylogger(display=display,
                           has_debug=DEBUG,
                           mouse_enabled=MOUSE_ENABLED)
+
+    active_keylogger = keylogger
 
     # Instancio conexión con la API
     apiconnection = ApiConnection()

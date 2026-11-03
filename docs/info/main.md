@@ -21,6 +21,11 @@ No define modelo propio. Opera sobre los `spurts` (rachas) de los modelos de
 teclado y ratón y sobre las tablas de [db-connection](db-connection.md).
 
 ## Flujos principales
+0. `shutdown(signum, frame)` — registrado por `register_signal_handlers()` al
+   inicio de `main()` para `SIGINT` (Ctrl+C), `SIGTERM` y `SIGHUP`. Llama a
+   `active_keylogger.stop()` (libera el event tap en macOS) y termina con
+   `os._exit(0)`. Una segunda señal o superar `SHUTDOWN_TIMEOUT_SECONDS` (5 s)
+   fuerza `os._exit(1)`.
 1. `main()`
    - Crea `Display` sólo si `SERIAL_DISPLAY_ENABLED`.
    - Instancia `Keylogger` (arranca hilos de captura para teclado y ratón).
@@ -80,13 +85,16 @@ teclado y ratón y sobre las tablas de [db-connection](db-connection.md).
 | `SERIAL_BAUDRATE` | `9600` | Baudios de la pantalla. |
 | `SERIAL_DISPLAY_ENABLED` | `False` | Activa la pantalla LCD serie. |
 | `DISPLAY_ORIENTATION` | `horizontal` | Orientación de la pantalla. |
-| `MOUSE_ENABLED` | `False` (acepta `True`/`true`) | Registra también el ratón. |
+| `MOUSE_ENABLED` | `False` (acepta `True`/`true`) | Registra también el ratón (Linux: librería `mouse`; macOS: tap nativo). |
 | `DEBUG` | `False` | Traza por consola. |
 | `UPLOAD_API` | `False` | Habilita la subida a la API. |
 | `SEND_DATA_TO_WEBSOCKET_SERVER` | `False` | Activa el cliente de pantalla en red. |
 | `SYNC_RETRY_INTERVAL_SECONDS` | `3600` | Intervalo mínimo (1 h) entre reintentos de sincronización si falla. |
 
 ## Trampas conocidas
+- El cierre usa `os._exit` a propósito: no se ejecutan `atexit` ni `finally` de
+  otros hilos. Lo pendiente en memoria (rachas sin volcar) se pierde, igual que
+  antes con Ctrl+C.
 - La sincronización inicial es **única**: una vez obtenida (`is_synced = True`),
   nunca se vuelve a pedir información a la API.
 - El servidor hace el corte por `created_at` en UTC; las pulsaciones y clicks
@@ -106,4 +114,4 @@ Ninguno ⚠️.
 - Decidir si se implementa o se elimina el bloque `reboot` comentado.
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-07
+> Creado: 2026-09-06 · Última revisión: 2026-11-03

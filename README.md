@@ -49,9 +49,8 @@ exige en Linux y el socket UNIX se crea en `/var/run`.
 Probado en Debian, Fedora, SteamOS, macOS y Raspberry OS. La captura de teclado
 funciona en todas ellas.
 
-⚠️ **En macOS no funciona la detección de clicks de ratón** (limitación de la
-librería `mouse` y de los permisos del sistema). La captura de teclado sí
-funciona con normalidad. Detalle en la
+En macOS la captura de teclado y de clics de ratón (`MOUSE_ENABLED=True`) es
+nativa, sin las librerías `keyboard` ni `mouse`. Detalle en la
 [matriz de compatibilidad](docs/info/matriz-compatibilidad.md).
 
 ### Visualización de datos en pantalla serial UART
@@ -114,8 +113,14 @@ Para la base de datos se utiliza el ORM **SQLAlchemy**
 Para macos tenemos que instalar unos paquetes
 
 ```
-sudo python3.12 -m pip install pyserial mouse keyboard sqlalchemy python-dotenv requests --break-system-packages
+sudo python3.12 -m pip install pyserial sqlalchemy python-dotenv requests pyobjc-framework-Quartz --break-system-packages
 ```
+
+> En macOS la captura de teclado es nativa (event tap pasivo con `pyobjc`), ya no
+> se usan las librerías `keyboard` ni `mouse`. Hay que conceder **Monitorización
+> de entrada** al terminal desde el que se lanza (Ajustes del Sistema →
+> Privacidad y seguridad). Para pararlo usa Ctrl+C o `kill`: el cierre libera
+> la captura antes de salir.
 
 > **Atención:** el paquete correcto es **`pyserial`**, no `serial`. En PyPI
 > existe otro paquete llamado `serial` que es una librería distinta y no provee

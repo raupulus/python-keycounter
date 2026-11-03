@@ -15,6 +15,7 @@ Antes de tocar un módulo, lee **sólo** su `.md` (lectura dirigida, ver
 |--------|---------|-------------|
 | [main](main.md) | `main.py` | Orquestador: arranca componentes y ejecuta el bucle de guardado/subida. |
 | [keylogger](keylogger.md) | `Models/Keylogger.py` | Captura de teclado y ratón mediante hooks en hilos. |
+| [mac-keyboard-tap](mac-keyboard-tap.md) | `Models/MacKeyboardTap.py` | Captura de teclado nativa en macOS con event tap pasivo (listen-only). |
 | [keyboard-logger](keyboard-logger.md) | `Models/KeyboardLogger.py` | Modelo de datos y estadísticas del teclado (rachas, combos). |
 | [mouse-logger](mouse-logger.md) | `Models/MouseLogger.py` | Modelo de datos y estadísticas del ratón (clicks, rachas). |
 | [system-info](system-info.md) | `Models/SystemInfo.py` | Telemetría nativa de hardware (RAM, CPU, disco, uptime, etc.) para Linux y macOS. |
@@ -50,4 +51,4 @@ Antes de tocar un módulo, lee **sólo** su `.md` (lectura dirigida, ver
 > sistema de estilos. Se crearán si algún día se añade una interfaz gráfica.
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-07
+> Creado: 2026-09-06 · Última revisión: 2026-11-03

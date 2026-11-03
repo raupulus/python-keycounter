@@ -17,12 +17,21 @@ from datetime import datetime
 from _thread import start_new_thread
 from time import sleep
 import subprocess
-import keyboard
+import sys
 from Models.KeyboardLogger import KeyboardLogger
 from Models.MouseLogger import MouseLogger
 import os
 
-if os.getenv('MOUSE_ENABLED') == 'True':
+IS_MACOS = sys.platform == 'darwin'
+
+if IS_MACOS:
+    # En macOS NO se usa la librería `keyboard`: su event tap es un filtro
+    # síncrono que puede bloquear WindowServer y cerrar la sesión del usuario.
+    from Models.MacKeyboardTap import MacKeyboardTap
+else:
+    import keyboard
+
+if os.getenv('MOUSE_ENABLED') == 'True' and not IS_MACOS:
     import mouse
 
 
@@ -53,6 +62,9 @@ class Keylogger:
     # tiene que disponer del método update_keycounter(data) que procese los
     # datos devueltos por el método statistics() de esta clase.
     display = None
+
+    # Captura nativa de teclado en macOS (MacKeyboardTap), None en Linux.
+    keyboard_tap = None
 
     # Traducción de carácteres para hacerlos imprimibles en texto plano.
     KEYS_MAP = {
@@ -129,14 +141,37 @@ class Keylogger:
         # Establezco contadores para sesión completa por día
         # self.model_keyboard.reset_global_counter()
 
-        # Almaceno los dispositivos de entrada conectados
-        self.devices = self.read_devices_by_id()
+        if IS_MACOS:
+            # Captura pasiva nativa; no necesita sondeo de dispositivos porque
+            # el tap de sesión recibe eventos de cualquier teclado/ratón
+            # conectado. Los clics se escuchan en el mismo tap (sin `mouse`).
+            self.keyboard_tap = MacKeyboardTap(
+                self.callback_keyboard,
+                has_debug=self.has_debug,
+                mouse_callback=self.callback_mouse if mouse_enabled else None
+            )
 
-        # Comienza la escucha de teclas pulsadas
-        start_new_thread(self.start_read_keyloggers_callback, ())
+            if not self.keyboard_tap.start():
+                print('[Keylogger] ERROR: keyboard capture not available',
+                      file=sys.stderr)
+        else:
+            # Almaceno los dispositivos de entrada conectados
+            self.devices = self.read_devices_by_id()
 
-        # Inicio hilo para comprobar cambios en dispositivos conectados/desconectados
-        start_new_thread(self.reload_keycounter_on_new_device, ())
+            # Comienza la escucha de teclas pulsadas
+            start_new_thread(self.start_read_keyloggers_callback, ())
+
+            # Inicio hilo para comprobar cambios en dispositivos conectados/desconectados
+            start_new_thread(self.reload_keycounter_on_new_device, ())
+
+    def stop (self):
+        """
+        Detiene la captura de teclado liberando los recursos del sistema
+        (en macOS desactiva e invalida el event tap). Debe llamarse antes de
+        terminar el proceso.
+        """
+        if self.keyboard_tap is not None:
+            self.keyboard_tap.stop()
 
     def read_devices_by_id (self):
         """
@@ -162,7 +197,7 @@ class Keylogger:
 
     def start_read_keyloggers_callback (self):
         """
-        Inicia el callback para contar las teclas pulsadas
+        Inicia el callback para contar las teclas pulsadas (sólo Linux).
         """
         keyboard.hook(self.callback_keyboard)
 
@@ -174,7 +209,7 @@ class Keylogger:
     def reload_keycounter_on_new_device (self):
         """
         Cuando se detecta un nuevo dispositivo conectado al sistema se recargará
-        el keycounter para añadirlo a la lista de soportados.
+        el keycounter para añadirlo a la lista de soportados (sólo Linux).
         """
         while True:
             sleep(0.2)
@@ -311,8 +346,10 @@ class Keylogger:
             if self.has_debug:
                 self.model_keyboard.debug(keypress=str(key))
 
-            # Muestra datos actuales por la pantalla si esta existiera.
-            start_new_thread(self.send_to_display, ())
+            # Muestra datos actuales por la pantalla si esta existiera
+            # (sin pantalla no se crea ningún hilo por cada tecla).
+            if self.display is not None:
+                start_new_thread(self.send_to_display, ())
 
     def send_to_display (self):
         """

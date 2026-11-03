@@ -44,9 +44,10 @@ propio proyecto.
 
 ### Captura de ratón
 
-Depende de la librería `mouse` (última versión **0.7.1**), que declara soporte
-oficial para **Windows y Linux**. En **macOS** es donde se produce el fallo
-conocido de este proyecto:
+En **Linux** depende de la librería `mouse` (última versión **0.7.1**). En
+**macOS** ya no se usa `mouse`: los clics se capturan con el event tap pasivo
+nativo de [mac-keyboard-tap](mac-keyboard-tap.md) (⚠️ sin verificar en uso real).
+Histórico de por qué `mouse` no servía en macOS:
 
 - Requiere permisos de **Accesibilidad / Monitorización de entrada** en
   Ajustes del Sistema → Privacidad y seguridad.
@@ -133,4 +134,4 @@ lectura) y de macOS (permisos TCC). Estado actual y limitaciones en
   fork con correcciones para Mac Silicon (alternativa a evaluar).
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-07
+> Creado: 2026-09-06 · Última revisión: 2026-11-03

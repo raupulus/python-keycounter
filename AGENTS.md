@@ -84,6 +84,7 @@ documentación no se actualiza EN EL MISMO COMMIT que el código.**
 |--------|--------------|-----|
 | main | `main.py` | `docs/info/main.md` |
 | keylogger | `Models/Keylogger.py` | `docs/info/keylogger.md` |
+| mac-keyboard-tap | `Models/MacKeyboardTap.py` | `docs/info/mac-keyboard-tap.md` |
 | keyboard-logger | `Models/KeyboardLogger.py` | `docs/info/keyboard-logger.md` |
 | mouse-logger | `Models/MouseLogger.py` | `docs/info/mouse-logger.md` |
 | system-info | `Models/SystemInfo.py` | `docs/info/system-info.md` |
@@ -102,6 +103,7 @@ documentación no se actualiza EN EL MISMO COMMIT que el código.**
 |--------|-------|---------|
 | Requiere root | proceso Python | Captura de teclado + socket en `/var/run/`. |
 | Internos de `keyboard` | `Models/Keylogger.py` | Usa `keyboard._nixkeyboard`/`_KeyboardListener`; frágil ante cambios de la librería, específico de Linux. |
+| Tap síncrono cuelga WindowServer | `Models/MacKeyboardTap.py` | En macOS el tap DEBE ser `kCGEventTapOptionListenOnly` y su callback sólo encolar. La librería `keyboard` (filtro síncrono) cerró la sesión del usuario. Ver D7. |
 | `method` ignorado | `Models/ApiConnection.py` | `send` siempre hace `POST`. |
 | «WebSocket» = TCP plano | `Models/ClientDisplayWebsocket.py` | No es protocolo WebSocket; TCP al puerto 80. |
 | Estado a nivel de clase | modelos y `DbConnection` | Varios atributos/conexiones se definen en la clase, no por instancia. |
@@ -129,6 +131,7 @@ python-keycounter/
 ├── functions.py                  # Vacío (placeholder sin uso)
 ├── Models/                       # Módulos de dominio (Python)
 │   ├── Keylogger.py
+│   ├── MacKeyboardTap.py         # Captura de teclado nativa macOS (tap pasivo)
 │   ├── KeyboardLogger.py
 │   ├── MouseLogger.py
 │   ├── DbConnection.py
@@ -166,4 +169,4 @@ python-keycounter/
 > cuando haya contenido real (no se dejan carpetas vacías).
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-07
+> Creado: 2026-09-06 · Última revisión: 2026-11-03

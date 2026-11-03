@@ -129,6 +129,10 @@ la pantalla en red no son coherentes con los almacenados.
 
 ### C.1. 🟠 Clicks de ratón en macOS
 
+> **En curso:** los clics se capturan ya con el tap nativo de
+> [mac-keyboard-tap](mac-keyboard-tap.md) sin la librería `mouse`; pendiente de
+> verificar en uso real. Texto original:
+
 La librería `mouse` declara soporte oficial solo para **Windows y Linux**, exige
 permisos de Accesibilidad en macOS y tiene incidencias abiertas con `on_click()`.
 El fallo está en la librería y los permisos, **no en la lógica de KeyCounter**.
@@ -234,4 +238,4 @@ Ninguno de estos puntos impide que el proyecto funcione hoy: lleva años en
 producción. Son riesgos de mantenimiento y de evolución, no fallos operativos.
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-07
+> Creado: 2026-09-06 · Última revisión: 2026-11-03
