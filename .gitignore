@@ -135,6 +135,8 @@ dmypy.json
 
 # IDEs
 /.idea
+# Skills que inyecta el IDE en la raíz; no pertenecen al proyecto.
+/skills/
 
 # Socket
 uds_socket

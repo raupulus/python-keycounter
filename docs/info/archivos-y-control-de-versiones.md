@@ -44,6 +44,7 @@ a Aplicaciones sin necesidad de compilar. No es un descuido.
 | `keycounter.sqbpro` | Proyecto de DB Browser for SQLite |
 | `__pycache__/`, `*.pyc` | Caché de bytecode |
 | `.idea/` | Configuración de JetBrains, incluidos orígenes de datos |
+| `/skills/` | Lo crea el IDE en la raíz; nunca forma parte del proyecto |
 | `docs/planning/` | Planificación local de trabajo |
 
 ---
@@ -57,6 +58,7 @@ Comprobado sobre el índice de git:
 | `.env` | ❌ No | ✅ Correcto — sin fuga del token |
 | `.env.example` | ✅ Sí | ✅ Correcto |
 | `.idea/` | ❌ No | ✅ Correcto |
+| `/skills/` (raíz) | ❌ No | ✅ Correcto — lo genera el IDE |
 | `__pycache__/`, `*.pyc` | ❌ No | ✅ Correcto |
 | `keycounter.db`, `keycounter.sqbpro` | ❌ No | ✅ Correcto |
 | **`xcuserdata/` (Xcode)** | **✅ Sí** | ❌ **No debería** |
@@ -104,7 +106,7 @@ Organizadas por bloques:
 | Entornos | `.env`, `.env.*` (con excepción de `.env.example`), `.venv`, `venv/` |
 | Base de datos | `keycounter.db`, `keycounter.sqbpro` |
 | Socket | `uds_socket`, `keycounter.socket` |
-| IDE | `/.idea`, `.vscode/`, `*.iml` |
+| IDE | `/.idea`, `/skills/`, `.vscode/`, `*.iml` |
 | Xcode / macOS | `xcuserdata/`, `*.xcuserstate`, `.DS_Store` |
 | Documentación local | `docs/planning/` |
 
@@ -148,4 +150,4 @@ y solo con documentación. Según lo previsto:
 - **Las modificaciones de código irán en una rama `dev`**, no en la principal.
 
 ---
-> Creado: 2026-09-06 · Última revisión: 2026-09-07
+> Creado: 2026-09-06 · Última revisión: 2026-11-03
